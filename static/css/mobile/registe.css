@@ -1,0 +1,103 @@
+.am-list {
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+    padding: 6px 0;
+}
+
+.am-flexbox {
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+    text-align: left;
+    display: -webkit-box!important;
+    display: box!important;
+    -webkit-box-orient: horizontal;
+    -webkit-box-pack: center;
+    -webkit-box-align: center;
+}
+
+.am-flexbox .am-flexbox-item {
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+    -webkit-box-flex: 1;
+    box-flex: 1;
+    margin-left: 8px;
+    min-width: 20px;
+}
+
+.am-list .am-list-item:last-child {
+    border-bottom-right-radius: 6px;
+    border-bottom-left-radius: 6px;
+    background-clip: padding-box;
+    border-bottom-width: 1px;
+}
+.am-list .am-list-item:first-child {
+    border-top-left-radius: 6px;
+    border-top-right-radius: 6px;
+    background-clip: padding-box;
+}
+.am-list div.am-list-item-form {
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+    padding: 0 10px;
+}
+
+.am-list .am-list-item {
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+    display: block;
+    position: relative;
+    z-index: 10;
+    margin: 0;
+    padding: 10px 30px 10px 10px;
+    width: 100%;
+    border: 1px solid #bfbfbf;
+    border-bottom-width: 0;
+    background-color: #fff;
+    color: #000;
+    text-align: left;
+    vertical-align: middle;
+}
+
+.am-list .am-list-item:after {
+    visibility: hidden;
+    display: block;
+    font-size: 0;
+    content: " ";
+    clear: both;
+    height: 0;
+}
+
+.am-list div.am-list-item-form input[type=text], .am-list div.am-list-item-form input[type=email], .am-list div.am-list-item-form input[type=number], .am-list div.am-list-item-form input[type=tel], .am-list div.am-list-item-form input[type=password], .am-list div.am-list-item-form input[type=url], .am-list div.am-list-item-form input[type=search] {
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+    -webkit-appearance: none;
+    padding: 8px 0;
+    width: 100%;
+    height: 45px;
+    border: 0;
+}
+
+.am-list .am-list-item-icon:last-child {
+    margin-left: 8px;
+}
+.am-list .am-list-item .am-list-item-icon {
+    display: inline-block;
+    white-space: nowrap;
+}
+.am-ft-lightgray {
+    color: #ccc!important;
+}
+.am-ft-xxl {
+    font-size: 20px!important;
+}
+
+.am-flexbox {
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+    text-align: left;
+    display: -webkit-box!important;
+    display: box!important;
+    -webkit-box-orient: horizontal;
+    -webkit-box-pack: center;
+    -webkit-box-align: center;
+}

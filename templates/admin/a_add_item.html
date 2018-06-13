@@ -1,0 +1,122 @@
+{% extends '../admin/a_layout.html' %}
+{% block css %}
+    
+{% end %}
+{% block title %}
+<a type="button" class="btn btn-default back_btn" onclick="history.back()" >🔙 后退</a>             
+{% end %}
+{% block content %}
+<div class="box box-primary" style="padding: 15px">
+    <div class="box-header">
+        <h3 class="box-title">添加商品</h3>
+    </div><!-- /.box-header -->
+    <!-- form start -->
+    <form role="form" method="POST" action="" enctype="multipart/form-data">
+        {% module xsrf_form_html() %}
+        <div class="box-body">
+        <div class="form-group">
+            <label for="recipient-name" class="control-label">商品名称:</label>
+            <input type="text" class="form-control" name="f_item_name" value="{{ form_data['item_name'] if form_data and form_data.get('item_name') else '' }}">
+            {% if form_errors and form_errors.get('item_name') %} <span style="color: red">{{ form_errors['item_name'] }}</span> {% end %}
+        </div>
+        <div class="form-group">
+            <label for="recipient-name" class="control-label">商品信息:</label>
+            <input type="text" class="form-control" name="f_item_info" value="{{ form_data['item_info'] if form_data and form_data.get('item_info') else '' }}">
+        </div>
+        <div class="form-group">
+            <label for="recipient-name" class="control-label">商品编码:</label>
+            <input type="text" class="form-control" name="f_item_code" value="{{ form_data['item_code'] if form_data and form_data.get('item_code') else '' }}">
+        </div>
+        <div class="form-group">
+            <label for="recipient-name" class="control-label">商品条码:</label>
+            <input type="text" class="form-control" name="f_item_barcode" value="{{ form_data['item_barcode'] if form_data and form_data.get('item_barcode') else '' }}">
+        </div>
+        <div class="form-group">
+            <label for="recipient-name" class="control-label">原价:</label>
+            <input type="number" onkeyup="value=value.replace(/[^\d]/g,'')" class="form-control" name="f_price" value="{{ form_data['price'] if form_data and form_data.get('price') else '' }}">
+        </div>
+        <div class="form-group">
+            <label for="recipient-name" class="control-label">现价:</label>
+            <input type="number" onkeyup="value=value  .replace(/[^\d]/g,'')" class="form-control" name="f_current_price" value="{{ form_data['current_price'] if form_data and form_data.get('current_price') else '' }}">
+        </div>
+        <div class="form-group">
+            <label for="recipient-name" class="control-label">国外价格:</label>
+            <input type="number" onkeyup="value=value.replace(/[^\d]/g,'')" class="form-control" name="f_foreign_price" value="{{ form_data['foreign_price'] if form_data and form_data.get('foreign_price') else '' }}">
+        </div>
+        <div class="form-group">
+            <label for="recipient-name" class="control-label">关键字:</label>
+            <input type="text" class="form-control" name="f_key_word" value="{{ form_data['key_word'] if form_data and form_data.get('key_word') else '' }}">
+        </div>
+        <div class="form-group">
+            <label for="recipient-name" class="control-label">产地:</label>
+            <input type="text" class="form-control" name="f_origin" value="{{ form_data['origin'] if form_data and form_data.get('origin') else '' }}">
+        </div>
+        <div class="form-group">
+            <label for="recipient-name" class="control-label">保质期:</label>
+            <input type="text" class="form-control" name="f_shelf_life" value="{{ form_data['shelf_life'] if form_data and form_data.get('shelf_life') else '' }}">
+        </div>
+        <div class="form-group">
+            <label for="recipient-name" class="control-label">容量:</label>
+            <input type="text" class="form-control" name="f_capacity" value="{{ form_data['capacity'] if form_data and form_data.get('capacity') else '' }}">
+        </div>
+        <div class="form-group">
+            <label for="recipient-name" class="control-label">规格类型:</label>
+            <select name="f_specifications_type_id" class="form-control">
+                <option value="" selected>选择规格</option>
+                {% for i in specifications_type_dict %}
+                    {% if form_data and form_data.get('specifications_type_id') is not None and i == form_data['specifications_type_id'] %}
+                        <option value="{{i}}" selected>{{specifications_type_dict[i]}}</option>
+                    {% else %}
+                        <option value="{{i}}">{{specifications_type_dict[i]}}</option>
+                    {% end %}
+                {% end %}
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="recipient-name" class="control-label">选择品牌:</label>
+            <select name="f_brand_id" class="form-control">
+                <option value="" selected>--选择--</option>
+                {% for i in brands_list %}
+                    {% if form_data and form_data.get('brand_id') is not None and i == form_data['brand_id'] %}
+                        <option value="{{ i }}" selected>{{ brands_list[i] }}</option>
+                    {% else %}
+                        <option value="{{ i }}">{{ brands_list[i] }}</option>
+                    {% end %}
+                {% end %}
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="recipient-name" class="control-label">选择分类:</label>
+            <select name="f_categories_id" class="form-control">
+                <option value="" selected>--选择--</option>
+                {% for i in categories_list %}
+                    {% if form_data and form_data.get('categories_id') is not None and i == form_data['categories_id'] %}
+                        <option value="{{ i }}" selected>{{ categories_list[i] }}</option>
+                    {% else %}
+                        <option value="{{ i }}">{{ categories_list[i] }}</option>
+                    {% end %}
+                {% end %}
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="recipient-name" class="control-label">适用人群:</label>
+            <input type="text" class="form-control" name="f_for_people" value="{{ form_data['for_people'] if form_data and form_data.get('for_people') else '' }}"> 
+        </div>
+        <div class="form-group">
+            <label for="recipient-name" class="control-label">重量:</label>
+            <input type="text" class="form-control" name="f_weight" value="{{ form_data['weight'] if form_data and form_data.get('weight') else '' }}">
+        </div>
+        </div><!-- /.box-body -->
+
+        <div class="box-footer">
+        <button type="submit" class="btn btn-primary">Submit</button>
+        </div>
+    </form>
+</div>
+
+
+
+{% end %}
+{% block js %}
+    
+{% end %}
