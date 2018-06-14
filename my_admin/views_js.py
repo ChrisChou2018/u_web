@@ -42,7 +42,7 @@ class UserCreationForm(forms.ModelForm):
         if commit:
             user.save()
         return user
-
+        
 
 def create_member(request):
     return_value = {
@@ -138,9 +138,9 @@ def item_image_create(request):
             return_value['result'] = 'success'
             return JsonResponse(return_value)
 
-
 def delete_item_images(request):
     image_id_list = request.POST.getlist('image_id_list[]')
     item_models.ItemImages. \
         update_images_by_image_id_list(image_id_list, {'status': 'deleted'})
     return JsonResponse({'status': 'success'})
+
