@@ -20,6 +20,7 @@ urlpatterns += [
     path('js/create_member/', views_js.create_member),
     path('js/delete_member/', views_js.delete_member),
     path('js/edit_member/', views_js.editor_member),
+    path('js/delete_items/', views_js.delete_items),
     path('js/item_image_create/', views_js.item_image_create),
     path('js/delete_item_images/', views_js.delete_item_images),
 ]

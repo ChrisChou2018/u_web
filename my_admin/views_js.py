@@ -42,7 +42,7 @@ class UserCreationForm(forms.ModelForm):
         if commit:
             user.save()
         return user
-        
+
 
 def create_member(request):
     return_value = {
@@ -99,6 +99,11 @@ def editor_member(request):
         member_models.Member.update_member_by_id(member_id, clear_data)
         return_value['status'] = 'success'
         return JsonResponse(return_value)
+
+def delete_items(request):
+    item_id_list = request.POST.getlist('item_id_list[]')
+    item_models.Items.delete_item_by_item_ids(item_id_list)
+    return JsonResponse({'status': 'success'})
 
 def item_image_create(request):
     return_value = {

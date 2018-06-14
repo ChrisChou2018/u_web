@@ -105,6 +105,10 @@ class Items(models.Model):
         except cls.DoesNotExist:
             return None
     
+    @classmethod
+    def delete_item_by_item_ids(cls, id_list):
+        cls.objects.filter(pk__in=id_list).update(status='deleted')
+    
     class Meta:
         db_table = "app_items"
     
