@@ -1,5 +1,5 @@
 from django.db import models
-
+from django.core.paginator import Paginator
 # Create your models here.
 
 
@@ -18,6 +18,12 @@ class Brands(models.Model):
     brand_image                 = models.CharField(db_column="brand_image", null=True, verbose_name="品牌图片路径", max_length=255)
 
 
+    @classmethod
+    def get_brands_dict_for_all(cls):
+        all_data = cls.objects.all().values('brand_id','cn_name')
+        return all_data
+
+
     class Meta:
         db_table = "app_brands"
 
@@ -27,7 +33,7 @@ class Items(models.Model):
     商品表
     '''
     item_id                     = models.AutoField(db_column="item_id", primary_key=True, verbose_name='商品ID')
-    item_name                   = models.CharField(db_column="item_name", verbose_name='商品名称', max_length=255)
+    item_name                   = models.CharField(db_column="item_name", verbose_name='商品名称', max_length=255, error_messages={'required': '新密码不能为空'})
     item_info                   = models.CharField(db_column="item_info", null=True, verbose_name='商品信息', max_length=255)
     item_code                   = models.CharField(db_column="item_code", null=True, verbose_name="商品编码", max_length=255)
     item_barcode                = models.CharField(db_column="item_barcode", null=True, verbose_name="商品条码", max_length=255)
@@ -62,9 +68,39 @@ class Items(models.Model):
     update_time                 = models.IntegerField(db_column="update_time", verbose_name="更新时间")
     status                      = models.CharField(db_column="status", verbose_name="状态", default="normal", max_length=255)
     
+
+    @classmethod
+    def create_item(cls, datas):
+        cls.objects.create(**datas)
+
+    @classmethod
+    def get_list_items(cls, current_page, search_value=None):
+        if search_value:
+            item_obj = cls.objects.filter(
+                **search_value, status = 'normal'
+            ).order_by("-item_id")
+        else:
+            item_obj = cls.objects.filter(status='normal'). \
+                order_by('-item_id')
+            
+        p = Paginator(item_obj, 15)
+        return p.page(current_page).object_list.values() 
+    
+    @classmethod
+    def get_items_count(cls, search_value=None):
+        if search_value:
+            item_obj_count = cls.objects.filter(
+                **search_value, status='normal'
+            ).count()
+        else:
+            item_obj_count = cls.objects.filter(status='normal').count()
+        return item_obj_count
+
     
     class Meta:
         db_table = "app_items"
+    
+
 
 
 class ItemImages(models.Model):
@@ -85,7 +121,20 @@ class ItemImages(models.Model):
     resolution      = models.CharField(db_column="resolution", verbose_name="分辨率", max_length=255)
     file_type       = models.CharField(db_column="file_type", verbose_name="文件类型", max_length=255)
     status          = models.CharField(db_column="status", verbose_name="状态", max_length=255)
-    
+
+
+    @classmethod
+    def get_thumbicon_by_item_id(cls, item_id):
+        try:
+            image_obj = cls.objects.get(
+                item_id = item_id,
+                status = "normal",
+                image_type = 1
+            )
+            return image_obj
+        except cls.DoesNotExist:
+            return None
+
 
     class Meta:
         db_table = "app_item_images"
@@ -118,6 +167,13 @@ class Categories(models.Model):
     )
     categorie_type  = models.SmallIntegerField(db_column="categorie_type", choices=type_choices, null=True, verbose_name="类别")
     image_path      = models.CharField(db_column="image_path", null=True, verbose_name="缩略图路径", max_length=255)
+
+
+    @classmethod
+    def get_categoreis_dict_for_all(cls):
+        all_obj =  cls.objects.all().values("categorie_id", "categorie_name")
+        return all_obj
+
 
     class Meta:
         db_table = "app_categories"

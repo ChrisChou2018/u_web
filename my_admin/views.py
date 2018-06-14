@@ -9,6 +9,8 @@ from django.contrib.auth.forms import ReadOnlyPasswordHashField
 from django.db.models import Q
 
 from my_admin import member_models
+from my_admin import item_models
+from my_admin import models
 
 
 def my_render(request, templater_path, **kwargs):
@@ -99,7 +101,7 @@ def member_manage(request):
     if request.method == "GET":
         GET = request.GET.get
         current_page = GET('page', 1)
-        value = GET('search_value', None)
+        value = GET('search_value', '')
         filter_args = None
         if value:
             filter_args = '&search_value={0}'.format(value)
@@ -125,8 +127,69 @@ def member_manage(request):
             member_count = member_count,
             uri = uri,
             filter_args = filter_args,
-            table_head = table_head
+            table_head = table_head,
+            search_value = value
         )
-    
+
+def items_manage(request):
+    if request.method == 'GET':
+        current_page = request.GET.get('page', 1)
+        value = request.GET.get('search_value', '')
+        filter_args = None
+        if value:
+            filter_args = '&search_value={0}'.format(value)
+            search_value = {"item_name" : value}
+            item_list = item_models.Items.get_list_items(current_page, search_value)
+            item_count = item_models.Items.get_items_count(search_value)
+        else:
+            item_list = item_models.Items.get_list_items(current_page)
+            item_count = item_models.Items.get_items_count()
+        uri = request.path
+        specifications_type_dict = dict(item_models.Items. \
+            specifications_type_choices)
+        brand_dict = item_models.Brands.get_brands_dict_for_all()
+        categories_dict = item_models.Categories.get_categoreis_dict_for_all()
+        return my_render(
+            request,
+            'admin/a_items_manage.html',
+            current_page = current_page,
+            filter_args = filter_args,
+            item_list = item_list,
+            item_count = item_count,
+            uri = uri,
+            specifications_type_dict = specifications_type_dict,
+            brand_dict = brand_dict,
+            categories_dict = categories_dict,
+        )
+
+
+class AddItemForm(forms.ModelForm):
+    class Meta:
+        model = item_models.Items
+        fields = (
+            "item_name", "item_info", "item_code",
+            "item_barcode", "price", "current_price",
+            "foreign_price", "key_word", "origin",
+            "shelf_life", "capacity", "specifications_type_id",
+            "for_people", "weight", "brand_id",
+            "categories_id"
+        )
+    def save(self, commit=True):
+        # Save the provided password in hashed format
+        item = super(AddItemForm, self).save(commit=False)
+        if commit:
+            item.save()
+        return item
+
+
+def add_item(request):
+    if request.method == 'GET':
+        return my_render(
+            request,
+            'admin/a_add_item.html',
+        )
     else:
-        pass
+        form = AddItemForm(request.POST)
+        if not form.is_valid():
+            pass
+        
