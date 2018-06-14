@@ -12,6 +12,7 @@ urlpatterns = [
     path('member_manage/', views.member_manage),
     path('item_manage/', views.items_manage),
     path('add_item/', views.add_item),
+    path('editor_item/', views.editor_item),
     path('item_image_manage/', views.item_image_manage),
     path('', views.index),
 ]

@@ -22,15 +22,15 @@
         </div>
         <div class="form-group">
             <label for="recipient-name" class="control-label">商品信息:</label>
-            <input type="text" class="form-control" name="item_info" value="{{ form_data.item_info }}">
+            <input type="text" class="form-control" name="item_info" value="{% if form_data.item_info %} {{ form_data.item_info }} {% endif %}">
         </div>
         <div class="form-group">
             <label for="recipient-name" class="control-label">商品编码:</label>
-            <input type="text" class="form-control" name="item_code" value="{{ form_data.item_code }}">
+            <input type="text" class="form-control" name="item_code" value="{% if form_data.item_code %}{{ form_data.item_code }} {% endif %}">
         </div>
         <div class="form-group">
             <label for="recipient-name" class="control-label">商品条码:</label>
-            <input type="text" class="form-control" name="item_barcode" value="{{ form_data.item_barcode }}">
+            <input type="text" class="form-control" name="item_barcode" value="{% if form_data.item_barcode %}{{ form_data.item_barcode }} {% endif %}">
         </div>
         <div class="form-group">
             <label for="recipient-name" class="control-label">原价:</label>
@@ -46,19 +46,19 @@
         </div>
         <div class="form-group">
             <label for="recipient-name" class="control-label">关键字:</label>
-            <input type="text" class="form-control" name="key_word" value="{{ form_data.key_word }}">
+            <input type="text" class="form-control" name="key_word" value="{% if form_data.key_word %}{{ form_data.key_word }} {% endif %}">
         </div>
         <div class="form-group">
             <label for="recipient-name" class="control-label">产地:</label>
-            <input type="text" class="form-control" name="origin" value="{{ form_data.origin }}">
+            <input type="text" class="form-control" name="origin" value="{% if form_data.origin %} {{ form_data.origin }} {% endif %}">
         </div>
         <div class="form-group">
             <label for="recipient-name" class="control-label">保质期:</label>
-            <input type="text" class="form-control" name="shelf_life" value="{{ form_data.shelf_life }}">
+            <input type="text" class="form-control" name="shelf_life" value="{% if form_data.shelf_life %} {{ form_data.shelf_life }} {% endif %}">
         </div>
         <div class="form-group">
             <label for="recipient-name" class="control-label">容量:</label>
-            <input type="text" class="form-control" name="f_capacity" value="{{ form_data.capacity }}">
+            <input type="text" class="form-control" name="f_capacity" value="{% if form_data.capacity %} {{ form_data.capacity }} {% endif %}">
         </div>
         <div class="form-group">
             <label for="recipient-name" class="control-label">规格类型:</label>
@@ -101,11 +101,11 @@
         </div>
         <div class="form-group">
             <label for="recipient-name" class="control-label">适用人群:</label>
-            <input type="text" class="form-control" name="for_people" value="{{ form_data.for_people }}"> 
+            <input type="text" class="form-control" name="for_people" value="{% if form_data.for_people %} {{ form_data.for_people }} {% endif %}"> 
         </div>
         <div class="form-group">
             <label for="recipient-name" class="control-label">重量:</label>
-            <input type="text" class="form-control" name="weight" value="{{ form_data.weight }}">
+            <input type="text" class="form-control" name="weight" value="{% if form_data.weight %}{{ form_data.weight }}{% endif %}">
         </div>
         </div><!-- /.box-body -->
 

@@ -7,6 +7,7 @@ from django.contrib.auth.decorators import login_required
 from django import forms
 from django.contrib.auth.forms import ReadOnlyPasswordHashField
 from django.db.models import Q
+from django.forms import model_to_dict
 
 from my_admin import member_models
 from my_admin import item_models
@@ -212,6 +213,65 @@ def add_item(request):
         form.save(request=request)
         return redirect('/myadmin/item_manage/')
 
+
+class EditorItemForm(forms.ModelForm):
+    item_name = forms.CharField(error_messages={'required': '至少这个不可以为空'})
+
+    class Meta:
+        model = item_models.Items
+        fields = (
+            "item_name", "item_info", "item_code",
+            "item_barcode", "price", "current_price",
+            "foreign_price", "key_word", "origin",
+            "shelf_life", "capacity", "specifications_type_id",
+            "for_people", "weight", "brand_id",
+            "categories_id"
+        )
+    def update(self, item_id, request=None):
+        item = self._meta.model
+        update_person = request.user.member_name
+        data = self.cleaned_data
+        data.update({'update_person': update_person})
+        item.update_item_by_id(item_id, data)
+        return item
+
+
+
+def editor_item(request):
+    specifications_type_dict = dict(
+        item_models.Items.specifications_type_choices
+    )
+    brands_dict = item_models.Brands.get_brands_dict_for_all()
+    categories_dict = item_models.Categories.get_categoreis_dict_for_all()
+    item_id = request.GET.get('item_id')
+    item_obj = item_models.Items.get_item_by_id(item_id)
+    form_data = model_to_dict(item_obj)
+    back_url = request.GET.get('back_url')
+    if request.method == 'GET':
+        return my_render(
+            request,
+            'admin/a_add_item.html',
+            form_data = form_data,
+            specifications_type_dict = specifications_type_dict,
+            brands_dict = brands_dict,
+            categories_dict = categories_dict,
+        )
+    else:
+        form = EditorItemForm(request.POST)
+        if not form.is_valid():
+            return my_render(
+                request,
+                'admin/a_add_item.html',
+                specifications_type_dict = specifications_type_dict,
+                brands_dict = brands_dict,
+                categories_dict = categories_dict,
+                form_errors = form.errors,
+            )
+        form.update(item_id, request)
+        return redirect(back_url)
+        
+
+
 def item_image_manage(request):
     if request.method == "GET":
         item_id = request.GET.get('item_id')
@@ -233,4 +293,5 @@ def item_image_manage(request):
             image_dict = image_dict,
             item_obj = item_obj,
         )
+
 

@@ -109,6 +109,10 @@ class Items(models.Model):
     def delete_item_by_item_ids(cls, id_list):
         cls.objects.filter(pk__in=id_list).update(status='deleted')
     
+    @classmethod
+    def update_item_by_id(cls, item_id, data):
+        cls.objects.filter(pk = item_id).update(**data)
+    
     class Meta:
         db_table = "app_items"
     
