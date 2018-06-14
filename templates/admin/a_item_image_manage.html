@@ -146,8 +146,7 @@
             })
             if(image_id_list.length>0){
                 var se = confirm("是否确认删除")
-                if (se==true)
-                {
+                if(se==true){
                     $.post(
                         '/myadmin/js/delete_item_images/',
                         {'image_id_list':image_id_list, 'csrfmiddlewaretoken':getCookie("csrftoken")},
@@ -161,17 +160,10 @@
                         'json'
                     )
                 }
-                else
-                {
-                
-                }
-                
+                else{
+                }   
             }
-            
-            
         })
-
-
     })
 </script>
     
