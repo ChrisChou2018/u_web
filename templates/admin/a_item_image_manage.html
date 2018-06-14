@@ -1,16 +1,16 @@
 {% extends '../admin/a_layout.html' %}
 {% block css %}
     
-{% end %}
+{% endblock %}
 {% block title %}
 <div><a type="button" class="btn btn-default back_btn" >🔙 后退</a> </div> <hr> 图片管理 
-{% end %}
+{% endblock %}
 {% block page_header %}
 <ol class="breadcrumb">
     <li>商品管理</li>
     <li class="active">{{item_obj.item_name}}</li>
 </ol>
-{% end %}
+{% endblock %}
 
 {% block content %}
 <input type="file" accept=".jpg" name="add_new_image" multiple style="display:none;" item-id="{{ item_obj.item_id }}"> 
@@ -23,21 +23,15 @@
     </h4>
     <div class="row" image-type='1' style="overflow: auto; max-width: 900px;" >
         
-        {% if image_dict.get(1) %}
-            {% for i in image_dict.get(1) %}
-                <div class="col-xs-6 col-md-2 image_item" image-id='{{i.get("image_id")}}'>
+        {% if image_dict.1 %}
+            {% for i in image_dict.1 %}
+                <div class="col-xs-6 col-md-2 image_item" image-id='{{i.image_id}}'>
                     <a class="thumbnail" style="width: 150px;height: 150px;">
-                    <img src="{{i.get('image_path')}}" alt="..." >
+                    <img src="{{ i.image_path }}" alt="..." >
                     </a>
                 </div>
-            {% end %}
-        {% else %}
-            <!-- <div class="col-xs-6 col-sm-2 image_item">
-                <a class="thumbnail" style="width: 150px;height: 150px;">
-                <img src="/images/user-default.jpg" alt="...">
-                </a>
-            </div> -->
-        {% end %}
+            {% endfor %}
+        {% endif %}
         
     </div>
     <h4>商品样式图 
@@ -46,21 +40,21 @@
     </h4>
     <div class="row" image-type='2' style="overflow: auto; max-width: 900px;">
         
-        {% if image_dict.get(2) %}
-            {% for i in image_dict.get(2) %}
-                <div class="col-xs-6 col-md-3 image_item" image-id='{{i.get("image_id")}}'> 
+        {% if image_dict.2 %}
+            {% for i in image_dict.2 %}
+                <div class="col-xs-6 col-md-3 image_item" image-id='{{ i.image_id }}'> 
                     <a class="thumbnail" style="width: 200px;height: 200px;">
-                    <img src="{{i.get('image_path')}}" alt="..." >
+                    <img src="{{ i.image_path }}" alt="..." >
                     </a>
                 </div>
-            {% end %}
+            {% endfor %}
         {% else %}
             <!-- <div class="col-xs-6 col-md-4 image_item">
                 <a class="thumbnail" style="width: 200px;height: 200px;">
                 <img src="/images/user-default.jpg" alt="...">
                 </a>
             </div> -->
-        {% end %}
+        {% endif %}
     </div>
 
     <h4>商品详细图 
@@ -69,24 +63,24 @@
     </h4>
     <div class="row" image-type='4' style="overflow: auto; max-width: 1000px;">
         
-        {% if image_dict.get(4) %}
-            {% for i in image_dict.get(4) %}
-                <div class="col-xs-6 col-md-4 image_item" image-id='{{i.get("image_id")}}'>
+        {% if image_dict.4 %}
+            {% for i in image_dict.4 %}
+                <div class="col-xs-6 col-md-4 image_item" image-id='{{ i.image_id }}'>
                     <a class="thumbnail" style="width: 350px;height: 350px; overflow: auto;">
-                    <img src="{{i.get('image_path')}}" alt="..." >
+                    <img src="{{ i.image_path }}" alt="..." >
                     </a>
                 </div>
-            {% end %}
+            {% endfor %}
         {% else %}
             <!-- <div class="col-xs-6 col-md-3 image_item">
                 <a class="thumbnail" style="width: 350px;height: 350px;">
                 <img src="/images/user-default.jpg" alt="...">
                 </a>
             </div> -->
-        {% end %}
+        {% endif %}
     </div>
 </div>
-{% end %}
+{% endblock %}
 {% block js %}
 <script>
     $(function(){
@@ -117,10 +111,10 @@
                 }
                 formData.append('image_type', image_type)
                 formData.append('item_id', $(this).attr('item-id'))
-                formData.append('_xsrf', getCookie("_xsrf"))
+                formData.append('csrfmiddlewaretoken', getCookie("csrftoken"))
                 $.ajax({
                     type:'post',
-                    url:"/j/add_image/",
+                    url:"/myadmin/js/item_image_create/",
                     data:formData,
                     dataType:'json',
                     contentType:false,
@@ -155,10 +149,10 @@
                 if (se==true)
                 {
                     $.post(
-                        '/j/delete_image/',
-                        {'image_id_list':image_id_list, '_xsrf':getCookie("_xsrf")},
+                        '/myadmin/js/delete_item_images/',
+                        {'image_id_list':image_id_list, 'csrfmiddlewaretoken':getCookie("csrftoken")},
                         function(value){
-                            if(value.result == 'success'){
+                            if(value.status == 'success'){
                                 location.reload()
                             }else{
                                 alert(value.message)
@@ -181,4 +175,4 @@
     })
 </script>
     
-{% end %}
+{% endblock %}

@@ -1,10 +1,13 @@
+import os
+
 from django.http import JsonResponse
 from django import forms
 from django.forms.models import model_to_dict
+from django.conf import settings
 
 from my_admin import member_models
-from my_admin import member_models
-
+from my_admin import item_models
+from ubskin_web_django.common import photo
 
 class UserCreationForm(forms.ModelForm):
     password1 = forms.CharField(
@@ -96,4 +99,48 @@ def editor_member(request):
         member_models.Member.update_member_by_id(member_id, clear_data)
         return_value['status'] = 'success'
         return JsonResponse(return_value)
-        
+
+def item_image_create(request):
+    return_value = {
+        'status':'error',
+        'msg':'',
+    }
+    if request.method == "POST":
+        files_dict = request.FILES
+        image_type = request.POST.get('image_type')
+        item_id = request.POST.get('item_id')
+        image_type_dict = dict(item_models.ItemImages.type_choces)
+        for k in files_dict:
+            server_file_path = '/media/photos'
+            file_dir = os.path.join(
+                settings.MEDIA_ROOT,
+                'photos'
+            )
+            if not os.path.exists(file_dir):
+                os.makedirs(file_dir)
+            data = photo.save_upload_photo(
+                files_dict[k],
+                file_dir,
+                server_file_path,
+                image_type_dict.get(int(image_type))
+            )
+            if data:
+                data.update({
+                    'image_type': image_type,
+                    'item_id': item_id,
+                    'status': 'normal'
+                })
+                item_models.ItemImages.create_item_image(data)
+            else:
+                return_value['message'] = '上传失败'
+                return JsonResponse(return_value)
+        else:
+            return_value['result'] = 'success'
+            return JsonResponse(return_value)
+
+
+def delete_item_images(request):
+    image_id_list = request.POST.getlist('image_id_list[]')
+    item_models.ItemImages. \
+        update_images_by_image_id_list(image_id_list, {'status': 'deleted'})
+    return JsonResponse({'status': 'success'})

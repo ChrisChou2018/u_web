@@ -212,5 +212,25 @@ def add_item(request):
         form.save(request=request)
         return redirect('/myadmin/item_manage/')
 
-def editor_item(request):
-    pass
+def item_image_manage(request):
+    if request.method == "GET":
+        item_id = request.GET.get('item_id')
+        item_image_list = item_models.ItemImages.get_images_by_itemid(item_id)
+        item_obj  = item_models.Items.get_item_by_id(item_id)
+        image_dict = {}
+        for i in item_image_list:
+            if i.image_type not in image_dict:
+                image_dict[i.image_type] = [
+                    {'image_path': i.image_path, 'image_id': i.image_id}
+                ]
+            else:
+                image_dict[i.image_type].append(
+                    {'image_path': i.image_path, 'image_id': i.image_id}
+                )
+        return my_render(
+            request,
+            'admin/a_item_image_manage.html',
+            image_dict = image_dict,
+            item_obj = item_obj,
+        )
+

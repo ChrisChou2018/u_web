@@ -88,10 +88,10 @@
                     </div>
                     <div class="col-md-2">
                         <div class="row">
-                            <a  href="/editor_item?item_id={{i.item_id}}&back_url={{request.uri}}" style='cursor:pointer;text-decoration:none;'><span class="glyphicon glyphicon-pencil"></span> 编辑</a>
+                            <a  href="/editor_item?item_id={{i.item_id}}&back_url={{request.get_full_path}}" style='cursor:pointer;text-decoration:none;'><span class="glyphicon glyphicon-pencil"></span> 编辑</a>
                         </div>
                         <div class="row">
-                            <a href="/image_manage?item_id={{i.item_id}}&back_url={{request.uri}}" style='cursor:pointer;text-decoration:none;'><span class="glyphicon glyphicon-picture"></span> 图片管理</a>
+                            <a href="/myadmin/item_image_manage/?item_id={{i.item_id}}&back_url={{request.get_full_path}}" style='cursor:pointer;text-decoration:none;'><span class="glyphicon glyphicon-picture"></span> 图片管理</a>
                         </div>
                     </div>
                 </div>

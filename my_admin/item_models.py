@@ -98,6 +98,12 @@ class Items(models.Model):
             item_obj_count = cls.objects.filter(status='normal').count()
         return item_obj_count
 
+    @classmethod
+    def get_item_by_id(cls, item_id):
+        try:
+            return cls.objects.get(pk=item_id)
+        except cls.DoesNotExist:
+            return None
     
     class Meta:
         db_table = "app_items"
@@ -137,6 +143,21 @@ class ItemImages(models.Model):
         except cls.DoesNotExist:
             return None
 
+    @classmethod
+    def get_images_by_itemid(cls, item_id):
+        try:
+            image_obj = cls.objects.filter(item_id=item_id, status = "normal")
+            return image_obj
+        except cls.DoesNotExist:
+            return None
+
+    @classmethod
+    def create_item_image(cls, datas):
+        cls.objects.create(**datas)
+
+    @classmethod
+    def update_images_by_image_id_list(cls, image_id_list, item_dict):
+        cls.objects.filter(image_id__in = image_id_list).update(**item_dict)
 
     class Meta:
         db_table = "app_item_images"
