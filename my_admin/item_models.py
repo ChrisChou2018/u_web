@@ -1,3 +1,5 @@
+import time
+
 from django.db import models
 from django.core.paginator import Paginator
 # Create your models here.
@@ -33,20 +35,20 @@ class Items(models.Model):
     商品表
     '''
     item_id                     = models.AutoField(db_column="item_id", primary_key=True, verbose_name='商品ID')
-    item_name                   = models.CharField(db_column="item_name", verbose_name='商品名称', max_length=255, error_messages={'required': '新密码不能为空'})
-    item_info                   = models.CharField(db_column="item_info", null=True, verbose_name='商品信息', max_length=255)
-    item_code                   = models.CharField(db_column="item_code", null=True, verbose_name="商品编码", max_length=255)
-    item_barcode                = models.CharField(db_column="item_barcode", null=True, verbose_name="商品条码", max_length=255)
-    price                       = models.FloatField(db_column="price", null=True, verbose_name="商品原价")
-    current_price               = models.FloatField(db_column='current_price', null=True, verbose_name="商品现价")
-    foreign_price               = models.FloatField(db_column='foreign_price', null=True, verbose_name="国外价格")
-    comment_count               = models.IntegerField(db_column="comment_count", null=True, verbose_name="评论数量")
-    hot_value                   = models.IntegerField(db_column="hot_value", null=True, verbose_name="热度值")
-    buy_count                   = models.IntegerField(db_column="buy_count", null=True, verbose_name="被购买次数")
-    key_word                    = models.CharField(db_column="key_word", null=True, verbose_name="搜索关键字", max_length=255)
-    origin                      = models.CharField(db_column="origin", null=True,  verbose_name="生产地", max_length=255)
-    shelf_life                  = models.CharField(db_column="shelf_life", null=True, verbose_name="保质期", max_length=255)
-    capacity                    = models.CharField(db_column="capacity", null=True, verbose_name="容量", max_length=255)
+    item_name                   = models.CharField(db_column="item_name", verbose_name='商品名称', max_length=255)
+    item_info                   = models.CharField(db_column="item_info", null=True, blank=True, verbose_name='商品信息', max_length=255)
+    item_code                   = models.CharField(db_column="item_code", null=True, blank=True, verbose_name="商品编码", max_length=255)
+    item_barcode                = models.CharField(db_column="item_barcode", null=True, blank=True, verbose_name="商品条码", max_length=255)
+    price                       = models.FloatField(db_column="price", null=True, blank=True, verbose_name="商品原价")
+    current_price               = models.FloatField(db_column='current_price', null=True, blank=True, verbose_name="商品现价")
+    foreign_price               = models.FloatField(db_column='foreign_price', null=True, blank=True, verbose_name="国外价格")
+    comment_count               = models.IntegerField(db_column="comment_count", null=True, blank=True, verbose_name="评论数量")
+    hot_value                   = models.IntegerField(db_column="hot_value", null=True, blank=True, verbose_name="热度值")
+    buy_count                   = models.IntegerField(db_column="buy_count", null=True, blank=True, verbose_name="被购买次数")
+    key_word                    = models.CharField(db_column="key_word", null=True, blank=True, verbose_name="搜索关键字", max_length=255)
+    origin                      = models.CharField(db_column="origin", null=True, blank=True, verbose_name="生产地", max_length=255)
+    shelf_life                  = models.CharField(db_column="shelf_life", null=True, blank=True, verbose_name="保质期", max_length=255)
+    capacity                    = models.CharField(db_column="capacity", null=True, blank=True, verbose_name="容量", max_length=255)
     specifications_type_choices = (
         (0, '瓶'),
         (1, '包'),
@@ -57,15 +59,15 @@ class Items(models.Model):
         (6, '对'),
         (7, '盒')
     )
-    specifications_type_id      = models.SmallIntegerField(db_column="specifications_type_id", choices=specifications_type_choices, null=True, verbose_name="规格类型")
-    categories_id               = models.BigIntegerField(db_column="categories_id", null=True, verbose_name="分类ID")
-    brand_id                    = models.BigIntegerField(db_column="brand_id", null=True, verbose_name="品牌ID")
-    for_people                  = models.CharField(db_column="for_people", null=True, verbose_name="适用人群", max_length=255)
-    weight                      = models.CharField(db_column="weight", null=True, verbose_name="重量", max_length=255)
+    specifications_type_id      = models.SmallIntegerField(db_column="specifications_type_id", choices=specifications_type_choices, null=True, blank=True, verbose_name="规格类型")
+    categories_id               = models.BigIntegerField(db_column="categories_id", null=True, blank=True, verbose_name="分类ID")
+    brand_id                    = models.BigIntegerField(db_column="brand_id", null=True, blank=True, verbose_name="品牌ID")
+    for_people                  = models.CharField(db_column="for_people", null=True, blank=True, verbose_name="适用人群", max_length=255)
+    weight                      = models.CharField(db_column="weight", null=True, blank=True, verbose_name="重量", max_length=255)
     create_person               = models.CharField(db_column="create_person", verbose_name="创建人", max_length=255)
-    create_time                 = models.IntegerField(db_column="create_time", verbose_name="创建时间")
-    update_person               = models.CharField(db_column="update_person", null=True, verbose_name="更新人", max_length=255)
-    update_time                 = models.IntegerField(db_column="update_time", verbose_name="更新时间")
+    create_time                 = models.IntegerField(db_column="create_time", verbose_name="创建时间", default=int(time.time()))
+    update_person               = models.CharField(db_column="update_person", null=True, blank=True, verbose_name="更新人", max_length=255)
+    update_time                 = models.IntegerField(db_column="update_time", verbose_name="更新时间", default=int(time.time()))
     status                      = models.CharField(db_column="status", verbose_name="状态", default="normal", max_length=255)
     
 

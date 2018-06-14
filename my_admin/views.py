@@ -164,6 +164,8 @@ def items_manage(request):
 
 
 class AddItemForm(forms.ModelForm):
+    item_name = forms.CharField(error_messages={'required': '至少这个不可以为空'})
+
     class Meta:
         model = item_models.Items
         fields = (
@@ -174,22 +176,41 @@ class AddItemForm(forms.ModelForm):
             "for_people", "weight", "brand_id",
             "categories_id"
         )
-    def save(self, commit=True):
-        # Save the provided password in hashed format
+    def save(self, commit=True, request=None):
         item = super(AddItemForm, self).save(commit=False)
         if commit:
+            item.create_person = request.user.member_name
             item.save()
         return item
 
 
 def add_item(request):
+    specifications_type_dict = dict(
+        item_models.Items.specifications_type_choices
+    )
+    brands_dict = item_models.Brands.get_brands_dict_for_all()
+    categories_dict = item_models.Categories.get_categoreis_dict_for_all()
     if request.method == 'GET':
         return my_render(
             request,
             'admin/a_add_item.html',
+            specifications_type_dict = specifications_type_dict,
+            brands_dict = brands_dict,
+            categories_dict = categories_dict,
         )
     else:
         form = AddItemForm(request.POST)
         if not form.is_valid():
-            pass
-        
+            return my_render(
+                request,
+                'admin/a_add_item.html',
+                specifications_type_dict = specifications_type_dict,
+                brands_dict = brands_dict,
+                categories_dict = categories_dict,
+                form_errors = form.errors,
+            )
+        form.save(request=request)
+        return redirect('/myadmin/item_manage/')
+
+def editor_item(request):
+    pass

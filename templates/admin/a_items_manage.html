@@ -34,7 +34,7 @@
         </div>
     </div>
     <div class="col-md-4">
-        <a href="/add_item/" class="btn btn-info add_item_btn" >添加商品 <span class="glyphicon glyphicon-plus"></span></a>
+        <a href="/myadmin/add_item/" class="btn btn-info add_item_btn" >添加商品 <span class="glyphicon glyphicon-plus"></span></a>
         <button type="button" class="btn btn-default choose_item">选择全部<span class="glyphicon glyphicon-saved"></span></button>
         <button type="button" class="btn btn-danger delete_item" >删除<span class="glyphicon glyphicon-trash"></span></button>
     </div>
@@ -44,7 +44,7 @@
 {% block content %}
 
 <div style="overflow: auto; padding: 15px;">
-    {% for i in item_obj %}
+    {% for i in item_list %}
     <div class="panel panel-info item_list">
         <div class="panel-heading"><input type="checkbox" class="item_checkbox" item-id={{i.item_id}}>商品名：{{i.item_name}}</div>
         <div class="panel-body">

@@ -97,4 +97,4 @@ def get_thumbicon_by_id(item_id):
     if item_image_obj:
         return item_image_obj.image_path
     else:
-        return "/images/user-default.jpg"
+        return "/static/images/user-default.jpg"

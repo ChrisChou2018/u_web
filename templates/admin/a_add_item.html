@@ -1,4 +1,5 @@
 {% extends '../admin/a_layout.html' %}
+{% load ui_method %}
 {% block css %}
     
 {% endblock %}
@@ -12,7 +13,7 @@
     </div><!-- /.box-header -->
     <!-- form start -->
     <form role="form" method="POST" action="" enctype="multipart/form-data">
-        {% module xsrf_form_html() %}
+        {% csrf_token %}
         <div class="box-body">
         <div class="form-group">
             <label for="recipient-name" class="control-label">商品名称:</label>
@@ -65,9 +66,9 @@
                 <option value="" selected>选择规格</option>
                 {% for i in specifications_type_dict %}
                     {% if form_data and form_data.specifications_type_id is not None and i == form_data.specifications_type_id %}
-                        <option value="{{i}}" selected>{{ get_value_by_key specifications_type_dict i }}</option>
+                        <option value="{{i}}" selected>{% get_value_by_key specifications_type_dict i %}</option>
                     {% else %}
-                        <option value="{{i}}">{{ get_value_by_key specifications_type_dict i }}</option>
+                        <option value="{{i}}">{% get_value_by_key specifications_type_dict i %}</option>
                     {% endif %}
                 {% endfor %}
             </select>
@@ -76,11 +77,11 @@
             <label for="recipient-name" class="control-label">选择品牌:</label>
             <select name="brand_id" class="form-control">
                 <option value="" selected>--选择--</option>
-                {% for i in brands_list %}
+                {% for i in brands_dict %}
                     {% if form_data and form_data.brand_id is not None and i == form_data.brand_id %}
-                        <option value="{{ i }}" selected>{{ get_value_by_key brands_list i }}</option>
+                        <option value="{{ i }}" selected>{% get_value_by_key brands_dict i %}</option>
                     {% else %}
-                        <option value="{{ i }}">{% get_value_by_key brands_list i %}</option>
+                        <option value="{{ i }}">{% get_value_by_key brands_dict i %}</option>
                     {% endif %}
                 {% endfor %}
             </select>
@@ -89,11 +90,11 @@
             <label for="recipient-name" class="control-label">选择分类:</label>
             <select name="categories_id" class="form-control">
                 <option value="" selected>--选择--</option>
-                {% for i in categories_list %}
+                {% for i in categories_dict %}
                     {% if form_data and form_data.categories_id is not None and i == form_data.categories_id %}
-                        <option value="{{ i }}" selected>{% get_value_by_key categories_list i %}</option>
+                        <option value="{{ i }}" selected>{% get_value_by_key categories_dict i %}</option>
                     {% else %}
-                        <option value="{{ i }}">{% get_value_by_key categories_list i %}</option>
+                        <option value="{{ i }}">{% get_value_by_key categories_dict i %}</option>
                     {% endif %}
                 {% endfor %}
             </select>
