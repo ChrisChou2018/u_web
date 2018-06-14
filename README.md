@@ -13,5 +13,7 @@ Development notes
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 import os
-os.environ["STATIC_PATH"] = "/path/to/ubskin/static/"
+os.environ["DB_HOST"] = "127.0.0.1"
+os.environ["DB_NAME"] = "ubskin_web"
+os.environ["DB_PORT"] = "3306"
 ```
