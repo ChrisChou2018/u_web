@@ -1,11 +1,12 @@
 
 {% extends '../admin/a_layout.html' %}
+{% load ui_method %}
 {% block css %}
     
-{% end %}
+{% endblock %}
 {% block title %}
 <a type="button" class="btn btn-default back_btn" onclick="history.back()" >🔙 后退</a>             
-{% end %}
+{% endblock %}
 {% block content %}
 <div class="box box-primary" style="padding: 15px">
     <div class="box-header">
@@ -13,33 +14,33 @@
     </div><!-- /.box-header -->
     <!-- form start -->
     <form role="form" method="POST" action="" enctype="multipart/form-data">
-        {% module xsrf_form_html() %}
+        {% csrf_token %}
       <div class="box-body">
         <div class="form-group">
           <label for="exampleInputEmail1">分类名字</label>
-          <input type="text" class="form-control" id="exampleInputEmail1" name="f_categorie_name" value="{{ form_data['categorie_name'] if form_data and form_data.get('categorie_name') else '' }}">
-          <span style="color: red">{{ form_error['categorie_name'] if form_error and form_error.get('categorie_name') else '' }}</span>
+          <input type="text" class="form-control" id="exampleInputEmail1" name="categorie_name" value="{% if form_data.categorie_name %}{{ form_data.categorie_name }}{% endif %}">
+          <span style="color: red">{% if form_errors.categorie_name  %}{{ form_errors.categorie_name }}{% endif %}</span>
         </div>
         <div class="form-group">
           <label for="cn_name_abridge">类别选择</label>
-          <select name="f_categorie_type" id="" class="form-control">
+          <select name="categorie_type" id="" class="form-control">
                 <option value="">--选择类别--</option>
                 {% for key in categorie_choices %}
-                    {% if form_data and form_data.get('categorie_type') is not None and form_data['categorie_type'] == key %}
-                        <option value="{{ key }}" selected>{{ categorie_choices[key] }}</option>
+                    {% if form_data and form_data.categorie_type is not None and form_data.categorie_type == key %}
+                        <option value="{{ key }}" selected>{% get_value_by_key categorie_choices key %}</option>
                     {% else %}
-                        <option value="{{ key }}">{{ categorie_choices[key] }}</option>
-                    {% end %}
-                {% end %}
+                        <option value="{{ key }}">{% get_value_by_key categorie_choices key %}</option>
+                    {% endif %}
+                {% endfor %}
           </select>
-          <span style="color: red">{{ form_error['categorie_type'] if form_error and form_error.get('categorie_type') else '' }}</span>
+          <span style="color: red">{% if form_errors.categorie_type %}{{ form_errors.categorie_type }}{% endif %}</span>
         </div>
         <div class="form-group">
             <label for="from_country">品牌图片</label>
-            <input type="file" class="form-control" name="f_categorie_image">
+            <input type="file" class="form-control" name="categorie_image">
         </div>
         <div class="image-box">
-            <img src="{{ form_data['image_path'] if form_data and form_data.get('image_path') else '' }}" alt="图片预览" style="width: 300px;height: 300px;">
+            <img src="{% if form_data.image_path %}{{ form_data.image_path }}{% endif %}" alt="图片预览" style="width: 300px;height: 300px;">
         </div>
       </div><!-- /.box-body -->
 
@@ -49,11 +50,11 @@
     </form>
   </div>
 
-{% end %}
+{% endblock %}
 {% block js %}
     <script>
     $(function(){
-        $('input[name="f_categorie_image"]').change(function(){
+        $('input[name="categorie_image"]').change(function(){
             file = this.files[0]
             var $image_item = $('.image-box img')
             var url = null ;
@@ -69,6 +70,6 @@
     })
     
     </script>
-{% end %}
+{% endblock %}
 
 

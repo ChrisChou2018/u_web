@@ -116,7 +116,6 @@ class Items(models.Model):
         else:
             item_obj = cls.objects.filter(status='normal'). \
                 order_by('-item_id')
-            
         p = Paginator(item_obj, 15)
         return p.page(current_page).object_list.values() 
     
@@ -236,6 +235,40 @@ class Categories(models.Model):
     def get_categoreis_dict_for_all(cls):
         all_obj =  cls.objects.all().values("categorie_id", "categorie_name")
         return all_obj
+
+    @classmethod
+    def get_list_categories(cls, current_page, search_value=None):
+        if search_value:
+            obj = cls.objects.filter(**search_value). \
+                order_by('-categorie_id')
+        else:
+            obj = cls.objects.all().order_by('-categorie_id')
+        
+        p = Paginator(obj, 15)
+        return p.page(current_page).object_list.values() 
+    
+    @classmethod
+    def get_categories_count(cls, search_value=None):
+        if search_value:
+            count = cls.objects.filter(**search_value).count()
+        else:
+            count = cls.objects.all().count()
+        return count
+    
+    @classmethod
+    def get_categorie_by_id(cls, categorie_id):
+        try:
+            return cls.objects.get(pk=categorie_id)
+        except cls.DoesNotExist:
+            return None
+    
+    @classmethod
+    def update_categorie_by_id(cls, categorie_id, data):
+        cls.objects.filter(pk=categorie_id).update(**data)
+
+    @classmethod
+    def delete_categories_by_id_list(cls, id_list):
+        cls.objects.filter(pk__in = id_list).delete()
 
 
     class Meta:

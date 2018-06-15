@@ -154,3 +154,9 @@ def delete_brands(request):
         brand_ids_list = request.POST.getlist('brand_ids_list[]')
         item_models.Brands.delete_brands_by_id_list(brand_ids_list)
         return JsonResponse({'status': 'success'})
+
+def delete_categories(request):
+    if request.method == 'POST':
+        categorie_ids_list = request.POST.getlist('categorie_ids_list[]')
+        item_models.Categories.delete_categories_by_id_list(categorie_ids_list)
+        return JsonResponse({'status': 'success'})

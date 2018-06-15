@@ -437,3 +437,153 @@ def editor_brand(request):
                 item_obj.save()
         back_url = request.GET.get('back_url')
         return redirect(back_url)
+
+def categorie_manage(request):
+    if request.method == 'GET':
+        current_page = request.GET.get('page', 1)
+        value = request.GET.get('search_value', '')
+        filter_args = None
+        categorie_choices = dict(item_models.Categories.type_choices)
+        if value:
+            filter_args = '&search_value={0}'.format(value)
+            search_value = {'categorie_name': value}
+            categories_list = item_models.Categories. \
+                get_list_categories(current_page, search_value)
+            categories_count = item_models.Categories. \
+                get_categories_count(search_value)
+        else:
+            categories_list = item_models.Categories. \
+                get_list_categories(current_page)
+            categories_count = item_models.Categories. \
+                get_categories_count()
+
+        return my_render(
+            request,
+            'admin/a_categorie_manage.html',
+            current_page = current_page,
+            search_value = value,
+            filter_args = filter_args,
+            categorie_choices = categorie_choices,
+            categories_list = categories_list,
+            categories_count = categories_count,
+        )
+
+
+class AddCategorieForm(forms.ModelForm):
+    categorie_name = forms.CharField(error_messages={'required': '不可以为空'})
+    categorie_type = forms.IntegerField(error_messages={'required': '请选择一个所属分类'})
+
+    class Meta:
+        model = item_models.Categories
+        fields = (
+            'categorie_name', 'categorie_type',
+        )
+
+
+    def save(self, commit=True, request=None):
+        categorie = super(AddCategorieForm, self).save(commit=False)
+        if commit:
+            categorie.save()
+        return categorie
+
+
+def add_categorie(request):
+    categorie_choices = dict(item_models.Categories.type_choices)
+    if request.method == 'GET':
+        return my_render(
+            request,
+            'admin/a_add_categorie.html',
+            categorie_choices = categorie_choices,
+        )
+    else:
+        form = AddCategorieForm(request.POST)
+        if not form.is_valid():
+            return my_render(
+                request,
+                'admin/a_add_categorie.html',
+                form_errors = form.errors,
+                categorie_choices = categorie_choices,
+            )
+        categorie = form.save()
+        files = request.FILES
+        if files:
+            file_obj = files.get('categorie_image')
+            server_file_path = '/media/photos'
+            file_dir = os.path.join(
+                settings.MEDIA_ROOT,
+                'photos'
+            )
+            if not os.path.exists(file_dir):
+                os.makedirs(file_dir)
+            data = photo.save_upload_photo(
+                file_obj,
+                file_dir,
+                server_file_path,
+                'brand'
+            )
+            if data:
+                categorie.image_path = data['image_path']
+                categorie.save()
+        return redirect('/myadmin/categorie_manage/')
+
+
+class EditorCategorieForm(forms.ModelForm):
+    categorie_name = forms.CharField(error_messages={'required': '不可以为空'})
+    categorie_type = forms.IntegerField(error_messages={'required': '请选择一个所属分类'})
+
+    class Meta:
+        model = item_models.Categories
+        fields = (
+            'categorie_name', 'categorie_type',
+        )
+
+
+    def update(self, categorie_id):
+        categorie = self._meta.model
+        data = self.cleaned_data
+        categorie.update_categorie_by_id(categorie_id, data)
+
+
+def editor_categorie(request):
+    categorie_id = request.GET.get('categorie_id')
+    categorie = item_models.Categories.get_categorie_by_id(categorie_id)
+    form_data = model_to_dict(categorie)
+    categorie_choices = dict(item_models.Categories.type_choices)
+    if request.method == 'GET':
+        return my_render(
+            request,
+            'admin/a_add_categorie.html',
+            form_data = form_data,
+            categorie_choices = categorie_choices,
+        )
+    else:
+        form = EditorCategorieForm(request.POST)
+        if not form.is_valid():
+            return my_render(
+                request,
+                'admin/a_add_categorie.html',
+                form_errors = form.errors,
+                categorie_choices = categorie_choices,
+            )
+        form.update(categorie_id)
+        files = request.FILES
+        if files:
+            file_obj = files.get('categorie_image')
+            server_file_path = '/media/photos'
+            file_dir = os.path.join(
+                settings.MEDIA_ROOT,
+                'photos'
+            )
+            if not os.path.exists(file_dir):
+                os.makedirs(file_dir)
+            data = photo.save_upload_photo(
+                file_obj,
+                file_dir,
+                server_file_path,
+                'brand'
+            )
+            if data:
+                categorie.image_path = data['image_path']
+                categorie.save()
+        back_url = request.GET.get('back_url')
+        return redirect(back_url)

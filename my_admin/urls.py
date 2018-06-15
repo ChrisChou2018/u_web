@@ -17,6 +17,9 @@ urlpatterns = [
     path('brand_manage/', views.brand_manage),
     path('add_brand/', views.add_brand),
     path('editor_brand/', views.editor_brand),
+    path('categorie_manage/', views.categorie_manage),
+    path('add_categorie/', views.add_categorie),
+    path('editor_categorie/', views.editor_categorie),
     path('', views.index),
 ]
 
@@ -28,4 +31,5 @@ urlpatterns += [
     path('js/item_image_create/', views_js.item_image_create),
     path('js/delete_item_images/', views_js.delete_item_images),
     path('js/delete_brands/',  views_js.delete_brands),
+    path('js/delete_categories/', views_js.delete_categories),
 ]
