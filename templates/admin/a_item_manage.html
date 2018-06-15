@@ -145,54 +145,6 @@
         $('.edit_item').click(get_edit_item_info)
         $('.image_manage').click()
     })
-    
-    
-    // var item_id = null
-    // function add_or_edit_item(is_edit){
-    //     var request_url = is_edit ? '/j/edit_item/?item_id=' + item_id : '/j/add_item/'
-    //     var $input_list = $('.item_form input')
-    //     var $select_list = $('.item_form select')
-    //     var data_dict = {}
-    //     $input_list.each(function(index,item){
-    //         var input_value = $(item).val().trim()
-    //         if(is_edit){
-    //             var input_old_value = $(item).attr('old_value')
-    //             if(input_value != input_old_value){
-    //                 data_dict[$(item).attr('name')]=input_value
-    //             }
-    //         }else{
-    //             data_dict[$(item).attr('name')]=input_value
-    //         }
-                
-    //     })
-    //     $select_list.each(function(index, item){
-    //         var select_value = $(item).val()
-    //         if(is_edit){
-    //             var select_old_value = $(item).attr('old_value')
-    //             if(select_value != select_old_value){
-    //                 data_dict[$(item).attr('name')]=select_value
-    //             }
-    //         }else{
-    //             data_dict[$(item).attr('name')]=select_value
-    //         }
-    //     })
-    //     data_dict['_xsrf'] = getCookie("_xsrf")
-    //     $.post(
-    //         request_url,
-    //         data_dict,
-    //         function(value){
-    //             if(value.result == 'success'){
-    //                 $('#exampleModal').modal('hide')
-    //                 location.reload()
-    //             }else{
-    //                 var error_msg = value.message
-    //                 $('.return_msg_box').text(error_msg)
-    //             }
-    //         },
-    //         'json'
-    //     )
-    // }
-
 
     function delete_item(){
         var $item_list = $('.item_list')
@@ -219,37 +171,6 @@
             )
         }
     }
-    // function get_edit_item_info(){
-    //     $('.modal-title').text('编辑商品')
-    //     item_id = $(this).parent().parent().children().first().text()
-    //     var data_dict = null
-    //     $.get(
-    //         '/j/edit_item/?item_id='+item_id,
-    //         function(value){
-    //             if(value.result == 'success'){
-    //                 data_dict = value.data
-    //                 $('#exampleModal').modal('show')
-    //                 var $input_list = $('.item_form input')
-    //                 var $select_list = $('.item_form select')
-    //                 $input_list.each(function(index, item){
-    //                     $(item).attr('old_value', data_dict[$(item).attr('name')])
-    //                     $(item).val(data_dict[$(item).attr('name')])
-    //                 })
-    //                 $select_list.each(function(index, item){
-    //                     $(item).attr('old_value', data_dict[$(item).attr('name')])
-    //                     $(item).val(data_dict[$(item).attr('name')])
-    //                 })
-    //                 $('.submit_btn').unbind()
-    //                 $('.submit_btn').click(function(){
-    //                     add_or_edit_item(true)
-    //                 })
-    //             }else{
-    //                 alert(value.message)
-    //             }
-    //         },
-    //         'json'
-    //     )
-    // }
-
+    
     </script>
 {% endblock %}

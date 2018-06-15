@@ -2,10 +2,10 @@
 {% extends '../admin/a_layout.html' %}
 {% block css %}
     
-{% end %}
+{% endblock %}
 {% block title %}
 <a type="button" class="btn btn-default back_btn" onclick="history.back()" >🔙 后退</a>             
-{% end %}
+{% endblock %}
 {% block content %}
 <div class="box box-primary" style="padding: 15px">
     <div class="box-header">
@@ -13,39 +13,39 @@
     </div><!-- /.box-header -->
     <!-- form start -->
     <form role="form" method="POST" action="" enctype="multipart/form-data">
-        {% module xsrf_form_html() %}
+        {% csrf_token %}
       <div class="box-body">
         <div class="form-group">
           <label for="exampleInputEmail1">品牌中文名</label>
-          <input type="text" class="form-control" id="exampleInputEmail1" name="f_cn_name" value="{{ form_data['cn_name'] if form_data and form_data.get('cn_name') else '' }}">
-          <span style="color: red">{{ form_error['cn_name'] if form_error and form_error.get('cn_name') else '' }}</span>
+          <input type="text" class="form-control" id="exampleInputEmail1" name="cn_name" value="{% if form_data.cn_name %}{{ form_data.cn_name }}{% endif %}">
+          {% if form_errors and form_errors.cn_name %}<span style="color: red">{{ form_errors.cn_name }}</span>{% endif %}
         </div>
         <div class="form-group">
           <label for="cn_name_abridge">品牌中文缩写</label>
-          <input type="text" class="form-control" id="cn_name_abridge" name="f_cn_name_abridge" value="{{ form_data['cn_name_abridge'] if form_data and form_data.get('cn_name_abridge') else '' }}">
+          <input type="text" class="form-control" id="cn_name_abridge" name="cn_name_abridge" value="{% if form_data.cn_name_abridge %}{{ form_data.cn_name_abridge }} {% endif %}">
         </div>
         <div class="form-group">
             <label for="en_name">品牌英文名</label>
-            <input type="text" class="form-control" id="en_name" name="f_en_name" value="{{ form_data['en_name'] if form_data and form_data.get('en_name') else '' }}">
+            <input type="text" class="form-control" id="en_name" name="en_name" value="{% if form_data.en_name %} {{ form_data.en_name }}{% endif %}">
         </div>
         <div class="form-group">
             <label for="from_country">所属国家</label>
-            <input type="text" class="form-control" id="from_country" name="f_form_country" value="{{ form_data['form_country'] if form_data and form_data.get('form_country') else '' }}">
+            <input type="text" class="form-control" id="from_country" name="form_country" value="{% if form_data.form_country %}{{ form_data.form_country }}{% endif %}">
         </div>
         <div class="form-group">
             <label for="from_country">关键字</label>
-            <input type="text" class="form-control" id="from_country" name="f_key_word" value="{{ form_data['key_word'] if form_data and form_data.get('key_word') else '' }}">
+            <input type="text" class="form-control" id="from_country" name="key_word" value="{% if form_data.key_word %}{{ form_data.key_word }}{% endif %}">
         </div>
         <div class="form-group">
             <label for="from_country">品牌简介</label>
-            <textarea name="f_brand_about" id="" cols="100" rows="10" class="form-control">{{ form_data['brand_about'] if form_data and form_data.get('brand_about') else '' }}</textarea>
+            <textarea name="brand_about" id="" cols="100" rows="10" class="form-control"> {% if form_data.brand_about %}{{ form_data.brand_about }}{% endif %}</textarea>
         </div>
         <div class="form-group">
             <label for="from_country">品牌图片</label>
-            <input type="file" class="form-control" name="f_brand_image">
+            <input type="file" class="form-control" name="brand_image">
         </div>
         <div class="image-box">
-            <img src="{{ form_data['brand_image'] if form_data and form_data.get('brand_image') else '' }}" alt="图片预览" style="width: 300px;height: 300px;">
+            <img src="{% if form_data.brand_image %}{{ form_data.brand_image }}{% endif %}" alt="图片预览" style="width: 300px;height: 300px;">
         </div>
       </div><!-- /.box-body -->
 
@@ -55,11 +55,11 @@
     </form>
   </div>
 
-{% end %}
+{% endblock %}
 {% block js %}
     <script>
     $(function(){
-        $('input[name="f_brand_image"]').change(function(){
+        $('input[name="brand_image"]').change(function(){
             file = this.files[0]
             var $image_item = $('.image-box img')
             var url = null ;
@@ -75,6 +75,6 @@
     })
     
     </script>
-{% end %}
+{% endblock %}
 
 

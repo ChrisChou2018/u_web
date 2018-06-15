@@ -149,3 +149,8 @@ def delete_item_images(request):
         update_images_by_image_id_list(image_id_list, {'status': 'deleted'})
     return JsonResponse({'status': 'success'})
 
+def delete_brands(request):
+    if request.method == 'POST':
+        brand_ids_list = request.POST.getlist('brand_ids_list[]')
+        item_models.Brands.delete_brands_by_id_list(brand_ids_list)
+        return JsonResponse({'status': 'success'})

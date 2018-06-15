@@ -12,18 +12,50 @@ class Brands(models.Model):
     '''
     brand_id                    = models.AutoField(db_column="brand_id", primary_key=True, verbose_name="品牌ID")
     cn_name                     = models.CharField(db_column="cn_name", verbose_name="品牌中文名", max_length=255)
-    cn_name_abridge             = models.CharField(db_column="cn_name_abridge", null=True, verbose_name="品牌中文名缩写", max_length=255)
-    en_name                     = models.CharField(db_column="en_name", null=True, verbose_name="品牌英文名", max_length=255)
-    form_country                = models.CharField(db_column="form_country", null=True, verbose_name="所属国家", max_length=255)
-    key_word                    = models.CharField(db_column="key_word", null=True, verbose_name="搜索关键字", max_length=255)
-    brand_about                 = models.CharField(db_column="brand_about", null=True, verbose_name="品牌简介", max_length=255)
-    brand_image                 = models.CharField(db_column="brand_image", null=True, verbose_name="品牌图片路径", max_length=255)
+    cn_name_abridge             = models.CharField(db_column="cn_name_abridge", null=True, blank=True, verbose_name="品牌中文名缩写", max_length=255)
+    en_name                     = models.CharField(db_column="en_name", null=True, blank=True, verbose_name="品牌英文名", max_length=255)
+    form_country                = models.CharField(db_column="form_country", null=True, blank=True, verbose_name="所属国家", max_length=255)
+    key_word                    = models.CharField(db_column="key_word", null=True, blank=True, verbose_name="搜索关键字", max_length=255)
+    brand_about                 = models.CharField(db_column="brand_about", null=True, blank=True, verbose_name="品牌简介", max_length=255)
+    brand_image                 = models.CharField(db_column="brand_image", null=True, blank=True, verbose_name="品牌图片路径", max_length=255)
 
 
     @classmethod
     def get_brands_dict_for_all(cls):
         all_data = cls.objects.all().values('brand_id','cn_name')
         return all_data
+
+    @classmethod
+    def get_list_brands(cls, current_page, search_value=None):
+        if search_value:
+            brand_obj = cls.objects.filter(**search_value).order_by('-brand_id')
+        else:
+            brand_obj = cls.objects.all().order_by('-brand_id')
+        p = Paginator(brand_obj, 15)
+        return p.page(current_page).object_list.values() 
+    
+    @classmethod
+    def get_brands_count(cls, search_value=None):
+        if search_value:
+            obj_count = cls.objects.filter(**search_value).count()
+        else:
+            obj_count = cls.objects.all().count()
+        return obj_count
+    
+    @classmethod
+    def get_brand_by_id(cls, brand_id):
+        try:
+            return cls.objects.get(pk = brand_id)
+        except cls.DoesNotExist:
+            return None
+    
+    @classmethod
+    def update_brand_by_id(cls, brand_id, data):
+        cls.objects.filter(pk = brand_id).update(**data)
+    
+    @classmethod
+    def delete_brands_by_id_list(cls, id_list):
+        cls.objects.filter(pk__in = id_list).delete()
 
 
     class Meta:
