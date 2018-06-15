@@ -1,8 +1,14 @@
-**暂时没有写readme.md**
+**初始化配置**
 
 `创建管理员用户`
 ```
 python3 manage.py createsuperuser
+```
+
+`数据库初始化`
+```
+python3 manage.py makemigrations
+python3 manage.py migrate
 ```
 
 Development notes
