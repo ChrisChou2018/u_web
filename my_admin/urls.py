@@ -20,6 +20,7 @@ urlpatterns = [
     path('categorie_manage/', views.categorie_manage),
     path('add_categorie/', views.add_categorie),
     path('editor_categorie/', views.editor_categorie),
+    path('item_comment_manage/', views.item_comment_manage),
     path('', views.index),
 ]
 
@@ -32,4 +33,5 @@ urlpatterns += [
     path('js/delete_item_images/', views_js.delete_item_images),
     path('js/delete_brands/',  views_js.delete_brands),
     path('js/delete_categories/', views_js.delete_categories),
+    path('js/delete_item_comments/', views_js.delete_item_comments),
 ]

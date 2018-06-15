@@ -587,3 +587,32 @@ def editor_categorie(request):
                 categorie.save()
         back_url = request.GET.get('back_url')
         return redirect(back_url)
+
+def item_comment_manage(request):
+    if request.method == 'GET':
+        current_page = request.GET.get('page', 1)
+        value = request.GET.get('search_value', '')
+        filter_args = None
+        if value:
+            filter_args = '&search_value={0}'.format(value)
+            item_id = item_models.Items.get_item_id_by_item_name(value)
+            if item_id:
+                search_value = {'item_id': item_id}
+            item_comments_list = item_models.ItemComments. \
+                get_item_comments_list(current_page, search_value)
+            count = item_models.ItemComments. \
+                get_item_comments_count(search_value)
+        else:
+            item_comments_list = item_models.ItemComments. \
+                get_item_comments_list(current_page)
+            count = item_models.ItemComments.get_item_comments_count()
+        return my_render(
+            request,
+            'admin/a_item_comment_manage.html',
+            current_page = current_page,
+            search_value = value,
+            filter_args = filter_args,
+            item_comments_list = item_comments_list,
+            count = count,
+        )
+

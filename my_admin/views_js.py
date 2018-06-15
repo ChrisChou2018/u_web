@@ -160,3 +160,9 @@ def delete_categories(request):
         categorie_ids_list = request.POST.getlist('categorie_ids_list[]')
         item_models.Categories.delete_categories_by_id_list(categorie_ids_list)
         return JsonResponse({'status': 'success'})
+
+def delete_item_comments(request):
+    if request.method == 'POST':
+        comment_ids_list = request.POST.getlist('comment_ids_list[]')
+        item_models.ItemComments.delete_comment_by_id_list(comment_ids_list)
+        return JsonResponse({'status': 'success'})

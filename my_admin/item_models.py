@@ -2,7 +2,9 @@ import time
 
 from django.db import models
 from django.core.paginator import Paginator
-# Create your models here.
+from django.forms import model_to_dict
+
+from my_admin import member_models
 
 
 
@@ -143,7 +145,14 @@ class Items(models.Model):
     @classmethod
     def update_item_by_id(cls, item_id, data):
         cls.objects.filter(pk = item_id).update(**data)
-    
+
+    classmethod
+    def get_item_id_by_item_name(cls, item_name):
+        try:
+            return cls.objects.get(item_name = item_name).item_id
+        except cls.DoesNotExist:
+            return None
+
     class Meta:
         db_table = "app_items"
     
@@ -285,7 +294,39 @@ class ItemComments(models.Model):
     comment_content = models.CharField(max_length=255, db_column="comment_content", verbose_name="评论内容")
     # reply_id        = models.BigIntegerField(db_column="reply_id", null=True, verbose_name="回复的评论ID")
     create_time     = models.IntegerField(db_column="create_time", verbose_name="创建时间")
+    stars           = models.SmallIntegerField(db_column="stars", verbose_name="星级", default=5)
     status          = models.CharField(db_column="status", verbose_name="状态", default="normal", max_length=255)
+
+    @classmethod
+    def get_item_comments_list(cls, current_page, search_value=None):
+        if search_value:
+            item_comments_list = cls.objects.filter(
+                **search_value, status = 'normal'
+            ).order_by('-comment_id')
+        else:
+            item_comments_list = cls.objects.filter(status = 'normal')
+        p = Paginator(item_comments_list, 15)
+        data = p.page(current_page).object_list.values()
+        for i in data:
+            member_id = i['member_id']
+            item_id = i['item_id']
+            member_obj = member_models.Member.get_member_by_id(member_id)
+            i['member_name'] = member_obj.member_name if member_obj else '已经注销用户'
+            item_obj = Items.get_item_by_id(item_id)
+            i['item_name'] = item_obj.item_name if item_obj else '商品已经下架'
+        return data
+    
+    @classmethod
+    def get_item_comments_count(cls, search_value=None):
+        if search_value:
+            count = cls.objects.filter(**search_value, status = 'normal').count()
+        else:
+            count = cls.objects.filter(status = 'normal').count()
+        return count
+
+    @classmethod
+    def delete_comment_by_id_list(cls, id_list):
+        cls.objects.filter(pk__in=id_list).update(status='deleted')
 
 
     class Meta:
