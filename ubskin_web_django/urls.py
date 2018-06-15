@@ -18,6 +18,14 @@ from django.urls import path
 from django.urls import include
 from django.conf.urls.static import static
 from django.conf import settings
+from rest_framework import routers
+
+from . import views_api
+### API register
+router = routers.DefaultRouter()
+router.register('users', views_api.MemberViewSet)
+###
+
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -25,3 +33,9 @@ urlpatterns = [
 ]
 
 urlpatterns += static(settings.MEDIA_URL, document_root = settings.MEDIA_ROOT)
+
+
+urlpatterns += [
+    path('', include(router.urls)),
+    path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
+]
