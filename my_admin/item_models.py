@@ -2,7 +2,9 @@ import time
 
 from django.db import models
 from django.core.paginator import Paginator
-# Create your models here.
+from django.forms import model_to_dict
+
+from my_admin import member_models
 
 
 
@@ -12,18 +14,50 @@ class Brands(models.Model):
     '''
     brand_id                    = models.AutoField(db_column="brand_id", primary_key=True, verbose_name="品牌ID")
     cn_name                     = models.CharField(db_column="cn_name", verbose_name="品牌中文名", max_length=255)
-    cn_name_abridge             = models.CharField(db_column="cn_name_abridge", null=True, verbose_name="品牌中文名缩写", max_length=255)
-    en_name                     = models.CharField(db_column="en_name", null=True, verbose_name="品牌英文名", max_length=255)
-    form_country                = models.CharField(db_column="form_country", null=True, verbose_name="所属国家", max_length=255)
-    key_word                    = models.CharField(db_column="key_word", null=True, verbose_name="搜索关键字", max_length=255)
-    brand_about                 = models.CharField(db_column="brand_about", null=True, verbose_name="品牌简介", max_length=255)
-    brand_image                 = models.CharField(db_column="brand_image", null=True, verbose_name="品牌图片路径", max_length=255)
+    cn_name_abridge             = models.CharField(db_column="cn_name_abridge", null=True, blank=True, verbose_name="品牌中文名缩写", max_length=255)
+    en_name                     = models.CharField(db_column="en_name", null=True, blank=True, verbose_name="品牌英文名", max_length=255)
+    form_country                = models.CharField(db_column="form_country", null=True, blank=True, verbose_name="所属国家", max_length=255)
+    key_word                    = models.CharField(db_column="key_word", null=True, blank=True, verbose_name="搜索关键字", max_length=255)
+    brand_about                 = models.CharField(db_column="brand_about", null=True, blank=True, verbose_name="品牌简介", max_length=255)
+    brand_image                 = models.CharField(db_column="brand_image", null=True, blank=True, verbose_name="品牌图片路径", max_length=255)
 
 
     @classmethod
     def get_brands_dict_for_all(cls):
         all_data = cls.objects.all().values('brand_id','cn_name')
         return all_data
+
+    @classmethod
+    def get_list_brands(cls, current_page, search_value=None):
+        if search_value:
+            brand_obj = cls.objects.filter(**search_value).order_by('-brand_id')
+        else:
+            brand_obj = cls.objects.all().order_by('-brand_id')
+        p = Paginator(brand_obj, 15)
+        return p.page(current_page).object_list.values() 
+    
+    @classmethod
+    def get_brands_count(cls, search_value=None):
+        if search_value:
+            obj_count = cls.objects.filter(**search_value).count()
+        else:
+            obj_count = cls.objects.all().count()
+        return obj_count
+    
+    @classmethod
+    def get_brand_by_id(cls, brand_id):
+        try:
+            return cls.objects.get(pk = brand_id)
+        except cls.DoesNotExist:
+            return None
+    
+    @classmethod
+    def update_brand_by_id(cls, brand_id, data):
+        cls.objects.filter(pk = brand_id).update(**data)
+    
+    @classmethod
+    def delete_brands_by_id_list(cls, id_list):
+        cls.objects.filter(pk__in = id_list).delete()
 
 
     class Meta:
@@ -84,7 +118,6 @@ class Items(models.Model):
         else:
             item_obj = cls.objects.filter(status='normal'). \
                 order_by('-item_id')
-            
         p = Paginator(item_obj, 15)
         return p.page(current_page).object_list.values() 
     
@@ -112,7 +145,14 @@ class Items(models.Model):
     @classmethod
     def update_item_by_id(cls, item_id, data):
         cls.objects.filter(pk = item_id).update(**data)
-    
+
+    classmethod
+    def get_item_id_by_item_name(cls, item_name):
+        try:
+            return cls.objects.get(item_name = item_name).item_id
+        except cls.DoesNotExist:
+            return None
+
     class Meta:
         db_table = "app_items"
     
@@ -205,6 +245,40 @@ class Categories(models.Model):
         all_obj =  cls.objects.all().values("categorie_id", "categorie_name")
         return all_obj
 
+    @classmethod
+    def get_list_categories(cls, current_page, search_value=None):
+        if search_value:
+            obj = cls.objects.filter(**search_value). \
+                order_by('-categorie_id')
+        else:
+            obj = cls.objects.all().order_by('-categorie_id')
+        
+        p = Paginator(obj, 15)
+        return p.page(current_page).object_list.values() 
+    
+    @classmethod
+    def get_categories_count(cls, search_value=None):
+        if search_value:
+            count = cls.objects.filter(**search_value).count()
+        else:
+            count = cls.objects.all().count()
+        return count
+    
+    @classmethod
+    def get_categorie_by_id(cls, categorie_id):
+        try:
+            return cls.objects.get(pk=categorie_id)
+        except cls.DoesNotExist:
+            return None
+    
+    @classmethod
+    def update_categorie_by_id(cls, categorie_id, data):
+        cls.objects.filter(pk=categorie_id).update(**data)
+
+    @classmethod
+    def delete_categories_by_id_list(cls, id_list):
+        cls.objects.filter(pk__in = id_list).delete()
+
 
     class Meta:
         db_table = "app_categories"
@@ -220,7 +294,39 @@ class ItemComments(models.Model):
     comment_content = models.CharField(max_length=255, db_column="comment_content", verbose_name="评论内容")
     # reply_id        = models.BigIntegerField(db_column="reply_id", null=True, verbose_name="回复的评论ID")
     create_time     = models.IntegerField(db_column="create_time", verbose_name="创建时间")
+    stars           = models.SmallIntegerField(db_column="stars", verbose_name="星级", default=5)
     status          = models.CharField(db_column="status", verbose_name="状态", default="normal", max_length=255)
+
+    @classmethod
+    def get_item_comments_list(cls, current_page, search_value=None):
+        if search_value:
+            item_comments_list = cls.objects.filter(
+                **search_value, status = 'normal'
+            ).order_by('-comment_id')
+        else:
+            item_comments_list = cls.objects.filter(status = 'normal')
+        p = Paginator(item_comments_list, 15)
+        data = p.page(current_page).object_list.values()
+        for i in data:
+            member_id = i['member_id']
+            item_id = i['item_id']
+            member_obj = member_models.Member.get_member_by_id(member_id)
+            i['member_name'] = member_obj.member_name if member_obj else '已经注销用户'
+            item_obj = Items.get_item_by_id(item_id)
+            i['item_name'] = item_obj.item_name if item_obj else '商品已经下架'
+        return data
+    
+    @classmethod
+    def get_item_comments_count(cls, search_value=None):
+        if search_value:
+            count = cls.objects.filter(**search_value, status = 'normal').count()
+        else:
+            count = cls.objects.filter(status = 'normal').count()
+        return count
+
+    @classmethod
+    def delete_comment_by_id_list(cls, id_list):
+        cls.objects.filter(pk__in=id_list).update(status='deleted')
 
 
     class Meta:

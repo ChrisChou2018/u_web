@@ -1,12 +1,19 @@
-**暂时没有写readme.md**
+初始化
+============
 
 `创建管理员用户`
 ```
 python3 manage.py createsuperuser
 ```
 
-Development notes
-------------
+`数据库初始化`
+```
+python3 manage.py makemigrations
+python3 manage.py migrate
+```
+
+配置文件相关
+==========
 配置文件（本机配置相关，都在这里设置，不要直接修改 youproject/settings.py）：
 请在根目录创建 settings_local.py，内容如下：
 ```
