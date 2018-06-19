@@ -6,6 +6,10 @@ register = template.Library()
 
 @register.simple_tag
 def Pagingfunc(current_page, all_count, filter_args, uri=None):
+    try:
+        current_page = int(current_page)
+    except:
+        current_page = 1
     data_num = 15
     a, b = divmod(all_count, data_num)
     if b:
@@ -95,6 +99,6 @@ def get_value_by_key(a_dict, key):
 def get_thumbicon_by_id(item_id):
     item_image_obj = item_models.ItemImages.get_thumbicon_by_item_id(item_id)
     if item_image_obj:
-        return item_image_obj.image_path
+        return item_image_obj["image_path"]
     else:
         return "/static/images/user-default.jpg"

@@ -21,6 +21,8 @@ urlpatterns = [
     path('add_categorie/', views.add_categorie),
     path('editor_categorie/', views.editor_categorie),
     path('item_comment_manage/', views.item_comment_manage),
+    path('edit_item_comment/', views.edit_item_comment),
+    path('comment_image_manage/', views.item_comment_image_manage),
     path('', views.index),
 ]
 

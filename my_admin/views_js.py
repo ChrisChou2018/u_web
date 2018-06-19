@@ -8,6 +8,7 @@ from django.conf import settings
 from my_admin import member_models
 from my_admin import item_models
 from ubskin_web_django.common import photo
+from ubskin_web_django.common import decorators
 
 class UserCreationForm(forms.ModelForm):
     password1 = forms.CharField(
@@ -35,6 +36,20 @@ class UserCreationForm(forms.ModelForm):
             raise forms.ValidationError("两次密码不一致")
         return password2
 
+    def clean_member_name(self):
+        member_name = self.cleaned_data.get("member_name")
+        member = member_models.Member.get_member_by_member_name(member_name)
+        if member:
+            raise forms.ValidationError("用户名已经存在")
+        return member_name
+
+    def clean_telephone(self):
+        telephone = self.cleaned_data.get("telephone")
+        member = member_models.Member.get_member_by_telephone(telephone)
+        if member:
+            raise forms.ValidationError("手机号已经被注册")
+        return telephone
+
     def save(self, commit=True):
         # Save the provided password in hashed format
         user = super(UserCreationForm, self).save(commit=False)
@@ -43,25 +58,26 @@ class UserCreationForm(forms.ModelForm):
             user.save()
         return user
 
-
+@decorators.api_authenticated
 def create_member(request):
     return_value = {
         'status':'error',
-        'msg':'',
+        'message':'',
     }
     if request.method == 'POST':
         form = UserCreationForm(request.POST)
         if not form.is_valid():
-            return_value['msg'] = list(form.errors.values())
+            return_value['message'] = list(form.errors.values())[0]
             return JsonResponse(return_value)
         form.save()
         return_value['status'] = 'success'
         return JsonResponse(return_value)
 
+@decorators.api_authenticated
 def delete_member(request):
     return_value = {
         'status':'error',
-        'msg':'',
+        'message':'',
     }
     if request.method == "POST":
         id_list = request.POST.getlist('member_id_list[]')
@@ -70,10 +86,11 @@ def delete_member(request):
         return JsonResponse(return_value)
 
 
+@decorators.api_authenticated
 def editor_member(request):
     return_value = {
         'status':'error',
-        'msg':'',
+        'message':'',
     }
     update_field = ['member_name', 'telephone', 'is_admin']
     member_id = request.GET.get('member_id')
@@ -88,7 +105,7 @@ def editor_member(request):
         password2 = request.POST.get('password2')
         if password1 and password2:
             if password1 != password2:
-                return_value['msg'] = ['两次密码不一致']
+                return_value['message'] = ['两次密码不一致']
                 return JsonResponse(return_value)
             member_obj.set_password(password2)
         clear_data = {
@@ -100,15 +117,17 @@ def editor_member(request):
         return_value['status'] = 'success'
         return JsonResponse(return_value)
 
+@decorators.api_authenticated
 def delete_items(request):
     item_id_list = request.POST.getlist('item_id_list[]')
     item_models.Items.delete_item_by_item_ids(item_id_list)
     return JsonResponse({'status': 'success'})
 
+@decorators.api_authenticated
 def item_image_create(request):
     return_value = {
         'status':'error',
-        'msg':'',
+        'message':'',
     }
     if request.method == "POST":
         files_dict = request.FILES
@@ -143,24 +162,28 @@ def item_image_create(request):
             return_value['result'] = 'success'
             return JsonResponse(return_value)
 
+@decorators.api_authenticated
 def delete_item_images(request):
     image_id_list = request.POST.getlist('image_id_list[]')
     item_models.ItemImages. \
         update_images_by_image_id_list(image_id_list, {'status': 'deleted'})
     return JsonResponse({'status': 'success'})
 
+@decorators.api_authenticated
 def delete_brands(request):
     if request.method == 'POST':
         brand_ids_list = request.POST.getlist('brand_ids_list[]')
         item_models.Brands.delete_brands_by_id_list(brand_ids_list)
         return JsonResponse({'status': 'success'})
 
+@decorators.api_authenticated
 def delete_categories(request):
     if request.method == 'POST':
         categorie_ids_list = request.POST.getlist('categorie_ids_list[]')
         item_models.Categories.delete_categories_by_id_list(categorie_ids_list)
         return JsonResponse({'status': 'success'})
 
+@decorators.api_authenticated
 def delete_item_comments(request):
     if request.method == 'POST':
         comment_ids_list = request.POST.getlist('comment_ids_list[]')
