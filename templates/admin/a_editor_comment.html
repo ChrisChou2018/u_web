@@ -2,10 +2,15 @@
 {% extends '../admin/a_layout.html' %}
 {% block css %}
     
-{% end %}
+{% endblock %}
+{% block page_header %}
+<ol class="breadcrumb">
+    <li><a href="#"><i class="fa fa-dashboard"></i> 评论管理</a></li>
+</ol>
+{% endblock %}
 {% block title %}
 <a type="button" class="btn btn-default back_btn" onclick="history.back()" >🔙 后退</a>             
-{% end %}
+{% endblock %}
 {% block content %}
 <div class="box box-primary" style="padding: 15px">
     <div class="box-header">
@@ -13,20 +18,16 @@
     </div><!-- /.box-header -->
     <!-- form start -->
     <form role="form" method="POST" action="" enctype="multipart/form-data">
-        {% module xsrf_form_html() %}
+        {% csrf_token %}
       <div class="box-body">
         <div class="form-group">
           <label for="exampleInputEmail1">评论内容</label>
-          <textarea name="f_comment_content" id="" cols="30" rows="10" class="form-control">
-            {{ form_data['comment_content'] if form_data and form_data.get('comment_content') else '' }}
-          </textarea>
-          <span style="color: red">{{ form_error['categorie_name'] if form_error and form_error.get('categorie_name') else '' }}</span>
+          <textarea name="comment_content" id="" cols="30" rows="10" class="form-control">{% if form_data and form_data.comment_content %}{{ form_data.comment_content }}{% endif %}</textarea>
+          <span>{% if form_errors and form_errors.comment_content %}{{ form_errors.comment_content }}{% endif %}</span>
         </div>
         <div class="form-group">
-          <label for="cn_name_abridge">所属商品: </label>
-          <!-- <input class="form-control" type="text" placeholder="查找商品名" readonly value="{{ form_data['item_name'] if form_data and form_data.get('item_name') else '' }}"> -->
-          <span style="font-size: 20px">{{ form_data['item_name'] if form_data and form_data.get('item_name') else '' }}</span>
-          <span style="color:red">{{ form_error['item_id'] if form_error and form_error.get('item_id') else '' }}</span>
+          <label for="cn_name_abridge">所属商品ID: </label>
+          <span style="font-size: 20px">{% if form_data and form_data.item_id %}{{ form_data.item_id }}{% endif %}</span>
         </div>
       </div><!-- /.box-body -->
 
@@ -36,7 +37,7 @@
     </form>
   </div>
 
-{% end %}
+{% endblock %}
 {% block js %}
     <script>
     $(function(){
@@ -71,6 +72,6 @@
     })
     
     </script>
-{% end %}
+{% endblock %}
 
 

@@ -42,7 +42,7 @@ class UserProfileManager(BaseUserManager):
 
 class Member(AbstractBaseUser, PermissionsMixin):
     member_id           = models.AutoField(db_column="member_id", primary_key=True, verbose_name="用户ID")
-    member_name         = models.CharField(db_column="member_name", max_length=255)
+    member_name         = models.CharField(db_column="member_name", max_length=255, unique=True)
     telephone           = models.CharField(db_column="telephone", max_length=255, unique=True)
     status              = models.CharField(db_column="status", default='normal', max_length=255)
     sessions            = models.CharField(db_column="sessions", max_length=255)
@@ -110,6 +110,26 @@ class Member(AbstractBaseUser, PermissionsMixin):
     def get_member_by_id(cls, member_id):
         try:
             return cls.objects.get(pk=member_id)
+        except cls.DoesNotExist:
+            return None
+
+    @classmethod
+    def get_member_by_member_name(cls, member_name):
+        try:
+            return cls.objects.get(
+            member_name = member_name,
+            status = 'normal'
+            )
+        except cls.DoesNotExist:
+            return None
+    
+    @classmethod
+    def get_member_by_telephone(cls, telephone):
+        try:
+            return cls.objects.get(
+            telephone = telephone,
+            status = 'normal'
+            )
         except cls.DoesNotExist:
             return None
 

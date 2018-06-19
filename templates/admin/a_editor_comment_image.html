@@ -1,15 +1,15 @@
 {% extends '../admin/a_layout.html' %}
 {% block css %}
     
-{% end %}
+{% endblock %}
 {% block title %}
 <div><a type="button" class="btn btn-default back_btn" >🔙 后退</a> </div> <hr> 图片管理 
-{% end %}
+{% endblock %}
 {% block page_header %}
 <ol class="breadcrumb">
     <li>评论图管理</li>
 </ol>
-{% end %}
+{% endblock %}
 
 {% block content %}
 <input type="file" accept=".jpg" name="add_new_image" multiple style="display:none;" > 
@@ -20,12 +20,12 @@
     <div class="row" image-type='1' style="overflow: auto; max-width: 900px;" >
         
             {% for i in comment_image_list %}
-                <div class="col-xs-6 col-md-3 image_item" image-id='{{i.get("image_id")}}'>
+                <div class="col-xs-6 col-md-3 image_item" image-id='{{i.image_id}}'>
                     <a class="thumbnail" style="width: 400px;height: 400px;">
-                    <img src="{{i.get('image_path')}}" alt="..." >
+                    <img src="{{i.image_path}}" alt="..." >
                     </a>
                 </div>
-            {% end %}
+            {% endfor %}
             <!-- <div class="col-xs-6 col-sm-2 image_item">
                 <a class="thumbnail" style="width: 150px;height: 150px;">
                 <img src="/images/user-default.jpg" alt="...">
@@ -35,7 +35,7 @@
     </div>
     
 </div>
-{% end %}
+{% endblock %}
 {% block js %}
 <script>
     $(function(){
@@ -128,4 +128,4 @@
     })
 </script>
     
-{% end %}
+{% endblock %}

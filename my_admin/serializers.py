@@ -22,6 +22,7 @@ class ItemSerializer(serializers.ModelSerializer):
             "categories_id", "item_id"
         )
 
+
 class ItemImagesSerializer(serializers.ModelSerializer):
     class Meta:
         model = item_models.ItemImages
@@ -30,3 +31,8 @@ class ItemImagesSerializer(serializers.ModelSerializer):
             'image_path', 'file_size', 'resolution',
             'file_type'
         )
+
+
+
+
+    

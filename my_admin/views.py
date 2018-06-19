@@ -284,13 +284,13 @@ def item_image_manage(request):
         item_obj  = item_models.Items.get_item_by_id(item_id)
         image_dict = {}
         for i in item_image_list:
-            if i.image_type not in image_dict:
-                image_dict[i.image_type] = [
-                    {'image_path': i.image_path, 'image_id': i.image_id}
+            if i['image_type'] not in image_dict:
+                image_dict[i['image_type']] = [
+                    {'image_path': i['image_path'], 'image_id': i['image_id']}
                 ]
             else:
-                image_dict[i.image_type].append(
-                    {'image_path': i.image_path, 'image_id': i.image_id}
+                image_dict[i['image_type']].append(
+                    {'image_path': i['image_path'], 'image_id': i['image_id']}
                 )
         return my_render(
             request,
@@ -616,3 +616,51 @@ def item_comment_manage(request):
             count = count,
         )
 
+def item_comment_image_manage(request):
+    if request.method == 'GET':
+        comment_id = request.GET.get('comment_id')
+        comment_image_list = item_models.CommentImages.get_comment_image_obj_by_id(comment_id)
+        return my_render(
+            request,
+            'admin/a_editor_comment_image.html',
+            comment_image_list = comment_image_list,
+        )
+
+
+class EditorItemCommentForm(forms.ModelForm):
+
+    class Meta:
+        model = item_models.ItemComments
+        fields = (
+            'comment_content',
+        )
+
+
+    def update(self, comment_id):
+        categorie = self._meta.model
+        data = self.cleaned_data
+        categorie.update_item_comment_by_id(comment_id, data)
+
+
+def edit_item_comment(request):
+    comment_id = request.GET.get('comment_id')
+    form_data = item_models.ItemComments.get_item_comment_by_id(comment_id)
+    if request.method == 'GET':
+        return my_render(
+            request,
+            'admin/a_editor_comment.html',
+            form_data = form_data,
+        )
+    else:
+        form = EditorItemCommentForm(request.POST)
+        if not form.is_valid():
+            return my_render(
+                request,
+                'admin/a_editor_comment.html',
+                form_data = form_data,
+            )
+        form.update(comment_id)
+        back_url = request.GET.get('back_url')
+        return redirect(back_url)
+
+    
