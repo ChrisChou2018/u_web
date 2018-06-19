@@ -152,12 +152,24 @@ class Items(models.Model):
             return cls.objects.get(item_name = item_name).item_id
         except cls.DoesNotExist:
             return None
+    
+    @classmethod
+    def get_items_list_for_api(cls, current_page):
+        item_obj = cls.objects.filter(status = 'normal').order_by('-item_id')
+        p = Paginator(item_obj, 15)
+        return p.page(current_page).object_list
+    
+    @classmethod
+    def get_items_by_categorie_id(cls, categorie_id, current_page):
+        item_obj = cls.objects. \
+            filter(categories_id = categorie_id, status = 'normal').order_by('-item_id')
+        p = Paginator(item_obj, 15)
+        return p.page(current_page).object_list
+
 
     class Meta:
         db_table = "app_items"
     
-
-
 
 class ItemImages(models.Model):
     '''
@@ -169,7 +181,7 @@ class ItemImages(models.Model):
         (0, "title"),
         (1, "thumbicon"),
         (2, "item_title"),
-        (4, "item"),
+        (3, "item_info"),
     )
     image_type      = models.IntegerField(db_column="image_type", choices=type_choces, verbose_name="图片类型")
     image_path      = models.CharField(db_column="image_path", verbose_name="路径", max_length=255)
@@ -278,6 +290,15 @@ class Categories(models.Model):
     @classmethod
     def delete_categories_by_id_list(cls, id_list):
         cls.objects.filter(pk__in = id_list).delete()
+    
+    @classmethod
+    def get_categoreis_for_api(cls):
+        data_list = list()
+        for i in cls.type_choices:
+            temp = cls.objects.filter(categorie_type = i[0]).values()
+            temp = list(temp)
+            data_list.append({i[1]: temp})
+        return data_list
 
 
     class Meta:
@@ -328,6 +349,20 @@ class ItemComments(models.Model):
     def delete_comment_by_id_list(cls, id_list):
         cls.objects.filter(pk__in=id_list).update(status='deleted')
 
+    @classmethod
+    def get_item_comment_by_item_id(cls, item_id, current_page):
+        try:
+            item_comments_list = cls.objects.filter(
+                item_id = item_id, status = 'normal'
+                ).order_by('-comment_id')
+            p = Paginator(item_comments_list, 15)
+            data = p.page(current_page).object_list.values()
+            for i in data:
+                image_list = CommentImages.get_comment_image_obj_by_id(i['comment_id'])
+                i['image_list'] = image_list
+            return data
+        except cls.DoesNotExist:
+            return None
 
     class Meta:
         db_table = "app_item_comments"
@@ -344,6 +379,13 @@ class CommentImages(models.Model):
     resolution      = models.CharField(db_column="resolution", verbose_name="分辨率", max_length=255)
     file_type       = models.CharField(db_column="file_type", verbose_name="文件类型", default='.jpg', max_length=255)
     status          = models.CharField(db_column="status", verbose_name="状态", default="normal", max_length=255)
+
+
+    @classmethod
+    def get_comment_image_obj_by_id(cls, comment_id):
+        return cls.objects.filter(
+        comment_id = comment_id, status = 'normal'
+        ).values()
 
 
     class Meta:
