@@ -69,7 +69,7 @@
                 formData.append('_xsrf', getCookie("_xsrf"))
                 $.ajax({
                     type:'post',
-                    url:"{% url 'add_image' %}",
+                    url:"",
                     data:formData,
                     dataType:'json',
                     contentType:false,
@@ -103,7 +103,7 @@
                 var se = confirm("是否确认删除")
                 if (se==true){
                     $.post(
-                        '{% url "delete_item_comment_image" %}',
+                        '',
                         {'image_id_list':image_id_list, '_xsrf':getCookie("_xsrf")},
                         function(value){
                             if(value.result == 'success'){
