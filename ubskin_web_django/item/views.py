@@ -1,7 +1,7 @@
 import os
 
 from django.shortcuts import render
-from django.shortcuts import redirect
+from django.http import HttpResponseRedirect as redirect
 from django import forms
 from django.forms import model_to_dict
 from django.conf import settings
