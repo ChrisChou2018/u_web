@@ -53,3 +53,19 @@ pidfile=/Users/ChrisChou/Public/my_documents/ubskin_web_django/conf/script/uwsgi
 ```
 include /Users/matt/Projects/ubskin_web/conf/vhost_dev.conf;
 ```
+
+项目启动说明
+------
+`本地启动项目`
+直接命令运行
+```
+python3 start_web.py
+```
+
+`线上启动`
+nginx和uwsgi配置文件配置好之后
+先切换到项目根目录下的/you_project/conf/script/下，执行
+```
+uwsgi --ini uwsgi.ini
+```
+再启动nginx
