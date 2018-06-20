@@ -1,0 +1,75 @@
+
+{% extends '../a_layout.html' %}
+{% load ui_method %}
+{% block css %}
+    
+{% endblock %}
+{% block title %}
+<a type="button" class="btn btn-default back_btn" onclick="history.back()" >🔙 后退</a>             
+{% endblock %}
+{% block content %}
+<div class="box box-primary" style="padding: 15px">
+    <div class="box-header">
+      <h3 class="box-title">添加分类</h3>
+    </div><!-- /.box-header -->
+    <!-- form start -->
+    <form role="form" method="POST" action="" enctype="multipart/form-data">
+        {% csrf_token %}
+      <div class="box-body">
+        <div class="form-group">
+          <label for="exampleInputEmail1">分类名字</label>
+          <input type="text" class="form-control" id="exampleInputEmail1" name="categorie_name" value="{% if form_data.categorie_name %}{{ form_data.categorie_name }}{% endif %}">
+          <span style="color: red">{% if form_errors.categorie_name  %}{{ form_errors.categorie_name }}{% endif %}</span>
+        </div>
+        <div class="form-group">
+          <label for="cn_name_abridge">类别选择</label>
+          <select name="categorie_type" id="" class="form-control">
+                <option value="">--选择类别--</option>
+                {% for key in categorie_choices %}
+                    {% if form_data and form_data.categorie_type is not None and form_data.categorie_type == key %}
+                        <option value="{{ key }}" selected>{% get_value_by_key categorie_choices key %}</option>
+                    {% else %}
+                        <option value="{{ key }}">{% get_value_by_key categorie_choices key %}</option>
+                    {% endif %}
+                {% endfor %}
+          </select>
+          <span style="color: red">{% if form_errors.categorie_type %}{{ form_errors.categorie_type }}{% endif %}</span>
+        </div>
+        <div class="form-group">
+            <label for="from_country">品牌图片</label>
+            <input type="file" class="form-control" name="categorie_image">
+        </div>
+        <div class="image-box">
+            <img src="{% if form_data.image_path %}{{ form_data.image_path }}{% endif %}" alt="图片预览" style="width: 300px;height: 300px;">
+        </div>
+      </div><!-- /.box-body -->
+
+      <div class="box-footer">
+        <button type="submit" class="btn btn-primary">Submit</button>
+      </div>
+    </form>
+  </div>
+
+{% endblock %}
+{% block js %}
+    <script>
+    $(function(){
+        $('input[name="categorie_image"]').change(function(){
+            file = this.files[0]
+            var $image_item = $('.image-box img')
+            var url = null ;
+            if (window.createObjectURL!=undefined) { // basic
+                url = window.createObjectURL(file) ;
+            } else if (window.URL!=undefined) { // mozilla(firefox)
+                url = window.URL.createObjectURL(file) ;
+            } else if (window.webkitURL!=undefined) { // webkit or chrome
+                url = window.webkitURL.createObjectURL(file) ;
+            }
+            $image_item.attr('src', url)
+        })
+    })
+    
+    </script>
+{% endblock %}
+
+

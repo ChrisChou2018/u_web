@@ -43,7 +43,9 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
-    'my_admin',
+    'ubskin_web_django.member',
+    'ubskin_web_django.item',
+    'ubskin_web_django.global_app',
 ]
 
 MIDDLEWARE = [
@@ -62,7 +64,7 @@ TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [
-            os.path.join(BASE_DIR, 'templates'),
+            os.path.join(BASE_DIR, 'ubskin_web_django/templates'),
         ],
         'APP_DIRS': True,
         'OPTIONS': {
@@ -89,7 +91,7 @@ WSGI_APPLICATION = 'ubskin_web_django.wsgi.application'
 #     }
 # }
 
-AUTH_USER_MODEL = 'my_admin.Member'
+AUTH_USER_MODEL = 'member.Member'
 
 DATABASES = {
     'default' : {
@@ -144,8 +146,10 @@ USE_TZ = True
 STATIC_URL = '/static/'
 
 STATICFILES_DIRS = (
-    os.path.join(BASE_DIR, 'static'),
+    os.path.join(BASE_DIR, 'ubskin_web_django/static'),
 )
 
 MEDIA_ROOT = os.path.join(BASE_DIR, "..", 'media')
 MEDIA_URL = "/media/"
+
+ALLOWED_HOSTS = ['*',]

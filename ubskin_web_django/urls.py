@@ -18,7 +18,6 @@ from django.urls import path
 from django.urls import include
 from django.conf.urls.static import static
 from django.conf import settings
-from rest_framework import routers
 
 # from . import views_api
 # ### API register
@@ -29,13 +28,8 @@ from rest_framework import routers
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('myadmin/', include('my_admin.urls')),
+    path('', include('ubskin_web_django.member.urls')),
+    path('', include('ubskin_web_django.item.urls')),
 ]
 
 urlpatterns += static(settings.MEDIA_URL, document_root = settings.MEDIA_ROOT)
-
-
-urlpatterns += [
-    path('api/', include('my_admin.urls_api')),
-    path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
-]

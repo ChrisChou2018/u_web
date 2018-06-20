@@ -3,3 +3,5 @@ my_admin/migrations/0005_auto_20180619_0336.py
 my_admin/migrations/0006_auto_20180619_0407.py
 my_admin/migrations/0007_auto_20180619_0614.py
 my_admin/migrations/0008_auto_20180619_1104.py
+ubskin_web_django/item/migrations/0001_initial.py
+ubskin_web_django/member/migrations/0001_initial.py
