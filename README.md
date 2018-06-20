@@ -38,7 +38,7 @@ location /static/ {
   }
 
 location /media/ {
-alias /users/chrischou/public/my_documents/media/;
+    alias /users/chrischou/public/my_documents/media/;
 }
 
 ```

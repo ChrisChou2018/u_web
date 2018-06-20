@@ -114,7 +114,7 @@
                 formData.append('csrfmiddlewaretoken', getCookie("csrftoken"))
                 $.ajax({
                     type:'post',
-                    url:"/myadmin/js/item_image_create/",
+                    url:"{% url 'item_image_create' %}",
                     data:formData,
                     dataType:'json',
                     contentType:false,
