@@ -28,7 +28,9 @@ os.environ["DB_PORT"] = "3306"
 服务器配置文件
 ------------
 推荐使用 Nginx + uWsgi 作为本地 Web 服务器,服务器采用动静分离设计，nginx处理所有静态文件，uWsgi处理动态请求
+
 复制 conf/vhost_dev.conf 为 conf/vhost_dev_xxx.conf，xxx 建议为用户名。
+
 `注意修改nginx配置文件中的静态文件地址`
 ```
 location /static/ {
