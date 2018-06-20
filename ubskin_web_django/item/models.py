@@ -160,10 +160,10 @@ class Items(models.Model):
         items_list = p.page(current_page).object_list.values()
         items_list = list(items_list)
         for i in items_list:
-            image_obj = ItemImages.get_images_by_itemid(i['item_id'])
+            image_obj = ItemImages.get_images_by_itemid(i['item_id'],True)
             if image_obj:
                 i['image_list'] = image_obj
-            icon_obj = ItemImages.get_thumbicon_by_item_id(i['item_id'])
+            icon_obj = ItemImages.get_thumbicon_by_item_id(i['item_id'], True)
             if icon_obj:
                 i['item_thumbicon'] = icon_obj
         return items_list
@@ -175,10 +175,10 @@ class Items(models.Model):
         p = Paginator(item_obj, 15)
         items_list =  list(p.page(current_page).object_list.values())
         for i in items_list:
-            image_obj = ItemImages.get_images_by_itemid(i['item_id'])
+            image_obj = ItemImages.get_images_by_itemid(i['item_id'], True)
             if image_obj:
                 i['image_list'] = image_obj
-            icon_obj = ItemImages.get_thumbicon_by_item_id(i['item_id'])
+            icon_obj = ItemImages.get_thumbicon_by_item_id(i['item_id'], True)
             if icon_obj:
                 i['item_thumbicon'] = icon_obj
         return items_list
@@ -209,7 +209,7 @@ class ItemImages(models.Model):
 
 
     @classmethod
-    def get_thumbicon_by_item_id(cls, item_id):
+    def get_thumbicon_by_item_id(cls, item_id, for_api=False):
         try:
             image_obj = cls.objects.filter(
                 item_id = item_id,
@@ -217,17 +217,24 @@ class ItemImages(models.Model):
                 image_type = 1
             ).first()
             if image_obj:
-                return model_to_dict(image_obj)
+                image_obj = model_to_dict(image_obj)
+                if for_api:
+                    image_obj['image_path'] = "http://www-local.ubskin.net" + image_obj['image_path']
+                    return image_obj
+                return image_obj
             else:
                 return None
         except cls.DoesNotExist:
             return None
 
     @classmethod
-    def get_images_by_itemid(cls, item_id):
+    def get_images_by_itemid(cls, item_id, for_api=False):
         try:
             image_obj = cls.objects.filter(item_id=item_id, status = "normal").values()
             image_obj = list(image_obj)
+            if for_api:
+                for i in image_obj:
+                    i['image_path'] = "http://www-local.ubskin.net" + i['image_path']
             return image_obj
         except cls.DoesNotExist:
             return None
@@ -387,7 +394,7 @@ class ItemComments(models.Model):
             data = p.page(current_page).object_list.values()
             data = list(data)
             for i in data:
-                image_list = list(CommentImages.get_comment_image_obj_by_id(i['comment_id']))
+                image_list = CommentImages.get_comment_image_obj_by_id(i['comment_id'], True)
                 i['image_list'] = image_list
             return data
         except cls.DoesNotExist:
@@ -423,10 +430,12 @@ class CommentImages(models.Model):
 
 
     @classmethod
-    def get_comment_image_obj_by_id(cls, comment_id):
-        return cls.objects.filter(
-        comment_id = comment_id, status = 'normal'
-        ).values()
+    def get_comment_image_obj_by_id(cls, comment_id, for_api=False):
+        image_list = list(cls.objects.filter(comment_id = comment_id, status = 'normal').values())
+        if for_api:
+            for i in image_list:
+                i['image_path'] = "http://www-local.ubskin.net" + i['image_path']
+        return image_list
     
     @classmethod
     def create_many_comment_image(cls, data_list):
