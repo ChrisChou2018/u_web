@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     'ubskin_web_django.member',
     'ubskin_web_django.item',
     'ubskin_web_django.global_app',
+    'ubskin_web_django.order',
 ]
 
 MIDDLEWARE = [

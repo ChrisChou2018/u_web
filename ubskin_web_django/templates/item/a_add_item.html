@@ -15,6 +15,7 @@
     <form role="form" method="POST" action="" enctype="multipart/form-data">
         {% csrf_token %}
         <div class="box-body">
+            <input type="text" name="item_id" value="{{ form_data.item_id }}" style="display: none">
         <div class="form-group">
             <label for="recipient-name" class="control-label">商品名称:</label>
             <input type="text" class="form-control" name="item_name" value="{{ form_data.item_name }}">
@@ -27,10 +28,12 @@
         <div class="form-group">
             <label for="recipient-name" class="control-label">商品编码:</label>
             <input type="text" class="form-control" name="item_code" value="{% if form_data.item_code %}{{ form_data.item_code }} {% endif %}">
+            {% if form_errors and form_errors.item_code %} <span style="color: red">{{ form_errors.item_code }}</span> {% endif %}
         </div>
         <div class="form-group">
             <label for="recipient-name" class="control-label">商品条码:</label>
             <input type="text" class="form-control" name="item_barcode" value="{% if form_data.item_barcode %}{{ form_data.item_barcode }} {% endif %}">
+            {% if form_errors and form_errors.item_barcode %} <span style="color: red">{{ form_errors.item_barcode }}</span> {% endif %}
         </div>
         <div class="form-group">
             <label for="recipient-name" class="control-label">原价:</label>

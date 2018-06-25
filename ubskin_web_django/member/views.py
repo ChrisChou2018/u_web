@@ -97,6 +97,7 @@ def change_pass(request):
         form.update_pass()
         return redirect('/signin/')
 
+@login_required(login_url='/signin/')
 def member_manage(request):
     if request.method == "GET":
         GET = request.GET.get

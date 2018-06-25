@@ -30,6 +30,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('ubskin_web_django.member.urls')),
     path('', include('ubskin_web_django.item.urls')),
+    path('', include('ubskin_web_django.order.urls')),
 ]
 
 urlpatterns += static(settings.MEDIA_URL, document_root = settings.MEDIA_ROOT)

@@ -69,3 +69,8 @@ nginx和uwsgi配置文件配置好之后
 uwsgi --ini uwsgi.ini
 ```
 再启动nginx
+
+**HOST**:
+```
+127.0.0.1       www-local.ubskin.net
+```

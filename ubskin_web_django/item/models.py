@@ -182,6 +182,38 @@ class Items(models.Model):
             if icon_obj:
                 i['item_thumbicon'] = icon_obj
         return items_list
+    
+    @classmethod
+    def get_item_name_by_item_code(cls, item_barcode):
+        try:
+            return cls.objects.get(item_barcode=item_barcode).item_name
+        except cls.DoesNotExist:
+            return None
+    
+    @classmethod
+    def get_item_dict_by_item_barcode(cls, item_barcode):
+        try:
+            model = cls.objects.get(item_barcode=item_barcode)
+            return model_to_dict(model)
+        except cls.DoesNotExist:
+            return None
+    
+    @classmethod
+    def has_exist_item_code(cls, item_code, item_id):
+        try:
+            obj = cls.objects.get(item_code=item_code)
+            if item_id != obj.item_id:
+                return True
+        except cls.DoesNotExist:
+            return False
+    @classmethod
+    def has_exist_item_barcode(cls, item_barcode, item_id):
+        try:
+            obj = cls.objects.get(item_barcode=item_barcode)
+            if item_id != obj.item_id:
+                return True
+        except cls.DoesNotExist:
+            return False
 
 
     class Meta:
