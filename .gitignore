@@ -8,3 +8,5 @@ ubskin_web_django/member/migrations/0001_initial.py
 ubskin_web_django/item/migrations/0002_auto_20180625_0323.py
 ubskin_web_django/member/migrations/0002_auto_20180625_0323.py
 ubskin_web_django/order/migrations/0001_initial.py
+ubskin_web_django/item/migrations/0003_auto_20180625_0547.py
+ubskin_web_django/member/migrations/0003_auto_20180625_0547.py

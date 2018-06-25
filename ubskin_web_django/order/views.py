@@ -67,7 +67,7 @@ def item_qr_Code_manage(request):
             )
             data_count = order_models.get_data_count(order_models.ItemQRCode)
         for i in data_list:
-            item_name = item_models.Items.get_item_name_by_item_code(i.get('item_barcode'))
+            item_name = item_models.Items.get_item_name_by_barcode(i.get('item_barcode'))
             i['item_name'] = item_name
         return my_render(
             request,

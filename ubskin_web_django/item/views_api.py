@@ -9,6 +9,7 @@ from django.conf import settings
 from ubskin_web_django.common import photo
 from ubskin_web_django.common import decorators
 from ubskin_web_django.item import models as item_models
+from ubskin_web_django.common import lib_data
 
 
 @decorators.api_authenticated
@@ -123,4 +124,22 @@ def create_item_comment(request):
                 item_models.CommentImages. \
                 create_many_comment_image(comment_image_list)
         return_value['status'] = 'success'
+        return JsonResponse(return_value)
+
+def get_item_info_by_code(request):
+    return_value = {
+        'status': 'error',
+        'message': '',
+    }
+    if request.method == 'GET':
+        item_barcode = request.GET.get('item_barcode')
+        if not item_barcode:
+            return_value['message'] = '无效的商品码'
+            return JsonResponse(return_value)
+        item_dict = item_models.Items.get_item_dict_by_barcode_api(item_barcode)
+        if item_dict is None:
+            return_value['message'] = '没有找到相关的商品'
+            return JsonResponse(return_value)
+        return_value['status'] = 'success'
+        return_value['data'] = [item_dict,]
         return JsonResponse(return_value)

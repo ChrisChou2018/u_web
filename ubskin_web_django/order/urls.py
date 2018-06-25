@@ -19,4 +19,5 @@ urlpatterns += [
     path('js/get_recv_addr/', views_js.get_reve_addr, name='get_recv_addr'),
     path('js/get_item_info_by_code/', views_js.get_item_info_by_code, name='get_item_info_by_code'),
     path('js/create_out_order/', views_js.create_out_order, name="create_out_order"),
+    path('js/jm_out_order_item_info/', views_js.jm_out_order_item_info, name='jm_out_order_item_info')
 ]

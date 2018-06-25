@@ -3,7 +3,29 @@ import time
 from django.db import models
 from django.forms.models import model_to_dict
 from django.core.paginator import Paginator
+from django.db.models import Count
+
+from ubskin_web_django.item import models as item_model
 # Create your models here.
+
+class Recv(models.Model):
+    recv_id = models.AutoField(db_column='recv_id', primary_key=True, verbose_name='recv_id')
+    recv_code = models.CharField(db_column='recv_code', verbose_name='收货方代码', max_length=255)
+    recv_addr = models.CharField(db_column='recv_addr', verbose_name='收货地点名称', max_length=255)
+    is_watch = models.BooleanField(db_column='is_watch', verbose_name='重点关注', default=False)
+    status = models.CharField(db_column="status", default='normal', max_length=255)
+
+
+    @classmethod
+    def get_recv_addr_by_recv_code(cls, recv_code):
+        try:
+            return cls.objects.get(recv_code=recv_code, status='normal').recv_addr
+        except cls.DoesNotExist:
+            return None
+
+
+    class Meta:
+        db_table = 'recv'
 
 
 
@@ -13,6 +35,10 @@ class Order(models.Model):
     recv_code               = models.CharField(db_column="recv_code", verbose_name='到达商家地点代码', max_length=255)
     create_time             = models.IntegerField(db_column="create_time", verbose_name="创建时间", default=int(time.time()))
     status                  = models.CharField(db_column="status", default='normal', max_length=255)
+
+    @classmethod
+    def get_order_dict_by_out_order_id(cls, out_order_id):
+        return cls.objects.filter(out_order_id=out_order_id, status='normal').values()[0]
 
 
     class Meta:
@@ -30,30 +56,28 @@ class ItemQRCode(models.Model):
     def get_count_by_out_order_id(cls, out_order_id):
         return cls.objects.filter(out_order_id=out_order_id, status='normal').count()
 
+    @classmethod
+    def get_order__info_by_out_order_id(cls, out_order_id):
+        data_dict = dict()
+        order = Order.get_order_dict_by_out_order_id(out_order_id)
+        recv_addr = Recv.get_recv_addr_by_recv_code(order['recv_code'])
+        data_dict['out_order_id'] = out_order_id
+        data_dict['recv_addr'] = recv_addr
+        data_dict['recv_code'] = order['recv_code']
+        data_dict['item_code_list'] = cls.objects. \
+            filter(out_order_id=out_order_id, status='normal'). \
+            values('item_barcode').annotate(c=Count('item_barcode'))
+        all_count = 0
+        if data_dict['item_code_list']:
+            for i in data_dict['item_code_list']:
+                i['item_name'] = item_model.Items.get_item_name_by_barcode(i['item_barcode'])
+                all_count += int(i['c'])
+        data_dict['all_count'] = all_count
+        return data_dict
+
 
     class Meta:
         db_table = 'item_qr_code'
-
-
-class Recv(models.Model):
-    recv_id = models.AutoField(db_column='recv_id', primary_key=True, verbose_name='recv_id')
-    recv_code = models.CharField(db_column='recv_code', verbose_name='收货方代码', max_length=255)
-    recv_addr = models.CharField(db_column='recv_addr', verbose_name='收货地点名称', max_length=255)
-    is_watch = models.BooleanField(db_column='is_watch', verbose_name='重点关注', default=False)
-    status = models.CharField(db_column="status", default='normal', max_length=255)
-
-
-    @classmethod
-    def get_recv_addr_by_recv_code(cls, recv_code):
-        try:
-            return cls.objects.get(recv_code=recv_code).recv_addr
-        except cls.DoesNotExist:
-            return None
-
-
-    class Meta:
-        db_table = 'recv'
-
 
 
 def get_data_list(model, current_page, search_value=None, order_by="-pk"):
