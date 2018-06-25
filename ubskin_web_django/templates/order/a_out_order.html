@@ -1,0 +1,353 @@
+{% extends '../a_layout.html' %}
+{% load ui_method %}
+{% block css %}
+<style>
+    table{
+    table-layout:auto;
+    }
+    th{
+        word-break:keep-all;
+        white-space:nowrap;
+    }
+    td{
+    /* width:100%; */
+    word-break:keep-all;
+    white-space:nowrap;
+    }
+    .header .navbar-brand b { color: #EB5424; }
+    .header #main-nav-menu .navbar-nav li a:hover, .header #main-nav-menu .navbar-nav li.active a, .header #main-nav-menu .navbar-nav li.active a:focus, .header #main-nav-menu .navbar-nav li.active a:hover { color: #EB5424; border-color: #EB5424; }
+    .header .navbar-inverse .navbar-nav .open .dropdown-menu li.active a { color: #EB5424; }
+    .turbolinks-progress-bar { color: #EB5424 !important; }
+    .cf_item_num { width: 60px; }
+</style>
+{% endblock %}
+{% block title %}
+<button class="btn btn-default back_btn" onclick="history.back()">🔙</button> 商品出库扫码            
+{% endblock %}
+{% block page_header %}
+<ol class="breadcrumb">
+    <li><a href="#"><i class="fa fa-dashboard"></i> 商品出库表</a></li>
+    <li><a href="#"><i class="fa fa-dashboard"></i> 商品出库扫码</a></li>
+</ol>
+{% endblock %}
+
+{% block content_title %}
+
+
+{% endblock %}
+
+{% block content %}
+    
+    <div class="row" style="padding: 15px">
+    <div class="col-md-12" role="main">
+
+
+    <div class="bs-docs-section">
+
+        <form action="" method="POST">
+        <div class="bs-example">
+
+
+        <!--  STEP 1 START -->
+
+        <div id="id_div_step_1">
+        <div class="form-group">
+            <label for="id_txt_form_no">请扫描出库单号</label>
+            <input id="id_txt_form_no" type="text" class="form-control" name="f_form_no" placeholder="出库单号">
+        </div>
+        <div class="form-group">
+            
+            <label for="id_ipt_recv_code">填写收货方编码</label>
+            <input type="text" id="id_ipt_recv_code" class="form-control" name="" placeholder="收货方编码">
+        </div>
+        <button id="id_btn_start" type="button" class="btn btn-primary">开始出库商品扫码</button>
+        </div>
+
+
+        <!--  STEP 2 START -->
+
+        <div id="id_div_step_2" style="display: none;">
+
+            <div id="id_div_curr_item_info" style="display: none;">
+                <div class="form-group col-md-6">
+                    <label for="">当前扫描商品条码</label>
+                    <div id="id_div_curr_barcode"></div>
+                </div>
+                <div class="form-group col-md-6">
+                    <label for="">当前扫描商品名称</label>
+                    <div id="id_div_curr_item_name"></div>
+                </div>
+                <div class="form-group" id="id_div_scan_hint">
+                    <h3 style="color:red">当前商品为重点关注商品，请贴二维码后扫码</h3>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="">请扫描二维码或条形码</label>
+                <div><input type="text" id="id_ipt_barcode" class="form-control"/></div>
+            </div>
+        </div>
+
+
+        </div>
+        </form>
+
+
+        <form>
+        <hr/>
+
+        <div id="id_div_out_form" style="border: 1px solid #ccc; display: none; padding: 15px;">
+            <div id="id_div_stock_info">
+
+            </div>
+            <div>
+                <button id="id_btn_submit" type="button" class="btn btn-primary">出库商品扫描完毕</button>
+            </div>
+        </div>
+        </form>
+        
+    </div>
+
+</div>
+</div>
+
+{% endblock %}
+
+{% block js %}
+<script>
+$(function(){
+    $('.order_manage').addClass('active')
+    
+})
+var out_order_id = null;
+var recv_code = null;
+var recv_addr = null;
+
+var curr_item_barcode = null;
+var codes_dict = {};
+var items_dict = {};
+// var nums_dict = {};
+
+
+function build_info_div() {
+    if (!out_order_id) {
+        return;
+    }
+    let so_form_tag = "<p><strong>出库单号: " + out_order_id +"</strong></p>";
+    let recv_addr_tag = "<p>收货地址: "+recv_addr+"</p>";
+    let hr_tag = "<p><hr/></p>";
+
+    let tbl_start_tag = '<table class="table table-bordered"><tr><th>货号</th><th>商品名</th><th>规格</th><th>条码号</th><th>数量</th></tr>';
+    let tbl_end_tag = "</table>";
+
+    let item_count = 0;
+    let items_tag = "";
+    $.each(codes_dict, (key, val) => {
+        let item = items_dict[key];
+        items_tag += "<tr><td>" + item.item_code + "</td><td>" + item.item_name + "</td><td>" +  item.specifications_type_id + "</td><td>" + key + "</td><td>" + val.length + "</td></tr>";
+        item_count += val.length;
+    });
+    // $.each(nums_dict, (key, num) => {
+    //     let item = items_dict[key];
+    //     items_tag += "<tr><td>" + item.item_code + "</td><td>" + item.item_name
+    //         + "</td><td>" + item.specifications_type_id + "</td><td>" + key + "</td><td>" 
+    //         + '<input type="text" name="'+key+'" class="form-control cf_item_num" value="'+num+'">' + "</td></tr>";
+    //     item_count += num;
+    // })
+    let item_count_tag = "<p>共计: " + item_count + "</p>";
+    
+
+    $('#id_div_stock_info').html(
+        so_form_tag + recv_addr_tag + hr_tag 
+        + tbl_start_tag + items_tag + tbl_end_tag + hr_tag + item_count_tag
+    );
+
+    $('#id_div_out_form').show();
+}
+
+$(function() {
+
+    $("#id_txt_form_no").focus();
+
+    $("#id_txt_form_no").keypress((e) => {
+        if (e.which == 13) {
+            $("#id_ipt_recv_code").focus();
+        }
+    });
+
+    $("#id_ipt_recv_code").keypress((e) => {
+        if (e.which == 13) {
+            $("#id_btn_start").trigger("click");
+        }
+    });
+
+    // start to scan items
+    $("#id_btn_start").click((e) => {
+        out_order_id = $('#id_txt_form_no').val();
+        if (!out_order_id) {
+            alert("请扫描或填写出库单条码编号");
+            return;
+        }
+        recv_code = $("#id_ipt_recv_code").val();
+        if (!recv_code) {
+            alert("请扫描或填写收货方编码");
+            return;
+        }
+        // check if in monitor codes and load brand names
+        $.get(
+            "{% url 'get_recv_addr' %}",
+            {recv_code: recv_code},
+            (r) => {
+                if (r.status == "success") {
+                    recv_addr = r.data.recv_addr;
+
+                    // recv_code = $('#id_sel_recv_code').val();
+                    // recv_addr = $('#id_sel_recv_code').find('option:selected').text();
+
+                    build_info_div();
+
+                    // hide step 1 div and show step 2
+                    $('#id_div_step_1').hide();
+                    $('#id_div_step_2').show();
+                    $('#id_ipt_barcode').focus();
+                }
+                else {
+                    var msg = (r && r.message) ? r.message : '发生数据错误, 请稍后重试';
+                    alert(msg);
+                }
+            }
+        );
+    });
+
+
+    // --- scan code produre ---
+
+    // barcode input
+    $('#id_ipt_barcode').keypress((e) => {
+        if (e.which != 13) {
+            return;
+        }
+        // alert($("#id_ipt_barcode").val());
+        let barcode = $("#id_ipt_barcode").val();
+        if (!barcode) {
+            return;
+        }
+
+        $("#id_ipt_barcode").val("");
+        
+        // if start with 'U', then it's a 2d code
+        if (barcode.length == 9 && barcode.indexOf("U") == 0) {
+            if (!curr_item_barcode) {
+                alert("请先扫描商品条码, 然后再扫描二维码");
+                $("#id_ipt_barcode").val("");
+                return;
+            }
+            if (!codes_dict[curr_item_barcode]) {
+                // alert("IN NOT codes_dict")
+                codes_dict[curr_item_barcode] = new Array();
+            }
+            // remove all equal item from all list
+            $.each(codes_dict, (key, val) => {
+                codes_dict[key] = $.grep(codes_dict[key], function(obj) {
+                    return obj != barcode;
+                });
+            });
+            codes_dict[curr_item_barcode].push(barcode);
+
+            build_info_div();
+        }
+        else {
+            curr_item_barcode = barcode;
+            // load goods info by barcode
+            $.get(
+                "{% url 'get_item_info_by_code' %}",
+                { item_barcode: curr_item_barcode, recv_code: recv_code },
+                (r) => {
+                    if (r && r.status == "success") {
+                        items_dict[curr_item_barcode] = r.data;
+
+                        // TODO: remove monitor check for temp
+                        r.in_monitor = false;
+
+                        // if it's in monitor list, then
+                        if (r.in_monitor) {
+                            // 2dcode is a must
+                            $("#id_div_scan_hint").show();
+                        }
+                        else {
+                            // product number plus 1
+                            // if (!nums_dict[curr_item_barcode]) {
+                            //     nums_dict[curr_item_barcode] = 0;
+                            // }
+                            // nums_dict[curr_item_barcode] += 1;
+
+                            $("#id_div_scan_hint").hide();
+                        }
+
+                        $("#id_div_curr_barcode").text(curr_item_barcode);
+                        $("#id_div_curr_item_name").text(r.data.item_name);
+                        $("#id_div_curr_item_info").show();
+
+                        build_info_div();
+                    }
+                    else {
+                        $("#id_div_curr_item_info").hide();
+                        var msg = (r && r.message) ? r.message : "发生数据错误, 请稍后重试";
+                        alert(msg);
+                        curr_item_barcode = null;
+                    }
+            })
+            .fail(function(xhr, status, error) {
+                alert("发生网络错误, 请稍后重试");
+            });
+        }
+    });
+
+
+    // --- bind event so we can set item number
+    // $("#id_div_stock_info").on("change", ".cf_item_num", function() {
+    //     let item_barcode = $(this).attr('name');
+    //     let item_num = $(this).val();
+    //     // alert(item_num);
+        
+    //     if (!$.isNumeric(item_num)) {
+    //         alert("请输入正确的数字");
+    //         $(this).focus();
+    //         return;
+    //     }
+        
+    //     nums_dict[item_barcode] = parseInt(item_num);
+    //     build_info_div();
+    // });
+
+
+    // submit form
+    $("#id_btn_submit").click(function(e) {
+        e.preventDefault();
+        if (!confirm("确定完成出库单扫描，提交数据吗？\n\n注：确认提交前请核对出库商品数量！")) {
+            return;
+        }
+        
+        var params = {
+            out_order_id: out_order_id,
+            recv_code: recv_code,
+            item_codes_dict: JSON.stringify(codes_dict),
+            'csrfmiddlewaretoken': getCookie('csrftoken'),
+            // item_nums_json: JSON.stringify(nums_dict),
+        }
+        $.post("{% url 'create_out_order' %}", params, (r) => {
+            if (r && r.status == "success") {
+                alert("出库信息已记录成功!");
+                location.href = "/order_manage/";
+            }
+            else {
+                var msg = (r && r.message) ? r.message : "发生数据错误, 请稍后重试";
+                alert(msg);
+            }
+        });
+    });
+
+});  
+
+</script>
+{% endblock %}

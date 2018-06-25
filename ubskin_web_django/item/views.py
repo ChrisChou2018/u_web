@@ -96,27 +96,48 @@ def add_item(request):
         return redirect('/item_manage/')
 
 
-class EditorItemForm(forms.ModelForm):
+class EditorItemForm(forms.Form):
+    item_id = forms.IntegerField()
     item_name = forms.CharField(error_messages={'required': '至少这个不可以为空'})
+    item_info = forms.CharField(required=False)
+    item_code = forms.CharField(required=False)
+    item_barcode = forms.CharField(required=False)
+    price = forms.IntegerField(required=False)
+    current_price = forms.IntegerField(required=False)
+    foreign_price = forms.IntegerField(required=False)
+    key_word = forms.CharField(required=False)
+    origin = forms.CharField(required=False)
+    shelf_life = forms.CharField(required=False)
+    capacity = forms.CharField(required=False)
+    specifications_type_id = forms.IntegerField(required=False)
+    for_people = forms.CharField(required=False)
+    weight = forms.IntegerField(required=False)
+    brand_id = forms.IntegerField(required=False)
+    categories_id = forms.IntegerField(required=False)
 
-    class Meta:
-        model = item_models.Items
-        fields = (
-            "item_name", "item_info", "item_code",
-            "item_barcode", "price", "current_price",
-            "foreign_price", "key_word", "origin",
-            "shelf_life", "capacity", "specifications_type_id",
-            "for_people", "weight", "brand_id",
-            "categories_id"
-        )
+
+    def clean_item_code(self):
+        item_code = self.cleaned_data['item_code']
+        item_id = self.cleaned_data['item_id']
+        if item_models.Items.has_exist_item_code(item_code, item_id):
+            raise forms.ValidationError("当前商品编码已经存在")
+        return item_code
+    
+    def clean_item_barcode(self):
+        item_barcode = self.cleaned_data['item_barcode']
+        item_id = self.cleaned_data['item_id']
+        if item_models.Items.has_exist_item_barcode(item_barcode, item_id):
+            raise forms.ValidationError("当前商品条码已经存在")
+        return item_barcode
+
     def update(self, item_id, request=None):
-        item = self._meta.model
+        item = item_models.Items
         update_person = request.user.member_name
         data = self.cleaned_data
+        item_id = data.pop('item_id')
         data.update({'update_person': update_person})
         item.update_item_by_id(item_id, data)
         return item
-
 
 
 def editor_item(request):
@@ -144,6 +165,7 @@ def editor_item(request):
             return my_render(
                 request,
                 'item/a_add_item.html',
+                form_data = form_data,
                 specifications_type_dict = specifications_type_dict,
                 brands_dict = brands_dict,
                 categories_dict = categories_dict,
@@ -152,8 +174,6 @@ def editor_item(request):
         form.update(item_id, request)
         return redirect(back_url)
         
-
-
 def item_image_manage(request):
     if request.method == "GET":
         item_id = request.GET.get('item_id')

@@ -1,0 +1,147 @@
+{% extends '../a_layout.html' %}
+{% load ui_method %}
+{% block css %}
+<style>
+    table{
+    table-layout:auto;
+    }
+    th{
+        word-break:keep-all;
+        white-space:nowrap;
+    }
+    td{
+    /* width:100%; */
+    word-break:keep-all;
+    white-space:nowrap;
+    }
+</style>
+{% endblock %}
+{% block title %}
+商品出库表            
+{% endblock %}
+{% block page_header %}
+<ol class="breadcrumb">
+    <li><a href="#"><i class="fa fa-dashboard"></i> 商品出库表</a></li>
+</ol>
+{% endblock %}
+
+{% block content_title %}
+
+<div class="row">
+    <div class="col-md-8">
+        <div "row">
+            <div class="col-md-8">
+                <form action="" method="GET" class="search_input">
+                <div class="input-group">
+                    <input type="text" class="form-control" placeholder="搜索出库单号" name="search_value" value="{{ search_value }}">
+                    <span class="input-group-btn">
+                        <button class="btn btn-default search_input_btn" type="submit">搜索</button>
+                    </span>
+                  </div><!-- /input-group -->
+                </form>
+            </div>
+            <div class="col-md-4">
+
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <a type="button" class="btn btn-info add_member_btn" type="button" href="{% url 'out_order' %}" >开始扫码出库 <span class="glyphicon glyphicon-plus"></span></a>
+        <!-- <button type="button" class="btn btn-default choose_member" type="button">选择<span class="glyphicon glyphicon-saved"></span></button>
+        <button type="button" class="btn btn-danger delete_member" type="button">删除<span class="glyphicon glyphicon-trash"></span></button> -->
+    </div>
+</div>
+{% endblock %}
+
+{% block content %}
+
+    <div class="row" style="padding: 15px">
+    <div class="col-md-12" role="main" >
+    
+    <div class="bs-docs-section">
+        <div class="table-responsive">
+            <table class="table table-bordered table-striped">
+                <colgroup>
+                <col class="col-xs-1">
+                <col class="col-xs-4">
+                <col class="col-xs-1">
+                <col class="col-xs-1">
+                <col class="col-xs-1">
+                </colgroup>
+                <thead>
+                <tr>
+                    <th>出库单号</th>
+                    <th>收货地址</th>
+                    <th>商品总数</th>
+                    <th>出库时间</th>
+                    <th>操作</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for stock in data_list %}
+                <tr>
+                    <th scope="row">{{ stock.out_order_id }}</th>
+                    <td>{{ stock.recv_code }} - {{ stock.recv_addr }}</td>
+                    <td>{{ stock.code_count }}</td>
+                    <td>{{ stock.recv_code }}</td>
+                    <td><a href="#modalItemCodes" data-toggle="modal" data-target="#modalItemCodes" data-batchid="{{ stock.order_id }}">详情</a></td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div id="modalItemCodes" class="modal fade" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content" id="id_modal_content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title">出库单</h4>
+            </div>
+            <div class="modal-body" id="id_modal_body">
+                <p><i class="fa fa-refresh fa-spin" style="font-size: 24px;"></i></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
+
+
+<div>
+    <nav aria-label="Page navigation">
+        <ul class="pagination page_box">
+            {% Pagingfunc current_page data_count filter_args request.uri as page %}
+            {{ page | safe }}
+        </ul>
+    </nav>
+</div>
+
+
+{% endblock %}
+
+{% block js %}
+    <script>
+        $(function(){
+            $('.order_manage').addClass('active')
+            $('#modalItemCodes').on('show.bs.modal', (e) => {
+                let btn = $(e.relatedTarget);
+                let batchId = btn.data('batchid');
+                
+                $('#id_modal_body').load('/admin/jm-items-stock-batch-detail/' + batchId, (res, status, xhr) => {
+                    if (status == "error") {
+                        $('#id_modal_body').html('<p>加载数据时出错, 请稍后再试</p>');
+                        return;
+                    }
+                });
+            });  
+        })
+        
+ 
+
+       
+
+    </script>
+{% endblock %}
