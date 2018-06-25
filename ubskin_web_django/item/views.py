@@ -91,6 +91,7 @@ def add_item(request):
                 brands_dict = brands_dict,
                 categories_dict = categories_dict,
                 form_errors = form.errors,
+                form_data = request.POST,
             )
         form.save(request=request)
         return redirect('/item_manage/')

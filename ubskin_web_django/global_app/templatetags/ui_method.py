@@ -1,3 +1,5 @@
+import time
+
 from django import template
 from ubskin_web_django.item import models as item_models
 
@@ -102,3 +104,10 @@ def get_thumbicon_by_id(item_id):
         return item_image_obj["image_path"]
     else:
         return "/static/images/user-default.jpg"
+
+@register.simple_tag
+def parse_timestamps(timestamps):
+    t = time.localtime(timestamps)
+    print(t,111111)
+    time_str = time.strftime('%Y-%m-%d %H:%M:%S', t)
+    return time_str

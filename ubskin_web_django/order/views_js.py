@@ -3,10 +3,14 @@ import json
 from django import forms
 from django.http import JsonResponse
 from django.forms.models import model_to_dict
+from django.shortcuts import render
 
 from ubskin_web_django.order import models as order_models
 from ubskin_web_django.item import models as item_models
 from ubskin_web_django.common import lib_data
+
+def my_render(request, templater_path, **kwargs):
+    return render(request, templater_path, dict(**kwargs))
 
 
 class RecvForm(forms.ModelForm):
@@ -159,3 +163,15 @@ def create_out_order(request):
                 )
         return_value['status'] = 'success'
         return JsonResponse(return_value)
+
+def jm_out_order_item_info(request):
+    data_id = request.GET.get('data_id')
+    order = order_models.get_model_obj_by_pk(order_models.Order, data_id)
+    out_order_id = order.out_order_id
+    code_data = order_models.ItemQRCode. \
+        get_order__info_by_out_order_id(out_order_id)
+    return my_render(
+        request,
+        'order/a_jm_out_order_info.html',
+        code_data = code_data
+    )

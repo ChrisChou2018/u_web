@@ -83,7 +83,7 @@
                     <th scope="row">{{ stock.out_order_id }}</th>
                     <td>{{ stock.recv_code }} - {{ stock.recv_addr }}</td>
                     <td>{{ stock.code_count }}</td>
-                    <td>{{ stock.recv_code }}</td>
+                    <td>{% parse_timestamps stock.create_time %}</td>
                     <td><a href="#modalItemCodes" data-toggle="modal" data-target="#modalItemCodes" data-batchid="{{ stock.order_id }}">详情</a></td>
                 </tr>
                 {% endfor %}
@@ -130,7 +130,7 @@
                 let btn = $(e.relatedTarget);
                 let batchId = btn.data('batchid');
                 
-                $('#id_modal_body').load('/admin/jm-items-stock-batch-detail/' + batchId, (res, status, xhr) => {
+                $('#id_modal_body').load('{% url "jm_out_order_item_info" %}?data_id=' + batchId, (res, status, xhr) => {
                     if (status == "error") {
                         $('#id_modal_body').html('<p>加载数据时出错, 请稍后再试</p>');
                         return;

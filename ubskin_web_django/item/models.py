@@ -71,8 +71,8 @@ class Items(models.Model):
     item_id                     = models.AutoField(db_column="item_id", primary_key=True, verbose_name='商品ID')
     item_name                   = models.CharField(db_column="item_name", verbose_name='商品名称', max_length=255)
     item_info                   = models.CharField(db_column="item_info", null=True, blank=True, verbose_name='商品信息', max_length=255)
-    item_code                   = models.CharField(db_column="item_code", null=True, blank=True, verbose_name="商品编码", max_length=255)
-    item_barcode                = models.CharField(db_column="item_barcode", null=True, blank=True, verbose_name="商品条码", max_length=255)
+    item_code                   = models.CharField(db_column="item_code", null=True, blank=True, verbose_name="商品编码", max_length=255, unique=True)
+    item_barcode                = models.CharField(db_column="item_barcode", null=True, blank=True, verbose_name="商品条码", max_length=255, unique=True)
     price                       = models.FloatField(db_column="price", null=True, blank=True, verbose_name="商品原价")
     current_price               = models.FloatField(db_column='current_price', null=True, blank=True, verbose_name="商品现价")
     foreign_price               = models.FloatField(db_column='foreign_price', null=True, blank=True, verbose_name="国外价格")
@@ -184,7 +184,7 @@ class Items(models.Model):
         return items_list
     
     @classmethod
-    def get_item_name_by_item_code(cls, item_barcode):
+    def get_item_name_by_barcode(cls, item_barcode):
         try:
             return cls.objects.get(item_barcode=item_barcode).item_name
         except cls.DoesNotExist:
@@ -195,6 +195,19 @@ class Items(models.Model):
         try:
             model = cls.objects.get(item_barcode=item_barcode)
             return model_to_dict(model)
+        except cls.DoesNotExist:
+            return None
+    
+    @classmethod
+    def get_item_dict_by_barcode_api(cls, item_barcode):
+        try:
+            data_dict = dict()
+            model = cls.objects.get(item_barcode=item_barcode)
+            data_dict['item_name'] = model.item_name
+            data_dict['specifications_type'] = dict(cls.specifications_type_choices)[model.specifications_type_id]
+            data_dict['thumbicon'] = ItemImages.get_thumbicon_by_item_id(model.item_id,True)
+            data_dict['item_barcode'] = model.item_barcode
+            return data_dict
         except cls.DoesNotExist:
             return None
     
@@ -251,7 +264,7 @@ class ItemImages(models.Model):
             if image_obj:
                 image_obj = model_to_dict(image_obj)
                 if for_api:
-                    image_obj['image_path'] = "http://www-local.ubskin.net" + image_obj['image_path']
+                    image_obj['image_path'] = "http://10.0.0.109" + image_obj['image_path']
                     return image_obj
                 return image_obj
             else:
