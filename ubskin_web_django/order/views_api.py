@@ -44,7 +44,6 @@ def create_stock_batch_api(request):
         recv_code = data.get('shop_id')
         item_codes_dict = data.get('item_codes_dict')
         openid = data.get('openid')
-        print(openid)
         member = member_models.Member.get_member_by_telephone(openid)
         if not member:
             return_value['message'] = '无权限'

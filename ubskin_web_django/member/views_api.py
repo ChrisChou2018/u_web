@@ -69,6 +69,9 @@ def wx_signin(request):
         avatar = data.get('avatar')
         member = member_models.Member.get_member_by_telephone(openid)
         if member:
+            member.member_name = name
+            member.avatar = avatar
+            member.save()
             return JsonResponse({'is_staff': member.is_staff})
         else:
             user_data = {'telephone': openid, 'member_name': name, 'avatar': avatar, 'is_staff': False}
