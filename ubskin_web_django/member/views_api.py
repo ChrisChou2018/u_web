@@ -1,5 +1,6 @@
 import os
 import random
+import json
 
 from django.views.decorators.csrf import csrf_exempt
 from django import forms
@@ -41,7 +42,43 @@ def signin(request):
 def signin_out(request):
     logout(request)
     return JsonResponse({'message':'登出成功'})
-    
+
+
+class UserCreationFormWX(forms.ModelForm):
+
+
+    class Meta:
+        model = member_models.Member
+        fields = ('member_name', 'telephone', 'avatar', 'is_staff')
+
+
+    def save(self, commit=True):
+        # Save the provided password in hashed format
+        user = super(UserCreationFormWX, self).save(commit=False)
+        user.set_password(self.cleaned_data["telephone"])
+        if commit:
+            user.save()
+        return user
+
+@csrf_exempt
+def wx_signin(request):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        openid = data.get('openid')
+        name = data.get('name')
+        avatar = data.get('avatar')
+        member = member_models.Member.get_member_by_telephone(openid)
+        if member:
+            return JsonResponse({'is_staff': member.is_staff})
+        else:
+            user_data = {'telephone': openid, 'member_name': name, 'avatar': avatar, 'is_staff': False}
+            form  = UserCreationFormWX(user_data)
+            if form.is_valid():
+                member = form.save()
+                return JsonResponse({'is_staff': member.is_staff})
+            else:
+                return JsonResponse({'error':'服务器出错'})
+
 
 class UserCreationForm(forms.ModelForm):
     password1 = forms.CharField(
@@ -68,13 +105,6 @@ class UserCreationForm(forms.ModelForm):
         if password1 and password2 and password1 != password2:
             raise forms.ValidationError("两次密码不一致")
         return password2
-
-    def clean_member_name(self):
-        member_name = self.cleaned_data.get("member_name")
-        member = member_models.Member.get_member_by_member_name(member_name)
-        if member:
-            raise forms.ValidationError("用户名已经存在")
-        return member_name
 
     def clean_telephone(self):
         telephone = self.cleaned_data.get("telephone")

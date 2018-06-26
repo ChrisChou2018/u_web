@@ -15,23 +15,22 @@ def order_manage(request):
         filter_args = None
         if value:
             filter_args = '&search_value={0}'.format(value)
-            search_value = {"out_order_id" : value}
+            search_value = {"stock_bach_id" : value}
             data_list = order_models.get_data_list(
-                order_models.Order, current_page, search_value
+                order_models.StockBatch, current_page, search_value
             )
             item_count = order_models.get_data_count(
-                order_models.Order, search_value
+                order_models.StockBatch, search_value
             )
         else:
             data_list = order_models.get_data_list(
-                order_models.Order, current_page
+                order_models.StockBatch, current_page
             )
-            print(data_list)
-            item_count = order_models.get_data_count(order_models.Order)
+            item_count = order_models.get_data_count(order_models.StockBatch)
         if data_list:
             for i in data_list:
-                item_qr_code_count = order_models.ItemQRCode. \
-                    get_count_by_out_order_id(i['out_order_id'])
+                item_qr_code_count = order_models.ItemQRCode.\
+                    get_count_by_stock_batch_id(i['stock_batch_id'])
                 i['code_count'] = item_qr_code_count
         for i in data_list:
             recv_addr = order_models.Recv. \
@@ -107,9 +106,9 @@ def recv_manage(request):
             data_count = data_count,
         )
 
-def out_order(request):
+def stock_batch(request):
     if request.method == 'GET':
         return my_render(
             request,
-            'order/a_out_order.html',
+            'order/a_stock_batch.html',
         )

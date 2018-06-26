@@ -136,42 +136,41 @@ def get_item_info_by_code(request):
         return_value['data'] = item_dict
         return JsonResponse(return_value)
 
-def create_out_order(request):
+def create_stock_bach(request):
     return_value = {
         'status': 'error',
         'message': '',
     }
     if request.method == 'POST':
-        out_order_id = request.POST.get('out_order_id')
+        stock_batch_id = request.POST.get('stock_batch_id')
         recv_code = request.POST.get('recv_code')
         item_codes_dict = request.POST.get('item_codes_dict')
         item_codes_dict = json.loads(item_codes_dict)
         order_models.create_model_data(
-            order_models.Order,
-            {"out_order_id": out_order_id, "recv_code": recv_code}
+            order_models.StockBatch,
+            {"stock_batch_id": stock_batch_id, "recv_code": recv_code}
         )
         for key, item in item_codes_dict.items():
             for i in item:
-                print()
                 order_models.create_model_data(
                     order_models.ItemQRCode,
                     {
                         "item_barcode": key,
                         "qr_code": i,
-                        "out_order_id": out_order_id
+                        "stock_batch_id": stock_batch_id
                     }
                 )
         return_value['status'] = 'success'
         return JsonResponse(return_value)
 
-def jm_out_order_item_info(request):
+def jm_stock_batch_info(request):
     data_id = request.GET.get('data_id')
-    order = order_models.get_model_obj_by_pk(order_models.Order, data_id)
-    out_order_id = order.out_order_id
+    stock = order_models.get_model_obj_by_pk(order_models.StockBatch, data_id)
+    out_order_id = stock.stock_batch_id
     code_data = order_models.ItemQRCode. \
-        get_order__info_by_out_order_id(out_order_id)
+        get_stock_batch_info_by_stock_batch_id(out_order_id)
     return my_render(
         request,
-        'order/a_jm_out_order_info.html',
+        'order/a_jm_stock_batch_info.html',
         code_data = code_data
     )

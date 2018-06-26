@@ -73,10 +73,10 @@
                 <thead>
                 <tr>
                     <th>ID</th>
-                    <th>物码识别号</th>
+                    <th>物品二维码</th>
                     <th>商品名</th>
                     <th>出库单号</th>
-                    <th>出库状态</th>
+                    <th>商品条码</th>
                     <th>操作</th>
                 </tr>
                 </thead>
@@ -86,8 +86,8 @@
                     <th scope="row">{{ code.qr_code_id }}</th>
                     <td>{{ code.qr_code }}</td>
                     <td>{{ code.item_name }}</td>
-                    <td>{{ code.out_order_id }}</td>
-                    <td>{{ code.out_status }}</td>
+                    <td>{{ code.stock_batch_id }}</td>
+                    <td>{{ code.item_barcode }}</td>
                     <!-- <td>{{ code.out_order_id }}</td> -->
                     <td><a href="#modalItemCodes" data-toggle="modal" data-target="#modalItemCodes" data-batchid="{{ code.qr_code_id }}">详细</a></td>
                 </tr>
