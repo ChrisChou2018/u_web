@@ -38,3 +38,6 @@ ubskin_web_django/order/migrations/0004_auto_20180626_0931.py
 ubskin_web_django/order/migrations/0005_auto_20180626_0933.py
 ubskin_web_django/order/migrations/0006_auto_20180626_0940.py
 ubskin_web_django/order/migrations/0007_auto_20180626_1104.py
+ubskin_web_django/item/migrations/0015_auto_20180626_1244.py
+ubskin_web_django/member/migrations/0015_auto_20180626_1244.py
+ubskin_web_django/order/migrations/0008_auto_20180626_1244.py
