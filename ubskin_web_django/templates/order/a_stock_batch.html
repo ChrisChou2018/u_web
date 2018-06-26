@@ -119,7 +119,7 @@ $(function(){
     $('.order_manage').addClass('active')
     
 })
-var out_order_id = null;
+var stock_batch_id = null;
 var recv_code = null;
 var recv_addr = null;
 
@@ -130,10 +130,10 @@ var items_dict = {};
 
 
 function build_info_div() {
-    if (!out_order_id) {
+    if (!stock_batch_id) {
         return;
     }
-    let so_form_tag = "<p><strong>出库单号: " + out_order_id +"</strong></p>";
+    let so_form_tag = "<p><strong>出库单号: " + stock_batch_id +"</strong></p>";
     let recv_addr_tag = "<p>收货地址: "+recv_addr+"</p>";
     let hr_tag = "<p><hr/></p>";
 
@@ -183,8 +183,8 @@ $(function() {
 
     // start to scan items
     $("#id_btn_start").click((e) => {
-        out_order_id = $('#id_txt_form_no').val();
-        if (!out_order_id) {
+        stock_batch_id = $('#id_txt_form_no').val();
+        if (!stock_batch_id) {
             alert("请扫描或填写出库单条码编号");
             return;
         }
@@ -329,13 +329,12 @@ $(function() {
         }
         
         var params = {
-            out_order_id: out_order_id,
+            stock_batch_id: stock_batch_id,
             recv_code: recv_code,
             item_codes_dict: JSON.stringify(codes_dict),
             'csrfmiddlewaretoken': getCookie('csrftoken'),
-            // item_nums_json: JSON.stringify(nums_dict),
         }
-        $.post("{% url 'create_out_order' %}", params, (r) => {
+        $.post("{% url 'create_stock_bach' %}", params, (r) => {
             if (r && r.status == "success") {
                 alert("出库信息已记录成功!");
                 location.href = "/order_manage/";

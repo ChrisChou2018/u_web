@@ -24,4 +24,5 @@ urlpatterns += [
     path('api/signin/', views_api.signin),
     path('api/signin_out/', views_api.signin_out),
     path('api/register/', views_api.register),
+    path('api/wx_signin/', views_api.wx_signin),
 ]

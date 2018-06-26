@@ -58,6 +58,12 @@
                         <input type="checkbox"  id="recipient-name" name="is_admin">
                     </div>
                 </div>
+                <div>
+                    <div class="form-group">
+                        <label for="" class="control-label">是否为内部账号:</label>
+                        <input type="checkbox"  id="recipient-name" name="is_staff">
+                    </div>
+                </div>
             </form>
             <span class="return_msg_box" style="color: red"></span>
         </div>
@@ -217,6 +223,11 @@
                         }else{
                             $('input[name="is_admin"]').prop('checked', false)  
                         }
+                        if(data_dict['is_staff']){
+                            $('input[name="is_staff"]').prop('checked', true)        
+                        }else{
+                            $('input[name="is_staff"]').prop('checked', false)  
+                        }
                         $('.submit_btn').unbind()
                         $('.submit_btn').click(function(){
                             add_or_edit_member(true)
@@ -253,6 +264,11 @@
                 data_dict['is_admin'] = true
             }else{
                 data_dict['is_admin'] = false
+            }
+            if($('input[name="is_staff"]').prop('checked')){
+                data_dict['is_staff'] = true
+            }else{
+                data_dict['is_staff'] = false
             }
             $.post(
                 post_url,

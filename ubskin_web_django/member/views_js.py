@@ -24,7 +24,7 @@ class UserCreationForm(forms.ModelForm):
 
     class Meta:
         model = member_models.Member
-        fields = ('member_name', 'telephone', 'is_admin')
+        fields = ('member_name', 'telephone', 'is_admin', 'is_staff')
 
     def clean_password2(self):
         # Check that the two password entries match
@@ -34,12 +34,6 @@ class UserCreationForm(forms.ModelForm):
             raise forms.ValidationError("两次密码不一致")
         return password2
 
-    def clean_member_name(self):
-        member_name = self.cleaned_data.get("member_name")
-        member = member_models.Member.get_member_by_member_name(member_name)
-        if member:
-            raise forms.ValidationError("用户名已经存在")
-        return member_name
 
     def clean_telephone(self):
         telephone = self.cleaned_data.get("telephone")
@@ -90,7 +84,7 @@ def editor_member(request):
         'status':'error',
         'message':'',
     }
-    update_field = ['member_name', 'telephone', 'is_admin']
+    update_field = ['member_name', 'telephone', 'is_admin', 'is_staff']
     member_id = request.GET.get('member_id')
     member_obj = member_models.Member.get_member_by_id(member_id)
     if request.method == 'GET':
@@ -111,6 +105,7 @@ def editor_member(request):
             if request.POST.get(key)
         }
         clear_data['is_admin'] = True if clear_data['is_admin'] == 'true' else False
+        clear_data['is_staff'] = True if clear_data['is_staff'] == 'true' else False
         member_models.Member.update_member_by_id(member_id, clear_data)
         return_value['status'] = 'success'
         return JsonResponse(return_value)

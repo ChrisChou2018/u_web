@@ -42,7 +42,7 @@ class UserProfileManager(BaseUserManager):
 
 class Member(AbstractBaseUser, PermissionsMixin):
     member_id           = models.AutoField(db_column="member_id", primary_key=True, verbose_name="用户ID")
-    member_name         = models.CharField(db_column="member_name", max_length=255, unique=True)
+    member_name         = models.CharField(db_column="member_name", max_length=255)
     telephone           = models.CharField(db_column="telephone", max_length=255, unique=True)
     status              = models.CharField(db_column="status", default='normal', max_length=255)
     sessions            = models.CharField(db_column="sessions", max_length=255)
@@ -51,17 +51,16 @@ class Member(AbstractBaseUser, PermissionsMixin):
     update_time         = models.IntegerField(db_column="update_time", default=int(time.time()))
     is_active           = models.BooleanField(default=True)
     is_admin            = models.BooleanField(default=False)
-    
+    is_staff            = models.BooleanField(default=True)
+    avatar              = models.CharField(db_column="avatar", max_length=255, null=True, blank=True)
+    # role                = models.CharField(db_column="role", default="")
+
     objects = UserProfileManager()
     USERNAME_FIELD = 'telephone'
     REQUIRED_FIELDS = ['member_name']
 
     def __str__(self):  # __unicode__ on Python 2
         return self.member_name
-
-    @property
-    def is_staff(self):
-        return self.is_admin
     
     def get_full_name(self):
         return self.member_name
@@ -95,6 +94,7 @@ class Member(AbstractBaseUser, PermissionsMixin):
             member_name = '用户名',
             telephone = '手机号',
             is_admin = '管理员身份',
+            is_staff = '内部账号',
             more = '更多'
         )
     
@@ -110,16 +110,6 @@ class Member(AbstractBaseUser, PermissionsMixin):
     def get_member_by_id(cls, member_id):
         try:
             return cls.objects.get(pk=member_id)
-        except cls.DoesNotExist:
-            return None
-
-    @classmethod
-    def get_member_by_member_name(cls, member_name):
-        try:
-            return cls.objects.get(
-            member_name = member_name,
-            status = 'normal'
-            )
         except cls.DoesNotExist:
             return None
     
