@@ -42,7 +42,6 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'rest_framework',
     'ubskin_web_django.member',
     'ubskin_web_django.item',
     'ubskin_web_django.global_app',
