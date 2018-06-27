@@ -28,7 +28,7 @@ def member_signin(request):
         user = authenticate(telephone=telephone, password=password)
         if user and user.is_admin:
             login(request, user)
-            return redirect('/index/')
+            return redirect('/myadmin/index/')
         else:
             return my_render(
                 request,
@@ -39,9 +39,9 @@ def member_signin(request):
 
 def member_signout(request):
     logout(request)
-    return redirect('/signin/')
+    return redirect('/myadmin/signin/')
 
-@login_required(login_url='/signin/')
+@login_required(login_url='/myadmin/signin/')
 def index(request):
     if request.method == "GET":
         return render(
@@ -68,7 +68,7 @@ class UserChangeForm(forms.ModelForm):
         user.save()
 
 
-@login_required(login_url='/signin/')
+@login_required(login_url='/myadmin/signin/')
 def change_pass(request):
     if request.method == 'GET':
         return my_render(
@@ -95,9 +95,9 @@ def change_pass(request):
                 form_data = request.POST
             )
         form.update_pass()
-        return redirect('/signin/')
+        return redirect('/myadmin/signin/')
 
-@login_required(login_url='/signin/')
+@login_required(login_url='/myadmin/signin/')
 def member_manage(request):
     if request.method == "GET":
         GET = request.GET.get
