@@ -68,15 +68,16 @@ def create_stock_batch_api(request):
         return JsonResponse(return_value)
 
 
-def item_code(request):
+def item_code(request, qr_code):
     return_value = {
         'status': 'error',
         'message': '',
     }
-    qr_code = request.GET.get('qr_code')
+    # qr_code = request.GET.get('qr_code')
     if not len(qr_code) == 9 and qr_code.startswith('U'):
         return_value['message'] = '代码格式错误'
         return JsonResponse(return_value)
+    
     qr_code_obj = order_models.ItemQRCode.get_qr_code_obj_by_qr_code(qr_code)
     if not qr_code_obj:
         return_value['message'] = '没有记录'
