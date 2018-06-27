@@ -1,13 +1,16 @@
 from django.shortcuts import render
+from django.contrib.auth.decorators import login_required
 
 from ubskin_web_django.order import models as order_models
 from ubskin_web_django.item import models as item_models
+
 
 # Create your views here.
 
 def my_render(request, templater_path, **kwargs):
     return render(request, templater_path, dict(**kwargs))
 
+@login_required(login_url='/myadmin/signin/')
 def order_manage(request):
     if request.method == 'GET':
         current_page = request.GET.get('page', 1)
@@ -46,6 +49,7 @@ def order_manage(request):
             serch_value = value,
         )
 
+@login_required(login_url='/myadmin/signin/')
 def item_qr_Code_manage(request):
     if request.method == 'GET':
         current_page = request.GET.get('page', 1)
@@ -78,6 +82,7 @@ def item_qr_Code_manage(request):
             data_count = data_count,
         )
 
+@login_required(login_url='/myadmin/signin/')
 def recv_manage(request):
     if request.method == 'GET':
         current_page = request.GET.get('page', 1)
@@ -106,6 +111,7 @@ def recv_manage(request):
             data_count = data_count,
         )
 
+@login_required(login_url='/myadmin/signin/')
 def stock_batch(request):
     if request.method == 'GET':
         return my_render(
