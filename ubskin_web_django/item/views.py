@@ -5,6 +5,7 @@ from django.http import HttpResponseRedirect as redirect
 from django import forms
 from django.forms import model_to_dict
 from django.conf import settings
+from django.contrib.auth.decorators import login_required
 
 from ubskin_web_django.item import models as item_models
 from ubskin_web_django.common import photo
@@ -13,6 +14,7 @@ from ubskin_web_django.common import photo
 def my_render(request, templater_path, **kwargs):
     return render(request, templater_path, dict(**kwargs))
 
+@login_required(login_url='/myadmin/signin/')
 def items_manage(request):
     if request.method == 'GET':
         current_page = request.GET.get('page', 1)
@@ -77,7 +79,7 @@ class AddItemForm(forms.ModelForm):
             item.save()
         return item
 
-
+@login_required(login_url='/myadmin/signin/')
 def add_item(request):
     specifications_type_dict = dict(
         item_models.Items.specifications_type_choices
@@ -152,6 +154,7 @@ class EditorItemForm(forms.Form):
         return item
 
 
+@login_required(login_url='/myadmin/signin/')
 def editor_item(request):
     specifications_type_dict = dict(
         item_models.Items.specifications_type_choices
@@ -185,7 +188,8 @@ def editor_item(request):
             )
         form.update(item_id, request)
         return redirect(back_url)
-        
+
+@login_required(login_url='/myadmin/signin/')  
 def item_image_manage(request):
     if request.method == "GET":
         item_id = request.GET.get('item_id')
@@ -208,6 +212,7 @@ def item_image_manage(request):
             item_obj = item_obj,
         )
 
+@login_required(login_url='/myadmin/signin/')
 def brand_manage(request):
     if request.method == 'GET':
         current_page = request.GET.get('page', 1)
@@ -262,6 +267,7 @@ class AddBrandForm(forms.ModelForm):
         return item
 
 
+@login_required(login_url='/myadmin/signin/')
 def add_brand(request):
     if request.method == 'GET':
         return my_render(
@@ -317,6 +323,7 @@ class EditorBrandForm(forms.ModelForm):
         return item
 
 
+@login_required(login_url='/myadmin/signin/')
 def editor_brand(request):
     brand_id = request.GET.get('brand_id')
     if request.method == 'GET':
@@ -359,6 +366,7 @@ def editor_brand(request):
         back_url = request.GET.get('back_url')
         return redirect(back_url)
 
+@login_required(login_url='/myadmin/signin/')
 def categorie_manage(request):
     if request.method == 'GET':
         current_page = request.GET.get('page', 1)
@@ -408,6 +416,7 @@ class AddCategorieForm(forms.ModelForm):
         return categorie
 
 
+@login_required(login_url='/myadmin/signin/')
 def add_categorie(request):
     categorie_choices = dict(item_models.Categories.type_choices)
     if request.method == 'GET':
@@ -465,6 +474,7 @@ class EditorCategorieForm(forms.ModelForm):
         categorie.update_categorie_by_id(categorie_id, data)
 
 
+@login_required(login_url='/myadmin/signin/')
 def editor_categorie(request):
     categorie_id = request.GET.get('categorie_id')
     categorie = item_models.Categories.get_categorie_by_id(categorie_id)
@@ -509,6 +519,7 @@ def editor_categorie(request):
         back_url = request.GET.get('back_url')
         return redirect(back_url)
 
+@login_required(login_url='/myadmin/signin/')
 def item_comment_manage(request):
     if request.method == 'GET':
         current_page = request.GET.get('page', 1)
@@ -537,6 +548,7 @@ def item_comment_manage(request):
             count = count,
         )
 
+@login_required(login_url='/myadmin/signin/')
 def item_comment_image_manage(request):
     if request.method == 'GET':
         comment_id = request.GET.get('comment_id')
@@ -563,6 +575,7 @@ class EditorItemCommentForm(forms.ModelForm):
         categorie.update_item_comment_by_id(comment_id, data)
 
 
+@login_required(login_url='/myadmin/signin/')
 def edit_item_comment(request):
     comment_id = request.GET.get('comment_id')
     form_data = item_models.ItemComments.get_item_comment_by_id(comment_id)
