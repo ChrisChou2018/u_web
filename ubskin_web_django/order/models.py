@@ -63,6 +63,13 @@ class ItemQRCode(models.Model):
     @classmethod
     def get_count_by_stock_batch_id(cls, stock_batch_id):
         return cls.objects.filter(stock_batch_id=stock_batch_id, status='normal').count()
+    
+    @classmethod
+    def get_qr_code_obj_by_qr_code(cls, qr_code):
+        try:
+            return cls.objects.filter(qr_code=qr_code).first()
+        except cls.DoesNotExist:
+            return None
 
     @classmethod
     def get_stock_batch_info_by_stock_batch_id(cls, stock_batch_id):
