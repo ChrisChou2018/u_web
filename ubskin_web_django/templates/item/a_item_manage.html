@@ -69,7 +69,7 @@
                             国外价格：{{i.foreign_price}}
                         </div>
                         <div class="row">
-                            容量：/规格：{% if i.specifications_type_id %}{% get_value_by_key specifications_type_dict i.specifications_type_id %}{% endif %}
+                            容量：/规格：{% if i.specifications_type_id is not None %}{% get_value_by_key specifications_type_dict i.specifications_type_id %}{% endif %}
                         </div>
                     </div>
                     <div class="col-md-2">

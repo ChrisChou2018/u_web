@@ -20,30 +20,13 @@ class Brands(models.Model):
     key_word                    = models.CharField(db_column="key_word", null=True, blank=True, verbose_name="搜索关键字", max_length=255)
     brand_about                 = models.CharField(db_column="brand_about", null=True, blank=True, verbose_name="品牌简介", max_length=255)
     brand_image                 = models.CharField(db_column="brand_image", null=True, blank=True, verbose_name="品牌图片路径", max_length=255)
-
+    status                      = models.CharField(db_column="status", verbose_name="状态", default="normal", max_length=255)
 
     @classmethod
     def get_brands_dict_for_all(cls):
         all_data = cls.objects.all().values_list('brand_id','cn_name')
         return dict(all_data)
 
-    @classmethod
-    def get_list_brands(cls, current_page, search_value=None):
-        if search_value:
-            brand_obj = cls.objects.filter(**search_value).order_by('-brand_id')
-        else:
-            brand_obj = cls.objects.all().order_by('-brand_id')
-        p = Paginator(brand_obj, 15)
-        return p.page(current_page).object_list.values() 
-    
-    @classmethod
-    def get_brands_count(cls, search_value=None):
-        if search_value:
-            obj_count = cls.objects.filter(**search_value).count()
-        else:
-            obj_count = cls.objects.all().count()
-        return obj_count
-    
     @classmethod
     def get_brand_by_id(cls, brand_id):
         try:
@@ -108,28 +91,6 @@ class Items(models.Model):
     @classmethod
     def create_item(cls, datas):
         cls.objects.create(**datas)
-
-    @classmethod
-    def get_list_items(cls, current_page, search_value=None):
-        if search_value:
-            item_obj = cls.objects.filter(
-                **search_value, status = 'normal'
-            ).order_by("-item_id")
-        else:
-            item_obj = cls.objects.filter(status='normal'). \
-                order_by('-item_id')
-        p = Paginator(item_obj, 15)
-        return p.page(current_page).object_list.values() 
-    
-    @classmethod
-    def get_items_count(cls, search_value=None):
-        if search_value:
-            item_obj_count = cls.objects.filter(
-                **search_value, status='normal'
-            ).count()
-        else:
-            item_obj_count = cls.objects.filter(status='normal').count()
-        return item_obj_count
 
     @classmethod
     def get_item_by_id(cls, item_id):
@@ -490,3 +451,28 @@ class CommentImages(models.Model):
 
     class Meta:
         db_table = "comment_images"
+
+
+def get_data_list(model, current_page, search_value=None, order_by="-pk", search_value_type='dict'):
+    if search_value:
+        if search_value_type == 'dict':
+            data_list = model.objects.filter(**search_value, status='normal'). \
+                order_by(order_by)
+        else:
+            data_list = model.objects.filter(search_value, status='normal'). \
+                order_by(order_by)
+    else:
+        data_list = model.objects.filter(status='normal'). \
+            order_by(order_by)
+    p = Paginator(data_list, 15)
+    return p.page(current_page).object_list.values()
+
+def get_data_count(model, search_value=None, search_value_type='dict'):
+    if search_value:
+        if search_value_type == 'dict':
+            count = model.objects.filter(**search_value, status='normal').count()
+        else:
+            count = model.objects.filter(search_value, status='normal').count()
+    else:
+        count = model.objects.filter(status='normal').count()
+    return count

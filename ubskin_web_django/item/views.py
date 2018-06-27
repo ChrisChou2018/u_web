@@ -21,12 +21,23 @@ def items_manage(request):
         if value:
             filter_args = '&search_value={0}'.format(value)
             search_value = {"item_name" : value}
-            item_list = item_models.Items. \
-                get_list_items(current_page, search_value)
-            item_count = item_models.Items.get_items_count(search_value)
+            item_list = item_models.get_data_list(
+                item_models.Items,
+                current_page,
+                search_value
+            )
+            item_count = item_models.get_data_count(
+                item_models.Items,
+                search_value
+            )
         else:
-            item_list = item_models.Items.get_list_items(current_page)
-            item_count = item_models.Items.get_items_count()
+            item_list = item_models.get_data_list(
+                item_models.Items,
+                current_page
+            )
+            item_count = item_models.get_data_count(
+                item_models.Items
+            )
         uri = request.path
         specifications_type_dict = dict(item_models.Items. \
             specifications_type_choices)
@@ -205,11 +216,24 @@ def brand_manage(request):
         if value:
             filter_args = '&search_value={0}'.format(value)
             search_value = {"cn_name": value}
-            brands_list = item_models.Brands.get_list_brands(current_page, search_value)
-            brands_count = item_models.Brands.get_brands_count(search_value)
+            brands_list = item_models.get_data_list(
+                item_models.Brands,
+                current_page,
+                search_value
+            )
+            brands_count = item_models.get_data_count(
+                item_models.Brands,
+                search_value
+            )
         else:
-            brands_list = item_models.Brands.get_list_brands(current_page)
-            brands_count = item_models.Brands.get_brands_count()
+            print(current_page)
+            brands_list = item_models.get_data_list(
+                item_models.Brands,
+                current_page,
+            )
+            brands_count = item_models.get_data_count(
+                item_models.Brands
+            )
         return my_render(
             request,
             'item/a_brand_manage.html',
