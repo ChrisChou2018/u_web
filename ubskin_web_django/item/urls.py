@@ -6,19 +6,19 @@ from ubskin_web_django.item import views_api
 
 
 urlpatterns = [
-    path('admin/item_manage/', views.items_manage, name='item_manage'),
-    path('admin/add_item/', views.add_item, name='add_item'),
-    path('admin/editor_item/', views.editor_item, name='editor_item'),
-    path('admin/item_image_manage/', views.item_image_manage, name='item_image_manage'),
-    path('admin/brand_manage/', views.brand_manage, name='brand_manage'),
-    path('admin/add_brand/', views.add_brand, name='add_brand'),
-    path('admin/editor_brand/', views.editor_brand, name='editor_brand'),
-    path('admin/categorie_manage/', views.categorie_manage, name='categorie_manage'),
-    path('admin/add_categorie/', views.add_categorie, name='add_categorie'),
-    path('admin/editor_categorie/', views.editor_categorie, name='editor_categorie'),
-    path('admin/item_comment_manage/', views.item_comment_manage, name='item_comment_manage'),
-    path('admin/edit_item_comment/', views.edit_item_comment, name='edit_item_comment'),
-    path('admin/comment_image_manage/', views.item_comment_image_manage, name='comment_image_manage'),
+    path('myadmin/item_manage/', views.items_manage, name='item_manage'),
+    path('myadmin/add_item/', views.add_item, name='add_item'),
+    path('myadmin/editor_item/', views.editor_item, name='editor_item'),
+    path('myadmin/item_image_manage/', views.item_image_manage, name='item_image_manage'),
+    path('myadmin/brand_manage/', views.brand_manage, name='brand_manage'),
+    path('myadmin/add_brand/', views.add_brand, name='add_brand'),
+    path('myadmin/editor_brand/', views.editor_brand, name='editor_brand'),
+    path('myadmin/categorie_manage/', views.categorie_manage, name='categorie_manage'),
+    path('myadmin/add_categorie/', views.add_categorie, name='add_categorie'),
+    path('myadmin/editor_categorie/', views.editor_categorie, name='editor_categorie'),
+    path('myadmin/item_comment_manage/', views.item_comment_manage, name='item_comment_manage'),
+    path('myadmin/edit_item_comment/', views.edit_item_comment, name='edit_item_comment'),
+    path('myadmin/comment_image_manage/', views.item_comment_image_manage, name='comment_image_manage'),
 ]
 
 urlpatterns += [

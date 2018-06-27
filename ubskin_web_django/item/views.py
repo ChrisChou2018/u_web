@@ -105,7 +105,7 @@ def add_item(request):
                 form_data = request.POST,
             )
         form.save(request=request)
-        return redirect('/item_manage/')
+        return redirect('/myadmin/item_manage/')
 
 
 class EditorItemForm(forms.Form):
@@ -296,7 +296,7 @@ def add_brand(request):
             if data:
                 brand.brand_image = data['image_path']
                 brand.save()
-        return redirect('/brand_manage/')
+        return redirect('/myadmin/brand_manage/')
 
 
 class EditorBrandForm(forms.ModelForm):
@@ -445,7 +445,7 @@ def add_categorie(request):
             if data:
                 categorie.image_path = data['image_path']
                 categorie.save()
-        return redirect('/categorie_manage/')
+        return redirect('/myadmin/categorie_manage/')
 
 
 class EditorCategorieForm(forms.ModelForm):
