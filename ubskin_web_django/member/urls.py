@@ -6,12 +6,12 @@ from ubskin_web_django.member import views_api
 
 urlpatterns = [
     # path('admin/', admin.site.urls),
-    path('signin/', views.member_signin, name='signin'),
-    path('index/', views.index, name='index'),
-    path('signout/', views.member_signout, name='signout'),
-    path('change_password/', views.change_pass, name='change_password'),
-    path('member_manage/', views.member_manage, name='member_manage'),
-    path('', views.index),
+    path('admin/signin/', views.member_signin, name='signin'),
+    path('admin/index/', views.index, name='index'),
+    path('admin/signout/', views.member_signout, name='signout'),
+    path('admin/change_password/', views.change_pass, name='change_password'),
+    path('admin/member_manage/', views.member_manage, name='member_manage'),
+    path('admin/', views.index),
 ]
 
 urlpatterns += [

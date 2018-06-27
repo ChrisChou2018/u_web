@@ -3,6 +3,7 @@ import time
 from django.db import models
 from django.core.paginator import Paginator
 from django.forms import model_to_dict
+from django.conf import settings
 
 from ubskin_web_django.member import models as member_models
 
@@ -56,8 +57,9 @@ class Items(models.Model):
     item_info                   = models.CharField(db_column="item_info", null=True, blank=True, verbose_name='商品信息', max_length=255)
     item_code                   = models.CharField(db_column="item_code", null=True, blank=True, verbose_name="商品编码", max_length=255, unique=True)
     item_barcode                = models.CharField(db_column="item_barcode", null=True, blank=True, verbose_name="商品条码", max_length=255, unique=True)
-    price                       = models.FloatField(db_column="price", null=True, blank=True, verbose_name="商品原价")
+    price                       = models.FloatField(db_column="price", null=True, blank=True, verbose_name="商品售价")
     current_price               = models.FloatField(db_column='current_price', null=True, blank=True, verbose_name="商品现价")
+    original_price              = models.FloatField(db_column='original_price', null=True, blank=True, verbose_name="商品原价")
     foreign_price               = models.FloatField(db_column='foreign_price', null=True, blank=True, verbose_name="国外价格")
     comment_count               = models.IntegerField(db_column="comment_count", null=True, blank=True, verbose_name="评论数量")
     hot_value                   = models.IntegerField(db_column="hot_value", null=True, blank=True, verbose_name="热度值")
@@ -77,8 +79,10 @@ class Items(models.Model):
         (7, '盒')
     )
     specifications_type_id      = models.SmallIntegerField(db_column="specifications_type_id", choices=specifications_type_choices, null=True, blank=True, verbose_name="规格类型")
+    specifications_type         = models.CharField(db_column="specifications_type", null=True, blank=True, verbose_name="规格", max_length=255)
     categories_id               = models.BigIntegerField(db_column="categories_id", null=True, blank=True, verbose_name="分类ID")
     brand_id                    = models.BigIntegerField(db_column="brand_id", null=True, blank=True, verbose_name="品牌ID")
+    brand_name                  = models.CharField(db_column="brand_name", null=True, blank=True, verbose_name="品牌名", max_length=255)
     for_people                  = models.CharField(db_column="for_people", null=True, blank=True, verbose_name="适用人群", max_length=255)
     weight                      = models.CharField(db_column="weight", null=True, blank=True, verbose_name="重量", max_length=255)
     create_person               = models.CharField(db_column="create_person", verbose_name="创建人", max_length=255)
@@ -152,6 +156,13 @@ class Items(models.Model):
             return None
     
     @classmethod
+    def get_item_obj_by_barcode(cls, item_barcode):
+        try:
+            return cls.objects.filter(item_barcode=item_barcode)
+        except cls.DoesNotExist:
+            return None
+    
+    @classmethod
     def get_item_dict_by_item_barcode(cls, item_barcode):
         try:
             model = cls.objects.get(item_barcode=item_barcode)
@@ -165,7 +176,7 @@ class Items(models.Model):
             data_dict = dict()
             model = cls.objects.get(item_barcode=item_barcode)
             data_dict['item_name'] = model.item_name
-            data_dict['specifications_type'] = dict(cls.specifications_type_choices)[model.specifications_type_id]
+            data_dict['specifications_type'] = model.specifications_type
             data_dict['thumbicon'] = ItemImages.get_thumbicon_by_item_id(model.item_id,True)
             data_dict['item_barcode'] = model.item_barcode
             return data_dict
@@ -225,13 +236,19 @@ class ItemImages(models.Model):
             if image_obj:
                 image_obj = model_to_dict(image_obj)
                 if for_api:
-                    image_obj['image_path'] = "http://10.0.0.109" + image_obj['image_path']
+                    image_obj['image_path'] = settings.SERVERHOST + image_obj['image_path']
                     return image_obj
                 return image_obj
             else:
-                return None
+                if for_api:
+                    return settings.SERVERHOST + "/static/images/user-default.jpg"
+                else:
+                    return "/static/images/user-default.jpg"
         except cls.DoesNotExist:
-            return None
+            if for_api:
+                return settings.SERVERHOST + "/static/images/user-default.jpg"
+            else:
+                return "/static/images/user-default.jpg"
 
     @classmethod
     def get_images_by_itemid(cls, item_id, for_api=False):
@@ -240,7 +257,7 @@ class ItemImages(models.Model):
             image_obj = list(image_obj)
             if for_api:
                 for i in image_obj:
-                    i['image_path'] = "http://www-local.ubskin.net" + i['image_path']
+                    i['image_path'] = settings.SERVERHOST + i['image_path']
             return image_obj
         except cls.DoesNotExist:
             return None
@@ -440,7 +457,7 @@ class CommentImages(models.Model):
         image_list = list(cls.objects.filter(comment_id = comment_id, status = 'normal').values())
         if for_api:
             for i in image_list:
-                i['image_path'] = "http://www-local.ubskin.net" + i['image_path']
+                i['image_path'] = settings.SERVERHOST + i['image_path']
         return image_list
     
     @classmethod
