@@ -1,4 +1,4 @@
 django==2.0.6
-pymysql==0.8.0
 uwsgi==2.0.17
 requests==2.18.4
+pillow==5.0.0
