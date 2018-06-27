@@ -74,8 +74,8 @@ def item_code(request, qr_code):
         'message': '',
     }
     # qr_code = request.GET.get('qr_code')
-    if not len(qr_code) == 9 and qr_code.startswith('U'):
-        return_value['message'] = '代码格式错误'
+    if not (len(qr_code) == 9 and qr_code.startswith('U')):
+        return_value['message'] = '商品码格式错误'
         return JsonResponse(return_value)
     
     qr_code_obj = order_models.ItemQRCode.get_qr_code_obj_by_qr_code(qr_code)
@@ -89,8 +89,11 @@ def item_code(request, qr_code):
     date = stock_batch_dict.get('create_time')
     date = lib_data.parse_timestamps(date)
     member_obj = member_models.Member.get_member_by_id(stock_batch_dict.get('create_user'))
-    is_admin = member_obj.is_admin
-    action = "出库扫码" if is_admin else '店铺扫码'
+    if member_obj:
+        is_admin = member_obj.is_admin
+        action = "出库扫码" if is_admin else '店铺扫码'
+    else:
+        action = '店铺扫码'
     return_value['data'] = [
         {"action": action, "to": recv_addr, "date": date},
     ]

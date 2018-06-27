@@ -116,9 +116,9 @@ class EditorItemForm(forms.Form):
     item_info = forms.CharField(required=False)
     item_code = forms.CharField(required=False)
     item_barcode = forms.CharField(required=False)
-    price = forms.IntegerField(required=False)
-    current_price = forms.IntegerField(required=False)
-    foreign_price = forms.IntegerField(required=False)
+    price = forms.FloatField(required=False)
+    current_price = forms.FloatField(required=False)
+    foreign_price = forms.FloatField(required=False)
     key_word = forms.CharField(required=False)
     origin = forms.CharField(required=False)
     shelf_life = forms.CharField(required=False)
@@ -177,6 +177,7 @@ def editor_item(request):
     else:
         form = EditorItemForm(request.POST)
         if not form.is_valid():
+            print(form.errors)
             return my_render(
                 request,
                 'item/a_add_item.html',

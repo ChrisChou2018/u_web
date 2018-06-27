@@ -176,7 +176,7 @@ class Items(models.Model):
             data_dict = dict()
             model = cls.objects.get(item_barcode=item_barcode)
             data_dict['item_name'] = model.item_name
-            data_dict['specifications_type'] = model.specifications_type
+            data_dict['specifications_type'] = model.specifications_type if model.specifications_type else '盒'
             data_dict['thumbicon'] = ItemImages.get_thumbicon_by_item_id(model.item_id,True)
             data_dict['item_barcode'] = model.item_barcode
             return data_dict
