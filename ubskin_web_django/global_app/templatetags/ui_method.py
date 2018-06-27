@@ -101,9 +101,8 @@ def get_value_by_key(a_dict, key):
 def get_thumbicon_by_id(item_id):
     item_image_obj = item_models.ItemImages.get_thumbicon_by_item_id(item_id)
     if item_image_obj:
-        return item_image_obj["image_path"]
-    else:
-        return "/static/images/user-default.jpg"
+        print(item_image_obj)
+        return item_image_obj
 
 @register.simple_tag
 def parse_timestamps(timestamps):

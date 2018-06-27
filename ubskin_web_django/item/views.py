@@ -226,7 +226,6 @@ def brand_manage(request):
                 search_value
             )
         else:
-            print(current_page)
             brands_list = item_models.get_data_list(
                 item_models.Brands,
                 current_page,
