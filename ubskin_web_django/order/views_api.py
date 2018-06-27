@@ -78,6 +78,9 @@ def item_code(request):
         return_value['message'] = '代码格式错误'
         return JsonResponse(return_value)
     qr_code_obj = order_models.ItemQRCode.get_qr_code_obj_by_qr_code(qr_code)
+    if not qr_code_obj:
+        return_value['message'] = '没有记录'
+        return JsonResponse(return_value)
     stock_batch_id = qr_code_obj.stock_batch_id
     stock_batch_dict = order_models.StockBatch.get_stock_dict_by_stock_batch_id(stock_batch_id)
     recv_code = stock_batch_dict.get('recv_code')
