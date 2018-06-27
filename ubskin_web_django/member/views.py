@@ -110,14 +110,25 @@ def member_manage(request):
                 Q(member_name = value) | \
                 Q(telephone = value)
             )
-            member_list = member_models.Member. \
-                get_member_list(current_page, search_value)
-            member_count = member_models.Member. \
-                get_member_count(search_value)
+            member_list = member_models.get_data_list(
+                member_models.Member,
+                current_page,
+                search_value,
+                search_value_type='not_dict'
+            )
+            member_count = member_models.get_data_count(
+                member_models.Member,
+                search_value,
+                search_value_type='not_dict',
+            )
         else:
-            member_list = member_models.Member. \
-            get_member_list(current_page)
-            member_count = member_models.Member.get_member_count()
+            member_list = member_models.get_data_list(
+                member_models.Member,
+                current_page
+            )
+            member_count = member_models.get_data_count(
+                member_models.Member
+            )
         uri = request.path
         table_head = member_models.Member.get_style_table_head()
         return my_render(

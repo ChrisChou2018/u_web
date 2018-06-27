@@ -69,25 +69,6 @@ class Member(AbstractBaseUser, PermissionsMixin):
         return self.member_name
 
     @classmethod
-    def get_member_list(cls, current_page, search_value=None):
-        if search_value:
-            member_obj = cls.objects.filter(search_value, status='normal'). \
-                order_by("-member_id")
-        else:
-            member_obj = cls.objects.filter(status='normal'). \
-                order_by("-member_id")
-        p = Paginator(member_obj, 15)
-        return p.page(current_page).object_list.values()   
-    
-    @classmethod
-    def get_member_count(cls, search_value=None):
-        if search_value:
-            member_obj_count = Member.objects.filter(search_value, status='normal').count()
-        else:
-            member_obj_count = Member.objects.filter(status='normal').count()
-        return member_obj_count
-
-    @classmethod
     def get_style_table_head(cls):
         return dict(
             member_id = '用户ID',
@@ -128,3 +109,28 @@ class Member(AbstractBaseUser, PermissionsMixin):
         db_table = "member"
         permissions = ()
 
+
+def get_data_list(model, current_page, search_value=None, order_by="-pk", search_value_type='dict'):
+    if search_value:
+        if search_value_type == 'dict':
+            data_list = model.objects.filter(**search_value, status='normal'). \
+                order_by(order_by)
+        else:
+            data_list = model.objects.filter(search_value, status='normal'). \
+                order_by(order_by)
+    else:
+        data_list = model.objects.filter(status='normal'). \
+            order_by(order_by)
+    p = Paginator(data_list, 15)
+    return p.page(current_page).object_list.values()
+
+
+def get_data_count(model, search_value=None, search_value_type='dict'):
+    if search_value:
+        if search_value_type == 'dict':
+            count = model.objects.filter(**search_value, status='normal').count()
+        else:
+            count = model.objects.filter(search_value, status='normal').count()
+    else:
+        count = model.objects.filter(status='normal').count()
+    return count
