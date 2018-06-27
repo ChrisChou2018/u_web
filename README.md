@@ -8,8 +8,7 @@ python3 manage.py createsuperuser
 
 `数据库初始化`
 ```
-python3 manage.py makemigrations
-python3 manage.py migrate
+python3 run_migrate.py
 ```
 
 配置文件相关
