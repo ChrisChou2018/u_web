@@ -41,3 +41,9 @@ ubskin_web_django/order/migrations/0007_auto_20180626_1104.py
 ubskin_web_django/item/migrations/0015_auto_20180626_1244.py
 ubskin_web_django/member/migrations/0015_auto_20180626_1244.py
 ubskin_web_django/order/migrations/0008_auto_20180626_1244.py
+ubskin_web_django/item/migrations/0017_auto_20180627_0754.py
+ubskin_web_django/item/migrations/0018_auto_20180627_0754.py
+ubskin_web_django/member/migrations/0017_auto_20180627_0754.py
+ubskin_web_django/member/migrations/0018_auto_20180627_0754.py
+ubskin_web_django/order/migrations/0010_auto_20180627_0754.py
+ubskin_web_django/order/migrations/0011_auto_20180627_0754.py
