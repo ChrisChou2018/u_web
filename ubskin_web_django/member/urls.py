@@ -10,7 +10,7 @@ urlpatterns = [
     path('myadmin/signout/', views.member_signout, name='signout'),
     path('myadmin/change_password/', views.change_pass, name='change_password'),
     path('myadmin/member_manage/', views.member_manage, name='member_manage'),
-    path('', views.member_signin),
+    path('', views.index),
 ]
 
 urlpatterns += [
