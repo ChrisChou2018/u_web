@@ -23,45 +23,49 @@
         </div>
         <div class="form-group">
             <label class="control-label">商品信息:</label>
-            <input type="text" class="form-control" name="item_info" value="{% if form_data.item_info %} {{ form_data.item_info }} {% endif %}">
+            <input type="text" class="form-control" name="item_info" value="{% if form_data.item_info %}{{ form_data.item_info }}{% endif %}">
         </div>
         <div class="form-group">
             <label class="control-label">商品编码:</label>
-            <input type="text" class="form-control" name="item_code" value="{% if form_data.item_code %}{{ form_data.item_code }} {% endif %}">
+            <input type="text" class="form-control" name="item_code" value="{% if form_data.item_code %}{{ form_data.item_code }}{% endif %}">
             {% if form_errors and form_errors.item_code %} <span style="color: red">{{ form_errors.item_code }}</span> {% endif %}
         </div>
         <div class="form-group">
             <label class="control-label">商品条码:</label>
-            <input type="text" class="form-control" name="item_barcode" value="{% if form_data.item_barcode %}{{ form_data.item_barcode }} {% endif %}">
+            <input type="text" class="form-control" name="item_barcode" value="{% if form_data.item_barcode %}{{ form_data.item_barcode }}{% endif %}">
             {% if form_errors and form_errors.item_barcode %} <span style="color: red">{{ form_errors.item_barcode }}</span> {% endif %}
         </div>
         <div class="form-group">
-            <label class="control-label">原价:</label>
-            <input type="text" onkeyup="value=value.replace(/[^\d\.]/g,'')" class="form-control" name="price" value="{% if form_data.price %}{{ form_data.price }} {% endif %}">
+            <label class="control-label">零售价:</label>
+            <input type="number" onkeyup="value=value.replace(/[^\d\.]/g,'')" class="form-control" name="price" value="{% if form_data.price %}{{ form_data.price }}{% endif %}">
         </div>
         <div class="form-group">
-            <label class="control-label">现价:</label>
-            <input type="text" onkeyup="value=value.replace(/[^\d\.]/g,'')" class="form-control" name="current_price" value="{% if form_data.current_price %}{{ form_data.current_price }} {% endif %}">
+            <label class="control-label">批发价:</label>
+            <input type="number" onkeyup="value=value.replace(/[^\d\.]/g,'')" class="form-control" name="current_price" value="{% if form_data.current_price %}{{ form_data.current_price }}{% endif %}">
         </div>
-        <div class="form-group">
+        <!-- <div class="form-group">
             <label class="control-label">国外价格:</label>
-            <input type="text" onkeyup="value=value.replace(/[^\d\.]/g,'')" class="form-control" name="foreign_price" value="{% if form_data.foreign_price %}{{ form_data.foreign_price }} {% endif %}">
+            <input type="number" onkeyup="value=value.replace(/[^\d\.]/g,'')" class="form-control" name="foreign_price" value="{% if form_data.foreign_price %}{{ form_data.foreign_price }}{% endif %}">
+        </div> -->
+        <div class="form-group">
+            <label class="control-label">参考价:</label>
+            <input type="number" onkeyup="value=value.replace(/[^\d\.]/g,'')" class="form-control" name="original_price" value="{% if form_data.original_price %}{{ form_data.original_price }}{% endif %}">
         </div>
         <div class="form-group">
             <label class="control-label">关键字:</label>
-            <input type="text" class="form-control" name="key_word" value="{% if form_data.key_word %}{{ form_data.key_word }} {% endif %}">
+            <input type="text" class="form-control" name="key_word" value="{% if form_data.key_word %}{{ form_data.key_word }}{% endif %}">
         </div>
         <div class="form-group">
             <label class="control-label">产地:</label>
-            <input type="text" class="form-control" name="origin" value="{% if form_data.origin %} {{ form_data.origin }} {% endif %}">
+            <input type="text" class="form-control" name="origin" value="{% if form_data.origin %}{{ form_data.origin }}{% endif %}">
         </div>
         <div class="form-group">
             <label class="control-label">保质期:</label>
-            <input type="text" class="form-control" name="shelf_life" value="{% if form_data.shelf_life %} {{ form_data.shelf_life }} {% endif %}">
+            <input type="text" class="form-control" name="shelf_life" value="{% if form_data.shelf_life %}{{ form_data.shelf_life }}{% endif %}">
         </div>
         <div class="form-group">
-            <label class="control-label">容量:</label>
-            <input type="text" class="form-control" name="capacity" value="{% if form_data.capacity %} {{ form_data.capacity }} {% endif %}">
+            <label class="control-label">规格:</label>
+            <input type="text" class="form-control" name="capacity" value="{% if form_data.capacity %}{{ form_data.capacity }}{% endif %}">
         </div>
         <div class="form-group">
             <label class="control-label">单位类型:</label>
@@ -104,7 +108,7 @@
         </div>
         <div class="form-group">
             <label class="control-label">适用人群:</label>
-            <input type="text" class="form-control" name="for_people" value="{% if form_data.for_people %} {{ form_data.for_people }} {% endif %}"> 
+            <input type="text" class="form-control" name="for_people" value="{% if form_data.for_people %}{{ form_data.for_people }}{% endif %}"> 
         </div>
         <div class="form-group">
             <label class="control-label">重量:</label>

@@ -46,7 +46,7 @@ class Member(AbstractBaseUser, PermissionsMixin):
     telephone           = models.CharField(db_column="telephone", max_length=255, unique=True)
     status              = models.CharField(db_column="status", default='normal', max_length=255)
     sessions            = models.CharField(db_column="sessions", max_length=255)
-    created_ip          = models.CharField(db_column="created_ip", null=True, max_length=255)
+    created_ip          = models.CharField(db_column="created_ip", null=True, blank=True, max_length=255)
     create_time         = models.IntegerField(db_column="create_time", default=int(time.time()))
     update_time         = models.IntegerField(db_column="update_time", default=int(time.time()))
     is_active           = models.BooleanField(default=True)

@@ -27,5 +27,4 @@ urlpatterns += [
     path('api/get_recv/', views_api.get_recv),
     path('api/create_stock_batch_api/', views_api.create_stock_batch_api),
     path('api/item_code/<str:qr_code>/', views_api.item_code),
-    path('create_recv/', views_api.create_recv)
 ]

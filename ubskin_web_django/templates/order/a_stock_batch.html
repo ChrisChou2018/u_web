@@ -337,7 +337,7 @@ $(function() {
         $.post("{% url 'create_stock_bach' %}", params, (r) => {
             if (r && r.status == "success") {
                 alert("出库信息已记录成功!");
-                location.href = "/myadmin/order_manage/";
+                location.href = "{% url 'order_manage' %}";
             }
             else {
                 var msg = (r && r.message) ? r.message : "发生数据错误, 请稍后重试";

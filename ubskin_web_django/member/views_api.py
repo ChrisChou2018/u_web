@@ -62,6 +62,11 @@ class UserCreationFormWX(forms.ModelForm):
 
 @csrf_exempt
 def wx_signin(request):
+    return_value  = {
+        'status': 'error',
+        'message': '',
+        'data': '',
+    }
     if request.method == 'POST':
         data = json.loads(request.body)
         openid = data.get('openid')
@@ -72,15 +77,20 @@ def wx_signin(request):
             member.member_name = name
             member.avatar = avatar
             member.save()
-            return JsonResponse({'is_staff': member.is_staff})
+            return_value['status'] = 'success'
+            return_value['data'] = [{'is_staff': member.is_staff},]
+            return JsonResponse(return_value)
         else:
             user_data = {'telephone': openid, 'member_name': name, 'avatar': avatar, 'is_staff': False}
             form  = UserCreationFormWX(user_data)
             if form.is_valid():
                 member = form.save()
-                return JsonResponse({'is_staff': member.is_staff})
+                return_value['status'] = 'success'
+                return_value['data'] = [{'is_staff': member.is_staff},]
+                return JsonResponse(return_value)
             else:
-                return JsonResponse({'error':'服务器出错'})
+                return_value['message'] = "携带参数错误或缺少参数"
+                return JsonResponse(return_value)
 
 
 class UserCreationForm(forms.ModelForm):
