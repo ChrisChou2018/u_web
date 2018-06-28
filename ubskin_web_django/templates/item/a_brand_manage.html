@@ -50,24 +50,24 @@
             <div class="panel-body">
                 <div class="media-left">
                     <a href="#">
-                        <img class="media-object" src="{% if i.brand_image %} {{i.brand_image }} {% else %} /static/images/user-default.jpg {% endif %}" style="width: 100px; height: 100px;">
+                        <img class="media-object" src="{% if i.brand_image %}{{i.brand_image }}{% else %} /static/images/user-default.jpg {% endif %}" style="width: 100px; height: 100px;">
                     </a>
                 </div>
                     <div class="media-body">
                     <div class="row">
                         <div class="col-md-4">
-                            {{i.brand_about}}
+                            {% if i.brand_about is not None %}{{ i.brand_about }}{% endif %}
                         </div>
                         <div class="col-md-2">
                             <div class="row">
-                                中文缩写：{{i.cn_name_abridge}}
+                                中文缩写：{% if i.cn_name_abridge is not None %}{{ i.cn_name_abridge }}{% endif %}
                             </div>
                         </div>
                         <div class="col-md-2">
-                                英文名：{{i.en_name}}
+                                英文名：{% if i.en_name is not None %}{{ i.en_name }}{% endif %}
                         </div>
                         <div class="col-md-2">
-                                所属国家：{{i.form_country}}
+                                所属国家：{% if i.form_country is not None %}{{ i.form_country }}{% endif %}
                         </div>
                         <div class="col-md-2">
                             <div class="row">

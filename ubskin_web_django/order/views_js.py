@@ -146,9 +146,17 @@ def create_stock_bach(request):
         recv_code = request.POST.get('recv_code')
         item_codes_dict = request.POST.get('item_codes_dict')
         item_codes_dict = json.loads(item_codes_dict)
+        create_user_id = request.user.member_id
+        if not item_codes_dict:
+            return_value['message'] = "扫码提交为空"
+            return JsonResponse(return_value)
         order_models.create_model_data(
             order_models.StockBatch,
-            {"stock_batch_id": stock_batch_id, "recv_code": recv_code}
+            {
+                "stock_batch_id": stock_batch_id,
+                "recv_code": recv_code,
+                "create_user": create_user_id
+            }
         )
         for key, item in item_codes_dict.items():
             for i in item:
@@ -157,7 +165,8 @@ def create_stock_bach(request):
                     {
                         "item_barcode": key,
                         "qr_code": i,
-                        "stock_batch_id": stock_batch_id
+                        "stock_batch_id": stock_batch_id,
+                        "create_user": create_user_id
                     }
                 )
         return_value['status'] = 'success'

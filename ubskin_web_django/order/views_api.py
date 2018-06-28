@@ -101,11 +101,3 @@ def item_code(request, qr_code):
     return JsonResponse(return_value)
 
 
-def create_recv(request):
-    recv_dict = lib_data.recv_code_dict1
-    for k, v in recv_dict.items():
-        order_models.create_model_data(
-            order_models.Recv,
-            {'recv_code': k, 'recv_addr': v},
-        )
-    return JsonResponse({'status': 'success'})
