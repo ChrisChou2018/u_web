@@ -6,6 +6,7 @@ from django import forms
 from django.forms import model_to_dict
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
+from django.db.models import Count
 
 from ubskin_web_django.item import models as item_models
 from ubskin_web_django.common import photo
@@ -380,6 +381,11 @@ def categorie_manage(request):
             search_value = {'categorie_name': value}
             categories_list = item_models.Categories. \
                 get_list_categories(current_page, search_value)
+            categories_list = item_models.get_data_list(
+                item_models.Categories,
+                current_page,
+                search_value
+            )
             categories_count = item_models.Categories. \
                 get_categories_count(search_value)
         else:
@@ -599,4 +605,14 @@ def edit_item_comment(request):
         back_url = request.GET.get('back_url')
         return redirect(back_url)
 
-    
+
+def create_brand(request):
+    obj = item_models.Items.objects.values('brand_name').annotate(c=Count('brand_name'))
+    brand_model = item_models.Brands
+    brand_model.objects.all().delete()
+    for i in obj:
+        item_models.create_model_data(
+            brand_model,
+            {'cn_name': i['brand_name']}
+        )
+    return redirect('/myadmin/brand_manage/')
