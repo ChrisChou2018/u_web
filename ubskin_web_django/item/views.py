@@ -56,6 +56,7 @@ def items_manage(request):
             specifications_type_dict = specifications_type_dict,
             brand_dict = brand_dict,
             categories_dict = categories_dict,
+            search_value = value,
         )
 
 
