@@ -60,13 +60,13 @@
                     </div>
                     <div class="col-md-2">
                         <div class="row">
-                            现价：{{i.current_price}}
+                            批发价：{{i.current_price}}
                         </div>
                         <div class="row">
-                            原价：{{i.price}}
+                            售价：{{i.price}}
                         </div>
                         <div class="row">
-                            国外价格：{{i.foreign_price}}
+                            参考价格：{{i.original_price}}
                         </div>
                         <div class="row">
                             单位：{% if i.specifications_type is not None %}{{ i.specifications_type }}{% endif %}/规格：{% if i.capacity is not None %}{{ i.capacity }}{% endif %}
@@ -74,7 +74,7 @@
                     </div>
                     <div class="col-md-2">
                         <div class="row">
-                            适用人群：{{i.for_people}}
+                            适用人群{% if i.for_people is not None %}{{ i.for_people }}{% endif %}
                         </div>
                         <div class="row">
                             所属品牌：{% if i.brand_id %}{% get_value_by_key brand_dict i.brand_id %}{% endif %}
