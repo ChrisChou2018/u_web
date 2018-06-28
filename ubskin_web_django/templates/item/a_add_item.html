@@ -61,12 +61,12 @@
         </div>
         <div class="form-group">
             <label class="control-label">容量:</label>
-            <input type="text" class="form-control" name="f_capacity" value="{% if form_data.capacity %} {{ form_data.capacity }} {% endif %}">
+            <input type="text" class="form-control" name="capacity" value="{% if form_data.capacity %} {{ form_data.capacity }} {% endif %}">
         </div>
         <div class="form-group">
-            <label class="control-label">规格类型:</label>
+            <label class="control-label">单位类型:</label>
             <select name="specifications_type_id" class="form-control">
-                <option value="" selected>选择规格</option>
+                <option value="" selected>选择单位</option>
                 {% for i in specifications_type_dict %}
                     {% if form_data and form_data.specifications_type_id is not None and i == form_data.specifications_type_id %}
                         <option value="{{i}}" selected>{% get_value_by_key specifications_type_dict i %}</option>

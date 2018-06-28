@@ -175,10 +175,11 @@ class Items(models.Model):
         try:
             data_dict = dict()
             model = cls.objects.get(item_barcode=item_barcode)
-            data_dict['item_name'] = model.item_name
-            data_dict['specifications_type'] = model.specifications_type if model.specifications_type else '盒'
-            data_dict['thumbicon'] = ItemImages.get_thumbicon_by_item_id(model.item_id,True)
-            data_dict['item_barcode'] = model.item_barcode
+            model = model_to_dict(model)
+            data_dict['item_name'] = model.get('item_name')
+            data_dict['specifications_type'] = model.get('capacity') if model.get('capacity') else '无规格信息'
+            data_dict['thumbicon'] = ItemImages.get_thumbicon_by_item_id(model.get('item_id'),True)
+            data_dict['item_barcode'] = model.get('item_barcode')
             return data_dict
         except cls.DoesNotExist:
             return None
