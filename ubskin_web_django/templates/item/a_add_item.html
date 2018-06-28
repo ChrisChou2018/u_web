@@ -37,11 +37,11 @@
         </div>
         <div class="form-group">
             <label class="control-label">零售价:</label>
-            <input type="number" onkeyup="value=value.replace(/[^\d\.]/g,'')" class="form-control" name="price" value="{% if form_data.price %}{{ form_data.price }}{% endif %}">
+            <input type="text" onkeyup="value=value.replace(/[^\d\.]/g,'')" class="form-control" name="price" value="{% if form_data.price %}{{ form_data.price }}{% endif %}">
         </div>
         <div class="form-group">
             <label class="control-label">批发价:</label>
-            <input type="number" onkeyup="value=value.replace(/[^\d\.]/g,'')" class="form-control" name="current_price" value="{% if form_data.current_price %}{{ form_data.current_price }}{% endif %}">
+            <input type="text" onkeyup="value=value.replace(/[^\d\.]/g,'')" class="form-control" name="current_price" value="{% if form_data.current_price %}{{ form_data.current_price }}{% endif %}">
         </div>
         <!-- <div class="form-group">
             <label class="control-label">国外价格:</label>
@@ -49,7 +49,7 @@
         </div> -->
         <div class="form-group">
             <label class="control-label">参考价:</label>
-            <input type="number" onkeyup="value=value.replace(/[^\d\.]/g,'')" class="form-control" name="original_price" value="{% if form_data.original_price %}{{ form_data.original_price }}{% endif %}">
+            <input type="text" onkeyup="value=value.replace(/[^\d\.]/g,'')" class="form-control" name="original_price" value="{% if form_data.original_price %}{{ form_data.original_price }}{% endif %}">
         </div>
         <div class="form-group">
             <label class="control-label">关键字:</label>
