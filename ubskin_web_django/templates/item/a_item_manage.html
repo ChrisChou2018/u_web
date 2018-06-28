@@ -56,17 +56,17 @@
                 <div class="media-body">
                 <div class="row">
                     <div class="col-md-4">
-                        {{i.item_info}}
+                        {% if i.item_info is not None %}{{ i.item_info }}{% endif %}
                     </div>
                     <div class="col-md-2">
                         <div class="row">
-                            批发价：{{i.current_price}}
+                            批发价：{% if i.current_price is not None %}{{ i.current_price }}{% endif %}
                         </div>
                         <div class="row">
-                            售价：{{i.price}}
+                            售价：{% if i.price is not None %}{{ i.price }}{% endif %}
                         </div>
                         <div class="row">
-                            参考价格：{{i.original_price}}
+                            参考价格：{% if i.original_price is not None %}{{ i.original_price }}{% endif %}
                         </div>
                         <div class="row">
                             单位：{% if i.specifications_type is not None %}{{ i.specifications_type }}{% endif %}/规格：{% if i.capacity is not None %}{{ i.capacity }}{% endif %}
@@ -84,7 +84,7 @@
                         </div>
                     </div>
                     <div class="col-md-2">
-                            保质期：{{i.shelf_life}}
+                            保质期：{% if i.shelf_life is not None %}{{ i.shelf_life }}{% endif %}
                     </div>
                     <div class="col-md-2">
                         <div class="row">
