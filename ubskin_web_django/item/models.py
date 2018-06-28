@@ -494,3 +494,6 @@ def get_data_count(model, search_value=None, search_value_type='dict'):
     else:
         count = model.objects.filter(status='normal').count()
     return count
+
+def create_model_data(model, data):
+    model.objects.create(**data)
