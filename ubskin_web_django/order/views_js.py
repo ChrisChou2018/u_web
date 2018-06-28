@@ -101,6 +101,7 @@ def get_reve_addr(request):
     return_value = {
         'status': 'error',
         'message': '',
+        'data': '',
     }
     if request.method == 'GET':
         recv_code = request.GET.get('recv_code')

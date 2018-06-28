@@ -10,6 +10,7 @@ from django.db.models import Count
 
 from ubskin_web_django.item import models as item_models
 from ubskin_web_django.common import photo
+from ubskin_web_django.common import common
 
 
 def my_render(request, templater_path, **kwargs):
@@ -196,22 +197,36 @@ def editor_item(request):
 def item_image_manage(request):
     if request.method == "GET":
         item_id = request.GET.get('item_id')
-        item_image_list = item_models.ItemImages.get_images_by_itemid(item_id)
+        item_image_list = item_models.ItemImages.get_item_images_by_itemid(item_id)
+        item_info_image_list = item_models.ItemImages.get_item_info_images_by_itemid(item_id)
         item_obj  = item_models.Items.get_item_by_id(item_id)
-        image_dict = {}
+        item_image_dict = {}
         for i in item_image_list:
-            if i['image_type'] not in image_dict:
-                image_dict[i['image_type']] = [
-                    {'image_path': i['image_path'], 'image_id': i['image_id']}
-                ]
+            if "title" not in item_image_dict:
+                item_image_dict['title'] = [{
+                    'image_path': common.build_photo_url(i['photo_id'], pic_version='title'),
+                    'image_id': i['image_id']
+                }]
             else:
-                image_dict[i['image_type']].append(
-                    {'image_path': i['image_path'], 'image_id': i['image_id']}
-                )
+                item_image_dict["title"].append({
+                    'image_path': common.build_photo_url(i['photo_id'], pic_version='title'),
+                    'image_id': i['image_id']
+                })
+        for i in item_info_image_list:
+            if "item" not in item_image_dict:
+                item_image_dict['item'] = [{
+                    'image_path': common.build_photo_url(i['photo_id'], pic_version='item'),
+                    'image_id': i['image_id']
+                }]
+            else:
+                item_image_dict["item"].append({
+                    'image_path': common.build_photo_url(i['photo_id'], pic_version='item'),
+                    'image_id': i['image_id']
+                })
         return my_render(
             request,
             'item/a_item_image_manage.html',
-            image_dict = image_dict,
+            item_image_dict = item_image_dict,
             item_obj = item_obj,
         )
 
@@ -289,21 +304,14 @@ def add_brand(request):
         files = request.FILES
         if files:
             file_obj = files.get('brand_image')
-            server_file_path = '/media/photos'
-            file_dir = os.path.join(
-                settings.MEDIA_ROOT,
-                'photos'
-            )
-            if not os.path.exists(file_dir):
-                os.makedirs(file_dir)
+            if not os.path.exists(settings.MEDIA_ROOT,):
+                os.makedirs(settings.MEDIA_ROOT,)
             data = photo.save_upload_photo(
                 file_obj,
-                file_dir,
-                server_file_path,
-                'brand'
+                settings.MEDIA_ROOT,
             )
             if data:
-                brand.brand_image = data['image_path']
+                brand.photo = data['photo_id']
                 brand.save()
         return redirect('/myadmin/brand_manage/')
 
@@ -350,21 +358,14 @@ def editor_brand(request):
         files = request.FILES
         if files:
             file_obj = files.get('brand_image')
-            server_file_path = '/media/photos'
-            file_dir = os.path.join(
-                settings.MEDIA_ROOT,
-                'photos'
-            )
-            if not os.path.exists(file_dir):
-                os.makedirs(file_dir)
+            if not os.path.exists(settings.MEDIA_ROOT,):
+                os.makedirs(settings.MEDIA_ROOT,)
             data = photo.save_upload_photo(
                 file_obj,
-                file_dir,
-                server_file_path,
-                'brand'
+                settings.MEDIA_ROOT,
             )
             if data:
-                item_obj.brand_image = data['image_path']
+                item_obj.photo_id = data['photo_id']
                 item_obj.save()
         back_url = request.GET.get('back_url')
         return redirect(back_url)
@@ -446,21 +447,14 @@ def add_categorie(request):
         files = request.FILES
         if files:
             file_obj = files.get('categorie_image')
-            server_file_path = '/media/photos'
-            file_dir = os.path.join(
-                settings.MEDIA_ROOT,
-                'photos'
-            )
-            if not os.path.exists(file_dir):
-                os.makedirs(file_dir)
+            if not os.path.exists(settings.MEDIA_ROOT,):
+                os.makedirs(settings.MEDIA_ROOT,)
             data = photo.save_upload_photo(
                 file_obj,
-                file_dir,
-                server_file_path,
-                'brand'
+                settings.MEDIA_ROOT,
             )
             if data:
-                categorie.image_path = data['image_path']
+                categorie.photo_id = data['photo_id']
                 categorie.save()
         return redirect('/myadmin/categorie_manage/')
 
@@ -508,21 +502,14 @@ def editor_categorie(request):
         files = request.FILES
         if files:
             file_obj = files.get('categorie_image')
-            server_file_path = '/media/photos'
-            file_dir = os.path.join(
-                settings.MEDIA_ROOT,
-                'photos'
-            )
-            if not os.path.exists(file_dir):
-                os.makedirs(file_dir)
+            if not os.path.exists(settings.MEDIA_ROOT,):
+                os.makedirs(settings.MEDIA_ROOT,)
             data = photo.save_upload_photo(
                 file_obj,
-                file_dir,
-                server_file_path,
-                'brand'
+                settings.MEDIA_ROOT,
             )
             if data:
-                categorie.image_path = data['image_path']
+                categorie.photo_id = data['photo_id']
                 categorie.save()
         back_url = request.GET.get('back_url')
         return redirect(back_url)

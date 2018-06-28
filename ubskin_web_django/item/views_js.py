@@ -24,20 +24,12 @@ def item_image_create(request):
         files_dict = request.FILES
         image_type = request.POST.get('image_type')
         item_id = request.POST.get('item_id')
-        image_type_dict = dict(item_models.ItemImages.type_choces)
         for k in files_dict:
-            server_file_path = '/media/photos'
-            file_dir = os.path.join(
-                settings.MEDIA_ROOT,
-                'photos'
-            )
-            if not os.path.exists(file_dir):
-                os.makedirs(file_dir)
+            if not os.path.exists(settings.MEDIA_ROOT):
+                os.makedirs(settings.MEDIA_ROOT)
             data = photo.save_upload_photo(
                 files_dict[k],
-                file_dir,
-                server_file_path,
-                image_type_dict.get(int(image_type))
+                settings.MEDIA_ROOT,
             )
             if data:
                 data.update({

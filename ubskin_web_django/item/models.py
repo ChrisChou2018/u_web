@@ -6,6 +6,7 @@ from django.forms import model_to_dict
 from django.conf import settings
 
 from ubskin_web_django.member import models as member_models
+from ubskin_web_django.common import common
 
 
 
@@ -20,7 +21,7 @@ class Brands(models.Model):
     form_country                = models.CharField(db_column="form_country", null=True, blank=True, verbose_name="所属国家", max_length=255)
     key_word                    = models.CharField(db_column="key_word", null=True, blank=True, verbose_name="搜索关键字", max_length=255)
     brand_about                 = models.CharField(db_column="brand_about", null=True, blank=True, verbose_name="品牌简介", max_length=255)
-    brand_image                 = models.CharField(db_column="brand_image", null=True, blank=True, verbose_name="品牌图片路径", max_length=255)
+    photo_id                    = models.CharField(db_column="photo_id", null=True, blank=True, verbose_name='图片名', max_length=255)
     status                      = models.CharField(db_column="status", verbose_name="状态", default="normal", max_length=255)
 
     @classmethod
@@ -125,9 +126,6 @@ class Items(models.Model):
         items_list = p.page(current_page).object_list.values()
         items_list = list(items_list)
         for i in items_list:
-            image_obj = ItemImages.get_images_by_itemid(i['item_id'],True)
-            if image_obj:
-                i['image_list'] = image_obj
             icon_obj = ItemImages.get_thumbicon_by_item_id(i['item_id'], True)
             if icon_obj:
                 i['item_thumbicon'] = icon_obj
@@ -140,9 +138,6 @@ class Items(models.Model):
         p = Paginator(item_obj, 15)
         items_list =  list(p.page(current_page).object_list.values())
         for i in items_list:
-            image_obj = ItemImages.get_images_by_itemid(i['item_id'], True)
-            if image_obj:
-                i['image_list'] = image_obj
             icon_obj = ItemImages.get_thumbicon_by_item_id(i['item_id'], True)
             if icon_obj:
                 i['item_thumbicon'] = icon_obj
@@ -213,13 +208,11 @@ class ItemImages(models.Model):
     image_id       = models.AutoField(db_column="image_id", primary_key=True, verbose_name="图片ID")
     item_id        = models.BigIntegerField(db_column="item_id", verbose_name="所属商品ID")
     type_choces    = (
-        (0, "title"),
-        (1, "thumbicon"),
-        (2, "item_title"),
-        (3, "item_info"),
+        (0, "item"),
+        (1, "item_info"),
     )
-    image_type      = models.IntegerField(db_column="image_type", choices=type_choces, verbose_name="图片类型")
-    image_path      = models.CharField(db_column="image_path", verbose_name="路径", max_length=255)
+    image_type      = models.IntegerField(db_column="image_type", choices=type_choces, verbose_name="图片类型", default=0)
+    photo_id        = models.CharField(db_column="photo_id", verbose_name="图片名", max_length=255)
     file_size       = models.CharField(db_column="file_size", verbose_name="文件大小", max_length=255)
     resolution      = models.CharField(db_column="resolution", verbose_name="分辨率", max_length=255)
     file_type       = models.CharField(db_column="file_type", verbose_name="文件类型", max_length=255)
@@ -232,36 +225,40 @@ class ItemImages(models.Model):
             image_obj = cls.objects.filter(
                 item_id = item_id,
                 status = "normal",
-                image_type = 1
+                image_type = 0
             ).first()
             if image_obj:
                 image_obj = model_to_dict(image_obj)
                 if for_api:
-                    image_obj['image_path'] = settings.SERVERHOST + image_obj['image_path']
-                    return image_obj
-                return image_obj
+                    return common.build_photo_url(image_obj['photo_id'], cdn=True)
+                return common.build_photo_url(image_obj['photo_id'])
             else:
                 if for_api:
-                    return settings.SERVERHOST + "/static/images/user-default.jpg"
+                    return common.build_photo_url(None,cdn=True)
                 else:
-                    return "/static/images/user-default.jpg"
+                    return common.build_photo_url(None)
         except cls.DoesNotExist:
             if for_api:
-                return settings.SERVERHOST + "/static/images/user-default.jpg"
+                return common.build_photo_url(None,cdn=True)
             else:
-                return "/static/images/user-default.jpg"
+                return common.build_photo_url(None)
 
     @classmethod
-    def get_images_by_itemid(cls, item_id, for_api=False):
+    def get_item_images_by_itemid(cls, item_id):
         try:
-            image_obj = cls.objects.filter(item_id=item_id, status = "normal").values()
-            image_obj = list(image_obj)
-            if for_api:
-                for i in image_obj:
-                    i['image_path'] = settings.SERVERHOST + i['image_path']
+            image_obj = cls.objects.filter(item_id=item_id, status = "normal", image_type=0).values()
             return image_obj
         except cls.DoesNotExist:
             return None
+    
+    @classmethod
+    def get_item_info_images_by_itemid(cls, item_id):
+        try:
+            image_obj = cls.objects.filter(item_id=item_id, status = "normal", image_type=1).values()
+            return image_obj
+        except cls.DoesNotExist:
+            return None
+    
 
     @classmethod
     def create_item_image(cls, datas):
@@ -301,7 +298,7 @@ class Categories(models.Model):
         (3, '营养保健')
     )
     categorie_type  = models.SmallIntegerField(db_column="categorie_type", choices=type_choices, null=True, verbose_name="类别")
-    image_path      = models.CharField(db_column="image_path", null=True, verbose_name="缩略图路径", max_length=255)
+    photo_id      = models.CharField(db_column="photo_id", null=True, verbose_name="缩略图路径", max_length=255)
 
 
     @classmethod
@@ -365,7 +362,6 @@ class ItemComments(models.Model):
     member_id       = models.BigIntegerField(db_column="member_id", verbose_name="评论用户ID")
     item_id         = models.BigIntegerField(db_column="item_id", verbose_name="所属商品ID")
     comment_content = models.CharField(max_length=255, db_column="comment_content", verbose_name="评论内容")
-    # reply_id        = models.BigIntegerField(db_column="reply_id", null=True, verbose_name="回复的评论ID")
     create_time     = models.IntegerField(db_column="create_time", verbose_name="创建时间", default=int(time.time()))
     start_choices   = (
         (1, '1星'),
@@ -446,7 +442,7 @@ class CommentImages(models.Model):
     '''
     image_id        = models.AutoField(db_column="image_id", verbose_name="图片ID", primary_key=True)
     comment_id      = models.BigIntegerField(db_column="comment_id", verbose_name="所属评论ID")
-    image_path      = models.CharField(db_column="image_path", verbose_name="路径", max_length=255)
+    photo_id        = models.CharField(db_column="photo_id", verbose_name="图片名", max_length=255)
     file_size       = models.CharField(db_column="file_size", verbose_name="文件大小", max_length=255)
     resolution      = models.CharField(db_column="resolution", verbose_name="分辨率", max_length=255)
     file_type       = models.CharField(db_column="file_type", verbose_name="文件类型", default='.jpg', max_length=255)
@@ -458,7 +454,9 @@ class CommentImages(models.Model):
         image_list = list(cls.objects.filter(comment_id = comment_id, status = 'normal').values())
         if for_api:
             for i in image_list:
-                i['image_path'] = settings.SERVERHOST + i['image_path']
+                i['image_path'] = common.build_photo_url(i['photo_id'], pic_version='title', cdn=True)
+        for i in image_list:
+                i['image_path'] = common.build_photo_url(i['photo_id'], pic_version='title')
         return image_list
     
     @classmethod
