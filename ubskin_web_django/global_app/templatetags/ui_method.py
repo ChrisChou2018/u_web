@@ -109,14 +109,13 @@ def Pagingfunc(current_page, all_count, filter_args, uri=None):
 
 @register.simple_tag
 def get_value_by_key(a_dict, key):
-    return a_dict.get(key)
+    return a_dict.get(key, '')
 
 
 @register.simple_tag
 def get_thumbicon_by_id(item_id):
     item_image_obj = item_models.ItemImages.get_thumbicon_by_item_id(item_id)
     if item_image_obj:
-        print(item_image_obj)
         return item_image_obj
 
 @register.simple_tag

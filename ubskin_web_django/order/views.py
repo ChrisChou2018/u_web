@@ -14,11 +14,11 @@ def my_render(request, templater_path, **kwargs):
 def order_manage(request):
     if request.method == 'GET':
         current_page = request.GET.get('page', 1)
-        value = request.GET.get('serch_value', '')
+        value = request.GET.get('search_value', '')
         filter_args = None
         if value:
             filter_args = '&search_value={0}'.format(value)
-            search_value = {"stock_bach_id" : value}
+            search_value = {"stock_batch_id" : value}
             data_list = order_models.get_data_list(
                 order_models.StockBatch, current_page, search_value
             )
@@ -46,18 +46,18 @@ def order_manage(request):
             current_page = current_page,
             filter_args = filter_args,
             data_count = item_count,
-            serch_value = value,
+            search_value = value,
         )
 
 @login_required(login_url='/myadmin/signin/')
 def item_qr_Code_manage(request):
     if request.method == 'GET':
         current_page = request.GET.get('page', 1)
-        value = request.GET.get('serch_value', '')
+        value = request.GET.get('search_value', '')
         filter_args = None
         if value:
             filter_args = '&search_value={0}'.format(value)
-            search_value = {"item_code" : value}
+            search_value = {"stock_batch_id" : value}
             data_list = order_models.get_data_list(
                 order_models.ItemQRCode, current_page, search_value
             )
@@ -78,7 +78,7 @@ def item_qr_Code_manage(request):
             data_list = data_list,
             current_page = current_page,
             filter_args = filter_args,
-            serch_value = value,
+            search_value = value,
             data_count = data_count,
         )
 
@@ -86,7 +86,7 @@ def item_qr_Code_manage(request):
 def recv_manage(request):
     if request.method == 'GET':
         current_page = request.GET.get('page', 1)
-        value = request.GET.get('serch_value', '')
+        value = request.GET.get('search_value', '')
         filter_args = None
         if value:
             filter_args = '&search_value={0}'.format(value)
@@ -107,7 +107,7 @@ def recv_manage(request):
             'order/a_recv_manage.html',
             data_list = data_list,
             filter_args = filter_args,
-            serch_value = value,
+            search_value = value,
             data_count = data_count,
         )
 

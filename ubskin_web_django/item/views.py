@@ -180,7 +180,6 @@ def editor_item(request):
     else:
         form = EditorItemForm(request.POST)
         if not form.is_valid():
-            print(form.errors)
             return my_render(
                 request,
                 'item/a_add_item.html',
@@ -523,6 +522,7 @@ def item_comment_manage(request):
         if value:
             filter_args = '&search_value={0}'.format(value)
             item_id = item_models.Items.get_item_id_by_item_name(value)
+            search_value = None
             if item_id:
                 search_value = {'item_id': item_id}
             item_comments_list = item_models.ItemComments. \

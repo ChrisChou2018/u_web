@@ -23,12 +23,24 @@ def member_signin(request):
             'member/a_signin.html',
         )
     else:
-        telephone = request.POST.get('username')
+        user_name = request.POST.get('username')
+        member = member_models.Member.get_member_by_telephone(user_name)
         password = request.POST.get('password')
-        user = authenticate(telephone=telephone, password=password)
+        user = authenticate(user_name=user_name, password=password)
         if user and user.is_admin:
             login(request, user)
             return redirect('/myadmin/index/')
+        elif member:
+            if member.check_password(password):
+                login(request, member)
+                return redirect('/myadmin/index/')
+            else:
+                return my_render(
+                    request,
+                    'member/a_signin.html',
+                    form_error = '用户名或者密码错误',
+                    form_data = request.POST
+                )
         else:
             return my_render(
                 request,
