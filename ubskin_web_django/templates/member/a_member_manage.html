@@ -250,10 +250,8 @@
                 var input_value = $(item).val().trim()
                 if(is_edit){
                     data_dict['member_id'] = member_id
-                    var input_old_value = $(item).attr('old_value')
-                    if(input_value != input_old_value){
-                        data_dict[$(item).attr('name')]=input_value
-                    }
+                    data_dict[$(item).attr('name')]=input_value
+                    
                 }else{
                     data_dict[$(item).attr('name')]=input_value
                 }

@@ -42,12 +42,12 @@ class UserProfileManager(BaseUserManager):
 
 class Member(AbstractBaseUser, PermissionsMixin):
     member_id           = models.AutoField(db_column="member_id", primary_key=True, verbose_name="用户ID")
-    member_name         = models.CharField(db_column="member_name", max_length=255, null=True)
-    telephone           = models.CharField(db_column="telephone", max_length=255, null=True)
-    user_name           = models.CharField(db_column="user_name", max_length=255, unique=True, null=True)
-    wx_openid           = models.CharField(db_column="wx_openid", max_length=255, null=True)
+    member_name         = models.CharField(db_column="member_name", max_length=255, null=True, blank=True)
+    telephone           = models.CharField(db_column="telephone", max_length=255, null=True, blank=True)
+    user_name           = models.CharField(db_column="user_name", max_length=255, unique=True, null=True, blank=True)
+    wx_openid           = models.CharField(db_column="wx_openid", max_length=255, null=True, blank=True)
     status              = models.CharField(db_column="status", default='normal', max_length=255)
-    sessions            = models.CharField(db_column="sessions", max_length=255, null=True)
+    sessions            = models.CharField(db_column="sessions", max_length=255, null=True, blank=True)
     created_ip          = models.CharField(db_column="created_ip", null=True, blank=True, max_length=255)
     create_time         = models.IntegerField(db_column="create_time", default=int(time.time()))
     update_time         = models.IntegerField(db_column="update_time", default=int(time.time()))
@@ -81,6 +81,17 @@ class Member(AbstractBaseUser, PermissionsMixin):
             is_staff = '内部账号',
             more = '更多'
         )
+
+    @classmethod
+    def has_member_telephone(cls, telephone, member_id):
+        try:
+            member =  cls.objects.get(telephone=telephone, status='normal')
+            if member and member.member_id != int(member_id):
+                return True
+            else:
+                return False
+        except cls.DoesNotExist:
+            return False
     
     @classmethod
     def update_member_by_id(cls, member_id, data):
