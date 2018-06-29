@@ -109,7 +109,7 @@ def Pagingfunc(current_page, all_count, filter_args, uri=None):
 
 @register.simple_tag
 def get_value_by_key(a_dict, key):
-    return a_dict.get(key)
+    return a_dict.get(key, '')
 
 
 @register.simple_tag

@@ -23,14 +23,15 @@ def signin(request):
     }
     telephone = request.POST.get('username')
     password = request.POST.get('password')
-    user = authenticate(telephone=telephone, password=password)
-    if user:
-        login(request, user)
+    member =  member_models.Member.get_member_by_telephone(telephone)
+    has_login = member.check_password(password)
+    if has_login:
+        login(request, member)
         return_value['status'] = 'success'
         return_value['data'] = {
             'sessionid': request.session.session_key,
-            'member_name': user.member_name,
-            'member_id': user.member_id,
+            'member_name': member.member_name,
+            'member_id': member.member_id,
         }
         return JsonResponse(return_value)
     else:
@@ -49,13 +50,11 @@ class UserCreationFormWX(forms.ModelForm):
 
     class Meta:
         model = member_models.Member
-        fields = ('member_name', 'telephone', 'avatar', 'is_staff')
-
+        fields = ('member_name', 'wx_openid', 'avatar', 'is_staff')
 
     def save(self, commit=True):
         # Save the provided password in hashed format
         user = super(UserCreationFormWX, self).save(commit=False)
-        user.set_password(self.cleaned_data["telephone"])
         if commit:
             user.save()
         return user
@@ -72,7 +71,7 @@ def wx_signin(request):
         openid = data.get('openid')
         name = data.get('name')
         avatar = data.get('avatar')
-        member = member_models.Member.get_member_by_telephone(openid)
+        member = member_models.Member.get_member_by_wx_openid(openid)
         if member:
             member.member_name = name
             member.avatar = avatar
@@ -81,7 +80,7 @@ def wx_signin(request):
             return_value['data'] = [{'is_staff': member.is_staff},]
             return JsonResponse(return_value)
         else:
-            user_data = {'telephone': openid, 'member_name': name, 'avatar': avatar, 'is_staff': False}
+            user_data = {'wx_openid': openid, 'member_name': name, 'avatar': avatar, 'is_staff': False}
             form  = UserCreationFormWX(user_data)
             if form.is_valid():
                 member = form.save()
