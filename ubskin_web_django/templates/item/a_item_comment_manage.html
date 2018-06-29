@@ -1,0 +1,156 @@
+{% extends '../a_layout.html' %}
+{% load ui_method %}
+{% block css %}
+{% endblock %}
+{% block title %}
+评论列表            
+{% endblock %}
+{% block page_header %}
+<ol class="breadcrumb">
+    <li><a href="#"><i class="fa fa-dashboard"></i> 评论管理</a></li>
+</ol>
+{% endblock %}
+
+{% block content_title %}
+
+
+<div class="row">
+    <div class="col-md-8">
+        <div "row">
+            <div class="col-md-8">
+                <form action="" method="GET" class="search_input">
+                <div class="input-group">
+                    <input type="text" class="form-control" placeholder="按商品搜索" name="search_value" value="{{ search_value }}">
+                    <span class="input-group-btn">
+                        <button class="btn btn-default search_input_btn" type="submit">搜索</button>
+                    </span>
+                  </div><!-- /input-group -->
+                </form>
+            </div>
+            <div class="col-md-4">
+
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <!-- <a href="/add_comment/" class="btn btn-info" >添加评论 <span class="glyphicon glyphicon-plus"></span></a> -->
+        <button type="button" class="btn btn-default choose_comment" type="button">选择全部<span class="glyphicon glyphicon-saved"></span></button>
+        <button type="button" class="btn btn-danger delete_comment" type="button">删除<span class="glyphicon glyphicon-trash"></span></button>
+    </div>
+</div>
+{% endblock %}
+
+{% block content %}
+
+<div style="padding: 15px;overflow: auto;">
+    {% for i in item_comments_list %}
+        <div class="panel panel-success comment_list">
+            <div class="panel-heading"><input type="checkbox" class="item_checkbox" item-id={{i.comment_id}}>商品名：{{i.item_name}}</div>
+            <div class="panel-body">
+                <!-- <div class="media-left">
+                    <a href="#">
+                        <img class="media-object" src="/images/user-default.jpg" style="width: 100px; height: 100px;">
+                    </a>
+                </div> -->
+                <div class="media-body">
+                    <div class="row">
+                        <div class="col-md-8">
+                            评论内容：{{ i.comment_content }}
+                        </div>
+                        <div class="col-md-2">
+                            用户名：{{ i.member_name }}
+                        </div>
+                        <div class="col-md-2">
+                            <div class="row">
+                                <a  href="{% url 'comment_image_manage' %}?comment_id={{i.comment_id}}" style='cursor:pointer;text-decoration:none;'><span class="glyphicon glyphicon-pencil"></span> 图片管理</a>                               
+                            </div>
+                            <div class="row">
+                                    <a  href="{% url 'edit_item_comment' %}?comment_id={{i.comment_id}}&back_url={{request.get_full_path}}" style='cursor:pointer;text-decoration:none;'><span class="glyphicon glyphicon-pencil"></span> 编辑</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+</div>
+
+
+<div>
+    <nav aria-label="Page navigation">
+        <ul class="pagination page_box">
+            {% Pagingfunc current_page count filter_args request.path as page %}
+            {{ page | safe }}
+        </ul>
+    </nav>
+</div>
+
+
+{% endblock %}
+
+{% block js %}
+    <script>
+        $(function(){
+            $('.item_comments_manage').addClass('active')
+            $('.add_categorie_btn').click(function(){
+                $('.modal-title').text('创建分类')
+                $('.submit_btn').unbind()
+                $('.submit_btn').click(function(){
+                    add_or_edit_categorie(false)
+                })
+            })
+            $('.choose_comment').click(function(){
+                var text =  $(this).text()
+                var $comment_list = $('.comment_list')
+                if(text == '选择全部'){
+                    $comment_list.each(function(index, item){
+                        var $f =  $(item).children().find('input[type="checkbox"]')
+                        $f.prop('checked', true)
+                    })
+                    $(this).html('取消全部<span class="glyphicon glyphicon-saved"></span>')
+                }else{
+                    $comment_list.each(function(index, item){
+                        var $f =  $(item).children().find('input[type="checkbox"]')
+                        $f.prop('checked', false)
+                    })
+                    $(this).html('选择全部<span class="glyphicon glyphicon-saved"></span>')
+                }
+                
+            })
+            $('.delete_comment').click(delete_comment)
+            $('.edit_categorie').click(get_edit_category_info)
+        })
+        
+ 
+
+        // 删除评论按钮
+        function delete_comment(){
+            var $item_list = $('.comment_list')
+            var comment_ids_list = []
+            $item_list.each(function(index, item){
+                var f =  $(item).children().find('input[type="checkbox"]')
+                var is_checked = $(f).prop('checked')
+                if(is_checked){
+                    comment_ids_list.push($(f).attr('item-id'))
+                }
+            })
+        
+            if(comment_ids_list.length>0){
+                $.post(
+                    "{% url 'delete_item_comments' %}",
+                    {'comment_ids_list': comment_ids_list, 'csrfmiddlewaretoken': getCookie('csrftoken')},
+                    function(value){
+                        if(value.status == 'success'){
+                            location.reload()
+                        }else{
+                            alert(value.message)
+                        }
+                    },
+                    'json'
+                )
+            }
+        }
+
+
+    </script>
+{% endblock %}

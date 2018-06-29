@@ -16,8 +16,21 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from django.urls import include
+from django.conf.urls.static import static
+from django.conf import settings
+
+# from . import views_api
+# ### API register
+# router = routers.DefaultRouter()
+# router.register('users', views_api.MemberViewSet)
+###
+
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
-    path('myadmin/', include('my_admin.urls')),
+    # path('admin/', admin.site.urls),
+    path('', include('ubskin_web_django.member.urls')),
+    path('', include('ubskin_web_django.item.urls')),
+    path('', include('ubskin_web_django.order.urls')),
 ]
+
+urlpatterns += static(settings.MEDIA_URL, document_root = settings.MEDIA_ROOT)
