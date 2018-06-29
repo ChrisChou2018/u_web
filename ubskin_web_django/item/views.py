@@ -11,6 +11,7 @@ from django.db.models import Count
 from ubskin_web_django.item import models as item_models
 from ubskin_web_django.common import photo
 from ubskin_web_django.common import common
+from ubskin_web_django.common import lib_data
 
 
 def my_render(request, templater_path, **kwargs):
@@ -603,3 +604,4 @@ def create_brand(request):
             {'cn_name': i['brand_name']}
         )
     return redirect('/myadmin/brand_manage/')
+
