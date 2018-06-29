@@ -50,7 +50,7 @@
             <div class="panel-body">
                 <div class="media-left">
                     <a href="#">
-                        <img class="media-object" src="{% if i.brand_image %}{{i.brand_image }}{% else %} /static/images/user-default.jpg {% endif %}" style="width: 100px; height: 100px;">
+                        <img class="media-object" src="{% build_photo_url i.photo_id %}" style="width: 100px; height: 100px;">
                     </a>
                 </div>
                     <div class="media-body">

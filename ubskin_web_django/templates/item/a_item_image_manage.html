@@ -15,33 +15,15 @@
 {% block content %}
 <input type="file" accept=".jpg" name="add_new_image" multiple style="display:none;" item-id="{{ item_obj.item_id }}"> 
 <div class="container">
-    <h4>商品缩略图 
-        <a type="button" class="btn btn-info add_image" >Add
-            <span class="glyphicon glyphicon-plus"></span>
-        </a>
-        <button type="button" class="btn btn-danger delete_image" type="button">Delete<span class="glyphicon glyphicon-trash"></span></button>
-    </h4>
-    <div class="row" image-type='1' style="overflow: auto; max-width: 900px;" >
-        
-        {% if image_dict.1 %}
-            {% for i in image_dict.1 %}
-                <div class="col-xs-6 col-md-2 image_item" image-id='{{i.image_id}}'>
-                    <a class="thumbnail" style="width: 150px;height: 150px;">
-                    <img src="{{ i.image_path }}" alt="..." >
-                    </a>
-                </div>
-            {% endfor %}
-        {% endif %}
-        
-    </div>
+    
     <h4>商品样式图 
         <button type="button" class="btn btn-info add_image" >Add<span class="glyphicon glyphicon-plus"></span></button>
         <button type="button" class="btn btn-danger delete_image" type="button">Delete<span class="glyphicon glyphicon-trash"></span></button>
     </h4>
-    <div class="row" image-type='2' style="overflow: auto; max-width: 900px;">
+    <div class="row" image-type='0' style="overflow: auto; max-width: 900px;">
         
-        {% if image_dict.2 %}
-            {% for i in image_dict.2 %}
+        {% if item_image_dict.title %}
+            {% for i in item_image_dict.title %}
                 <div class="col-xs-6 col-md-3 image_item" image-id='{{ i.image_id }}'> 
                     <a class="thumbnail" style="width: 200px;height: 200px;">
                     <img src="{{ i.image_path }}" alt="..." >
@@ -61,10 +43,10 @@
         <button type="button" class="btn btn-info add_image" >Add<span class="glyphicon glyphicon-plus"></span></button>
         <button type="button" class="btn btn-danger delete_image" type="button">Delete<span class="glyphicon glyphicon-trash"></span></button>
     </h4>
-    <div class="row" image-type='4' style="overflow: auto; max-width: 1000px;">
+    <div class="row" image-type='1' style="overflow: auto; max-width: 1000px;">
         
-        {% if image_dict.4 %}
-            {% for i in image_dict.4 %}
+        {% if item_image_dict.item %}
+            {% for i in item_image_dict.item %}
                 <div class="col-xs-6 col-md-4 image_item" image-id='{{ i.image_id }}'>
                     <a class="thumbnail" style="width: 350px;height: 350px; overflow: auto;">
                     <img src="{{ i.image_path }}" alt="..." >

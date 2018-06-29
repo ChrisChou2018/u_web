@@ -104,18 +104,11 @@ def create_item_comment(request):
         if files:
             for i in files:
                 file_obj = files[i]
-                server_file_path = '/media/photos'
-                file_dir = os.path.join(
-                    settings.MEDIA_ROOT,
-                    'photos'
-                )
-                if not os.path.exists(file_dir):
-                    os.makedirs(file_dir)
+                if not os.path.exists(settings.MEDIA_ROOT,):
+                    os.makedirs(settings.MEDIA_ROOT,)
                 data = photo.save_upload_photo(
                     file_obj,
-                    file_dir,
-                    server_file_path,
-                    'comment'
+                    settings.MEDIA_ROOT,
                 )
                 if data:
                     data['comment_id'] = obj.comment_id

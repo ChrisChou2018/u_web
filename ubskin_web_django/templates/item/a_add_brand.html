@@ -1,5 +1,6 @@
 
 {% extends '../a_layout.html' %}
+{% load ui_method %}
 {% block css %}
     
 {% endblock %}
@@ -45,7 +46,7 @@
             <input type="file" class="form-control" name="brand_image">
         </div>
         <div class="image-box">
-            <img src="{% if form_data.brand_image %}{{ form_data.brand_image }}{% endif %}" alt="图片预览" style="width: 300px;height: 300px;">
+            <img src="{%if form_data and form_data.photo_id %}{% build_photo_url form_data.photo_id %}{% endif %}" alt="图片预览" style="width: 300px;height: 300px;">
         </div>
       </div><!-- /.box-body -->
 
