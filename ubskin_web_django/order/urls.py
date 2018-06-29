@@ -8,8 +8,9 @@ from ubskin_web_django.order import views_api
 urlpatterns = [
     path('myadmin/order_manage/', views.order_manage, name='order_manage'),
     path('myadmin/item_qr_Code_manage/', views.item_qr_Code_manage, name='item_qr_Code_manage'),
-    path('myadmin/reve_manage/', views.recv_manage, name='recv_manage'),
-    path('myadmin/stock_batch/', views.stock_batch, name='stock_batch')
+    path('myadmin/recv_manage/', views.recv_manage, name='recv_manage'),
+    path('myadmin/stock_batch/', views.stock_batch, name='stock_batch'),
+    path('create_recv/', views.create_recv)
 ]
 
 urlpatterns += [

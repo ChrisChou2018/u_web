@@ -76,7 +76,7 @@ class Member(AbstractBaseUser, PermissionsMixin):
             member_id = '用户ID',
             member_name = '用户名',
             telephone = '手机号',
-            wx_openid = '微信openid',
+            wx_openid = '微信openID',
             is_admin = '管理员身份',
             is_staff = '内部账号',
             more = '更多'

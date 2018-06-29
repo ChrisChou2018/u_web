@@ -41,12 +41,18 @@ def signin(request):
 @decorators.api_authenticated
 @csrf_exempt
 def signin_out(request):
+    return_value  = {
+        'status': 'error',
+        'message': '',
+        'data': '',
+    }
     logout(request)
-    return JsonResponse({'message':'登出成功'})
+    return_value['status'] = 'success'
+    return JsonResponse(return_value)
 
 
 class UserCreationFormWX(forms.ModelForm):
-
+    
 
     class Meta:
         model = member_models.Member

@@ -1,8 +1,10 @@
 from django.shortcuts import render
+from django.http import HttpResponseRedirect
 from django.contrib.auth.decorators import login_required
 
 from ubskin_web_django.order import models as order_models
 from ubskin_web_django.item import models as item_models
+from ubskin_web_django.common import lib_data
 
 
 # Create your views here.
@@ -118,3 +120,13 @@ def stock_batch(request):
             request,
             'order/a_stock_batch.html',
         )
+
+def create_recv(request):
+    recv_data = lib_data.recv_code_dict1
+    order_models.Recv.objects.all().delete()
+    for k, v in recv_data.items():
+        order_models.create_model_data(
+            order_models.Recv,
+            {'recv_code': k, 'recv_addr': v},
+        )
+    return HttpResponseRedirect('/myadmin/recv_manage/')
