@@ -34,8 +34,8 @@ def order_manage(request):
             item_count = order_models.get_data_count(order_models.StockBatch)
         if data_list:
             for i in data_list:
-                item_qr_code_count = order_models.ItemQRCode.\
-                    get_count_by_stock_batch_id(i['stock_batch_id'])
+                item_qr_code_count = order_models. \
+                    StockBatchCount.get_item_count_by_stock_batch_id(i['stock_batch_id'])
                 i['code_count'] = item_qr_code_count
         for i in data_list:
             recv_addr = order_models.Recv. \
@@ -58,8 +58,9 @@ def item_qr_Code_manage(request):
         value = request.GET.get('search_value', '')
         filter_args = None
         if value:
+            id_list =  order_models.StockBatchCount.get_obj_by_stock_batch_id(value)
             filter_args = '&search_value={0}'.format(value)
-            search_value = {"stock_batch_id" : value}
+            search_value = {"stock_batch_count_id__in" : id_list}
             data_list = order_models.get_data_list(
                 order_models.ItemQRCode, current_page, search_value
             )
@@ -72,8 +73,15 @@ def item_qr_Code_manage(request):
             )
             data_count = order_models.get_data_count(order_models.ItemQRCode)
         for i in data_list:
-            item_name = item_models.Items.get_item_name_by_barcode(i.get('item_barcode'))
-            i['item_name'] = item_name
+            obj = order_models.get_model_obj_by_pk(
+                order_models.StockBatchCount,
+                i.get('stock_batch_count_id')
+            )
+            if obj:
+                item_name = item_models.Items.get_item_name_by_barcode(obj.item_barcode)
+                i['item_name'] = item_name
+                i['item_barcode'] = obj.item_barcode
+                i['stock_batch_id'] = obj.stock_batch_id
         return my_render(
             request,
             'order/a_item_qr_code_manage.html',

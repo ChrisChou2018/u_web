@@ -166,37 +166,43 @@ def create_stock_bach(request):
                     if not (len(i) == 9 and i.startswith('U')):
                         return_value['message'] = '商品二维码格式错误'
                         return JsonResponse(return_value)
+                stock_batch_count = order_models.create_model_data(
+                    order_models.StockBatchCount,
+                    {
+                        'item_barcode': key,
+                        'stock_batch_id': stock_batch_id,
+                        'item_count': len(item),
+                    }
+                )
+                for i in item:
                     order_models.create_model_data(
                         order_models.ItemQRCode,
                         {
-                            "item_barcode": key,
                             "qr_code": i,
-                            "stock_batch_id": stock_batch_id,
+                            "stock_batch_count_id": stock_batch_count.stock_batch_count_id,
                             "create_user": create_user_id
                         }
                     )
         else:
             for key, item in nums_dict.items():
-                for i in range(int(item)):
-                    order_models.create_model_data(
-                        order_models.ItemQRCode,
-                        {
-                            "item_barcode": key,
-                            "stock_batch_id": stock_batch_id,
-                            "create_user": create_user_id
-                        }
-                    )
+                order_models.create_model_data(
+                    order_models.StockBatchCount,
+                    {
+                        "item_barcode": key,
+                        "stock_batch_id": stock_batch_id,
+                        "item_count": int(item),
+                    }
+                )
         return_value['status'] = 'success'
         return JsonResponse(return_value)
 
 def jm_stock_batch_info(request):
     data_id = request.GET.get('data_id')
-    stock = order_models.get_model_obj_by_pk(order_models.StockBatch, data_id)
-    out_order_id = stock.stock_batch_id
-    code_data = order_models.ItemQRCode. \
-        get_stock_batch_info_by_stock_batch_id(out_order_id)
-    return my_render(
-        request,
-        'order/a_jm_stock_batch_info.html',
-        code_data = code_data
-    )
+    if data_id:
+        code_data = order_models.ItemQRCode. \
+            get_stock_batch_info_by_stock_batch_id(data_id)
+        return my_render(
+            request,
+            'order/a_jm_stock_batch_info.html',
+            code_data = code_data
+        )

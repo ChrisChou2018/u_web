@@ -89,7 +89,7 @@
                     <td>{{ code.stock_batch_id }}</td>
                     <td>{{ code.item_barcode }}</td>
                     <!-- <td>{{ code.out_order_id }}</td> -->
-                    <td><a href="#modalItemCodes" data-toggle="modal" data-target="#modalItemCodes" data-batchid="{{ code.qr_code_id }}">详细</a></td>
+                    <td><a href="#modalItemCodes" data-toggle="modal" data-target="#modalItemCodes" data-batchid="{{ code.stock_batch_id }}">详细</a></td>
                 </tr>
                 {% endfor %}
                 </tbody>
@@ -136,7 +136,7 @@ $(function() {
         let btn = $(e.relatedTarget);
         let batchId = btn.data('batchid');
         $('#id_modal_body').load(
-            '/admin/jm-items-code-detail/' + batchId,
+            '{% url "a_jm_stock_batch_info" %}?data_id=' + batchId,
             (res, status, xhr) => {
                 if (status == "error") {
                     $('#id_modal_body').html('<p>加载数据时出错, 请稍后再试</p>');

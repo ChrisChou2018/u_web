@@ -52,14 +52,37 @@ class StockBatch(models.Model):
         else:
             return None
 
+
     class Meta:
         db_table = 'stock_batch'
+
+
+class StockBatchCount(models.Model):
+    stock_batch_count_id    = models.AutoField(db_column='stock_batch_count_id', primary_key=True, verbose_name='stock_batch_count_id')
+    stock_batch_id          = models.CharField(db_column="stock_batch_id", verbose_name='库存单号', max_length=255, null=True, blank=True)
+    item_barcode            = models.CharField(db_column='item_barcode', verbose_name='商品条码', max_length=255, null=True, blank=True)
+    item_count              = models.IntegerField(db_column="item_count", verbose_name="库商品数量", default=0)
+
+    class Meta:
+        db_table = 'stock_batch_count'
+
+    @classmethod
+    def get_item_count_by_stock_batch_id(cls, stock_batch_id):
+        obj = cls.objects.filter(stock_batch_id=stock_batch_id).values_list('item_count')
+        count_list = [ i[0] for i in obj ]
+        count = sum(count_list)
+        return count
+
+    @classmethod
+    def get_obj_by_stock_batch_id(cls, stock_batch_id):
+        id_list =  cls.objects.filter(stock_batch_id=stock_batch_id).values_list('stock_batch_count_id')
+        id_list = [ i[0] for i in id_list]
+        return id_list
 
 class ItemQRCode(models.Model):
     qr_code_id = models.AutoField(db_column='qr_code_id', primary_key=True, verbose_name='qr_code_id')
     qr_code = models.CharField(db_column='qr_code', verbose_name='商品二维码', max_length=255, null=True, blank=True)
-    item_barcode = models.CharField(db_column='item_barcode', verbose_name='商品条码', max_length=255)
-    stock_batch_id = models.CharField(db_column='stock_batch_id', verbose_name='出库单号ID', max_length=255, null=True, blank=True)
+    stock_batch_count_id = models.BigIntegerField(db_column='stock_batch_count_id', verbose_name='出库单表ID', null=True, blank=True)
     status = models.CharField(db_column="status", default='normal', max_length=255)
     create_user = models.BigIntegerField(db_column='create_user', verbose_name='创建用户', null=True, blank=True)
 
@@ -117,7 +140,7 @@ def get_data_count(model, search_value=None):
     return count   
 
 def create_model_data(model, data):
-    model.objects.create(**data)
+     return model.objects.create(**data)
 
 def delete_models_by_pk(model, id_list):
     model.objects.filter(pk__in=id_list).update(status='deleted')
