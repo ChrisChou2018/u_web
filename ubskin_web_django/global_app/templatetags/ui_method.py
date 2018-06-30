@@ -122,5 +122,5 @@ def get_thumbicon_by_id(item_id):
 @register.simple_tag
 def parse_timestamps(timestamps):
     t = time.localtime(timestamps)
-    time_str = time.strftime('%Y-%m-%d %H:%M:%S', t)
+    time_str = time.strftime(r'%Y-%m-%d %H:%M:%S', t)
     return time_str
