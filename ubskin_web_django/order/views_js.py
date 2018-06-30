@@ -164,6 +164,8 @@ def create_stock_bach(request):
         )
         if item_codes_dict:
             for key, item in item_codes_dict.items():
+                if not item:
+                    continue
                 for i in item:
                     if not (len(i) == 9 and i.startswith('U')):
                         return_value['message'] = '商品二维码格式错误'
