@@ -63,7 +63,7 @@ def create_stock_batch_api(request):
             if not item:
                 continue
             for i in item:
-                if not (len(i) == 9 and  i.startswith('U')):
+                if not (len(i) == 9 and i.startswith('U')):
                     return_value['message'] = '商品二维码格式错误'
                     return JsonResponse(return_value)
             stock_batch_count = order_models.create_model_data(
