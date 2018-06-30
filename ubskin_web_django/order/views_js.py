@@ -189,6 +189,8 @@ def create_stock_bach(request):
                     )
         else:
             for key, item in nums_dict.items():
+                if int(item) == 0:
+                    continue 
                 order_models.create_model_data(
                     order_models.StockBatchCount,
                     {
@@ -203,6 +205,7 @@ def create_stock_bach(request):
 def jm_stock_batch_info(request):
     data_id = request.GET.get('data_id')
     if data_id:
+
         code_data = order_models.ItemQRCode. \
             get_stock_batch_info_by_stock_batch_id(data_id)
         return my_render(
