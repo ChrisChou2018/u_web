@@ -129,9 +129,10 @@ def get_item_info_by_code(request):
         if item_dict is None:
             return_value['message'] = '没有找到相关的商品'
             return JsonResponse(return_value)
-        if recv_code and recv_code in lib_data.monitor_recv_codes:
-            return_value['in_monitor'] = True \
-                if item_dict["brand_name"] in lib_data.monitor_brand_names else False
+        
+        recv = order_models.Recv.get_recv_obj_by_recv_code(recv_code)
+        if recv:
+            return_value['in_monitor'] = True if recv.is_watch else False
         item_dict.pop("item_id")
         return_value['status'] = 'success'
         return_value['data'] = item_dict
@@ -145,11 +146,11 @@ def create_stock_bach(request):
     if request.method == 'POST':
         stock_batch_id = request.POST.get('stock_batch_id')
         recv_code = request.POST.get('recv_code')
-        item_codes_dict = request.POST.get('item_codes_dict')
-        item_codes_dict = json.loads(item_codes_dict)
+        item_codes_dict = json.loads(request.POST.get('item_codes_dict'))
+        nums_dict = json.loads(request.POST.get('nums_dict'))
         create_user_id = request.user.member_id
-        if not item_codes_dict:
-            return_value['message'] = "扫码提交为空"
+        if not recv_code or not stock_batch_id or not (item_codes_dict or  nums_dict):
+            return_value['message'] = "提交数据有误，请确认"
             return JsonResponse(return_value)
         order_models.create_model_data(
             order_models.StockBatch,
@@ -159,17 +160,32 @@ def create_stock_bach(request):
                 "create_user": create_user_id
             }
         )
-        for key, item in item_codes_dict.items():
-            for i in item:
-                order_models.create_model_data(
-                    order_models.ItemQRCode,
-                    {
-                        "item_barcode": key,
-                        "qr_code": i,
-                        "stock_batch_id": stock_batch_id,
-                        "create_user": create_user_id
-                    }
-                )
+        if item_codes_dict:
+            for key, item in item_codes_dict.items():
+                for i in item:
+                    if not (len(i) == 9 and i.startswith('U')):
+                        return_value['message'] = '商品二维码格式错误'
+                        return JsonResponse(return_value)
+                    order_models.create_model_data(
+                        order_models.ItemQRCode,
+                        {
+                            "item_barcode": key,
+                            "qr_code": i,
+                            "stock_batch_id": stock_batch_id,
+                            "create_user": create_user_id
+                        }
+                    )
+        else:
+            for key, item in nums_dict.items():
+                for i in range(int(item)):
+                    order_models.create_model_data(
+                        order_models.ItemQRCode,
+                        {
+                            "item_barcode": key,
+                            "stock_batch_id": stock_batch_id,
+                            "create_user": create_user_id
+                        }
+                    )
         return_value['status'] = 'success'
         return JsonResponse(return_value)
 

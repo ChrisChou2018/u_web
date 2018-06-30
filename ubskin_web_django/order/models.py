@@ -26,6 +26,10 @@ class Recv(models.Model):
     def get_recv_list(cls):
         data_list = cls.objects.filter().values('recv_code', 'recv_addr')
         return list(data_list)
+    
+    @classmethod
+    def get_recv_obj_by_recv_code(cls, recv_code):
+        return cls.objects.filter(recv_code=recv_code).first()
 
 
     class Meta:
@@ -53,9 +57,9 @@ class StockBatch(models.Model):
 
 class ItemQRCode(models.Model):
     qr_code_id = models.AutoField(db_column='qr_code_id', primary_key=True, verbose_name='qr_code_id')
-    qr_code = models.CharField(db_column='qr_code', verbose_name='商品二维码', max_length=255)
+    qr_code = models.CharField(db_column='qr_code', verbose_name='商品二维码', max_length=255, null=True, blank=True)
     item_barcode = models.CharField(db_column='item_barcode', verbose_name='商品条码', max_length=255)
-    stock_batch_id = models.CharField(db_column='stock_batch_id', verbose_name='出库单号ID', max_length=255, null=True)
+    stock_batch_id = models.CharField(db_column='stock_batch_id', verbose_name='出库单号ID', max_length=255, null=True, blank=True)
     status = models.CharField(db_column="status", default='normal', max_length=255)
     create_user = models.BigIntegerField(db_column='create_user', verbose_name='创建用户', null=True, blank=True)
 

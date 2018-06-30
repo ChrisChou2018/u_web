@@ -126,7 +126,7 @@ var recv_addr = null;
 var curr_item_barcode = null;
 var codes_dict = {};
 var items_dict = {};
-// var nums_dict = {};
+var nums_dict = {};
 
 
 function build_info_div() {
@@ -144,16 +144,16 @@ function build_info_div() {
     let items_tag = "";
     $.each(codes_dict, (key, val) => {
         let item = items_dict[key];
-        items_tag += "<tr><td>" + item.item_code + "</td><td>" + item.item_name + "</td><td>" +  item.specifications_type_id + "</td><td>" + key + "</td><td>" + val.length + "</td></tr>";
+        items_tag += "<tr><td>" + item.item_code + "</td><td>" + item.item_name + "</td><td>" +  item.capacity + "</td><td>" + key + "</td><td>" + val.length + "</td></tr>";
         item_count += val.length;
     });
-    // $.each(nums_dict, (key, num) => {
-    //     let item = items_dict[key];
-    //     items_tag += "<tr><td>" + item.item_code + "</td><td>" + item.item_name
-    //         + "</td><td>" + item.specifications_type_id + "</td><td>" + key + "</td><td>" 
-    //         + '<input type="text" name="'+key+'" class="form-control cf_item_num" value="'+num+'">' + "</td></tr>";
-    //     item_count += num;
-    // })
+    $.each(nums_dict, (key, num) => {
+        let item = items_dict[key];
+        items_tag += "<tr><td>" + item.item_code + "</td><td>" + item.item_name
+            + "</td><td>" + item.capacity + "</td><td>" + key + "</td><td>" 
+            + '<input type="text" name="'+key+'" class="form-control cf_item_num" value="'+num+'">' + "</td></tr>";
+        item_count += num;
+    })
     let item_count_tag = "<p>共计: " + item_count + "</p>";
     
 
@@ -267,7 +267,7 @@ $(function() {
                         items_dict[curr_item_barcode] = r.data;
 
                         // TODO: remove monitor check for temp
-                        r.in_monitor = false;
+                        // r.in_monitor = true;
 
                         // if it's in monitor list, then
                         if (r.in_monitor) {
@@ -276,10 +276,10 @@ $(function() {
                         }
                         else {
                             // product number plus 1
-                            // if (!nums_dict[curr_item_barcode]) {
-                            //     nums_dict[curr_item_barcode] = 0;
-                            // }
-                            // nums_dict[curr_item_barcode] += 1;
+                            if (!nums_dict[curr_item_barcode]) {
+                                nums_dict[curr_item_barcode] = 0;
+                            }
+                            nums_dict[curr_item_barcode] += 1;
 
                             $("#id_div_scan_hint").hide();
                         }
@@ -305,20 +305,20 @@ $(function() {
 
 
     // --- bind event so we can set item number
-    // $("#id_div_stock_info").on("change", ".cf_item_num", function() {
-    //     let item_barcode = $(this).attr('name');
-    //     let item_num = $(this).val();
-    //     // alert(item_num);
+    $("#id_div_stock_info").on("change", ".cf_item_num", function() {
+        let item_barcode = $(this).attr('name');
+        let item_num = $(this).val();
+        // alert(item_num);
         
-    //     if (!$.isNumeric(item_num)) {
-    //         alert("请输入正确的数字");
-    //         $(this).focus();
-    //         return;
-    //     }
+        if (!$.isNumeric(item_num)) {
+            alert("请输入正确的数字");
+            $(this).focus();
+            return;
+        }
         
-    //     nums_dict[item_barcode] = parseInt(item_num);
-    //     build_info_div();
-    // });
+        nums_dict[item_barcode] = parseInt(item_num);
+        build_info_div();
+    });
 
 
     // submit form
@@ -332,6 +332,7 @@ $(function() {
             stock_batch_id: stock_batch_id,
             recv_code: recv_code,
             item_codes_dict: JSON.stringify(codes_dict),
+            nums_dict:JSON.stringify(nums_dict),
             'csrfmiddlewaretoken': getCookie('csrftoken'),
         }
         $.post("{% url 'create_stock_bach' %}", params, (r) => {
