@@ -94,14 +94,14 @@ def recv_manage(request):
             filter_args = '&search_value={0}'.format(value)
             search_value = {"recv_addr" : value}
             data_list = order_models.get_data_list(
-                order_models.Recv, current_page, search_value, '-is_watch'
+                order_models.Recv, current_page, search_value,
             )
             data_count = order_models.get_data_count(
                 order_models.Recv, search_value
             )
         else:
             data_list = order_models.get_data_list(
-                order_models.Recv, current_page, order_by='-is_watch'
+                order_models.Recv, current_page,
             )
             data_count = order_models.get_data_count(order_models.Recv)
         return my_render(
@@ -111,6 +111,7 @@ def recv_manage(request):
             filter_args = filter_args,
             search_value = value,
             data_count = data_count,
+            current_page = current_page
         )
 
 @login_required(login_url='/myadmin/signin/')

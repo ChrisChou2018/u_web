@@ -46,7 +46,7 @@ def create_stock_batch_api(request):
         item_codes_dict = data.get('item_codes_dict')
         openid = data.get('openid')
         member = member_models.Member.get_member_by_wx_openid(openid)
-        if not member:
+        if not member and not member.is_staff:
             return_value['message'] = '无权限'
             return JsonResponse(return_value)
         order_models.create_model_data(
@@ -55,6 +55,9 @@ def create_stock_batch_api(request):
         )
         for key, item in item_codes_dict.items():
             for i in item:
+                if not (len(i) == 9 and i.startswith('U')):
+                    return_value['message'] = '商品二维码格式错误'
+                    return JsonResponse(return_value)
                 order_models.create_model_data(
                     order_models.ItemQRCode,
                     {
