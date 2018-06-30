@@ -18,5 +18,5 @@ def build_photo_url(photo_id, pic_version="thumb", pic_type="photos", cdn=False)
                 "/", photo_id[:2], "/", photo_id , ".jpg"
             ])
         else:
-            return "".join([settings.SERVERHOST, "/static/", "images/", "user-default", ".png"])
+            return "".join([settings.SERVERHOST, "/static/", "images/", "user-default", ".jpg"])
 
