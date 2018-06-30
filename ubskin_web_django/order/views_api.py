@@ -1,6 +1,7 @@
 import json
 import string
 import random
+import time
 
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
@@ -51,7 +52,12 @@ def create_stock_batch_api(request):
             return JsonResponse(return_value)
         order_models.create_model_data(
             order_models.StockBatch,
-            {"stock_batch_id": stock_batch_id, "recv_code": recv_code, "create_user": member.member_id}
+            {
+                "stock_batch_id": stock_batch_id,
+                "recv_code": recv_code,
+                "create_user": member.member_id,
+                "create_time": int(time.time()),
+            }
         )
         for key, item in item_codes_dict.items():
             for i in item:

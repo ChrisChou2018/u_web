@@ -1,4 +1,5 @@
 import json
+import time
 
 from django import forms
 from django.http import JsonResponse
@@ -157,7 +158,8 @@ def create_stock_bach(request):
             {
                 "stock_batch_id": stock_batch_id,
                 "recv_code": recv_code,
-                "create_user": create_user_id
+                "create_user": create_user_id,
+                "create_time": int(time.time())
             }
         )
         if item_codes_dict:
