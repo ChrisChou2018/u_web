@@ -12,6 +12,7 @@ from django.contrib.auth import logout
 
 from ubskin_web_django.common import decorators
 from ubskin_web_django.member import models as member_models
+from ubskin_web_django.common import request_wx_openid
 
 
 @csrf_exempt
@@ -65,6 +66,21 @@ class UserCreationFormWX(forms.ModelForm):
             user.save()
         return user
 
+def wx_regist_member(return_value, openid, name, avatar, session_key=None):
+    user_data = {'wx_openid': openid, 'member_name': name, 'avatar': avatar, 'is_staff': False}
+    if session_key is not None:
+        user_data.update({'sessions': session_key})
+    form  = UserCreationFormWX(user_data)
+    if form.is_valid():
+        member = form.save()
+        return_value['status'] = 'success'
+        return_value['data'] = [{'is_staff': member.is_staff, 'openid': openid},]
+        return JsonResponse(return_value)
+    else:
+        return_value['message'] = "携带参数错误或缺少参数"
+        return JsonResponse(return_value)
+
+
 @csrf_exempt
 def wx_signin(request):
     return_value  = {
@@ -77,26 +93,25 @@ def wx_signin(request):
         openid = data.get('openid')
         name = data.get('name')
         avatar = data.get('avatar')
+        appid = data.get('appid')
+        js_code = data.get('js_code')
+        secret = data.get('secret')
+        rep =  request_wx_openid.request_user_session_key(
+            appid, js_code, secret
+        )
+        rep_dict = json.loads(rep)
+        openid = rep_dict.get('openid')
+        session_key = rep_dict.get('session_key') 
         member = member_models.Member.get_member_by_wx_openid(openid)
         if member:
             member.member_name = name
             member.avatar = avatar
             member.save()
             return_value['status'] = 'success'
-            return_value['data'] = [{'is_staff': member.is_staff},]
+            return_value['data'] = [{'is_staff': member.is_staff, 'openid': member.wx_openid},]
             return JsonResponse(return_value)
         else:
-            user_data = {'wx_openid': openid, 'member_name': name, 'avatar': avatar, 'is_staff': False}
-            form  = UserCreationFormWX(user_data)
-            if form.is_valid():
-                member = form.save()
-                return_value['status'] = 'success'
-                return_value['data'] = [{'is_staff': member.is_staff},]
-                return JsonResponse(return_value)
-            else:
-                return_value['message'] = "携带参数错误或缺少参数"
-                return JsonResponse(return_value)
-
+            return wx_regist_member(return_value, openid, name, avatar, session_key)
 
 class UserCreationForm(forms.ModelForm):
     password1 = forms.CharField(

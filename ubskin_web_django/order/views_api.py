@@ -58,12 +58,20 @@ def create_stock_batch_api(request):
                 if not (len(i) == 9 and i.startswith('U')):
                     return_value['message'] = '商品二维码格式错误'
                     return JsonResponse(return_value)
+            stock_batch_count = order_models.create_model_data(
+                order_models.StockBatchCount,
+                {
+                    'item_barcode': key,
+                    'stock_batch_id': stock_batch_id,
+                    'item_count': len(item),
+                }
+            )
+            for i in item:
                 order_models.create_model_data(
                     order_models.ItemQRCode,
                     {
-                        "item_barcode": key,
                         "qr_code": i,
-                        "stock_batch_id": stock_batch_id,
+                        "stock_batch_count_id": stock_batch_count.stock_batch_count_id,
                         "create_user": member.member_id
                     }
                 )
@@ -85,8 +93,12 @@ def item_code(request, qr_code):
     if not qr_code_obj:
         return_value['message'] = '没有记录'
         return JsonResponse(return_value)
-    stock_batch_id = qr_code_obj.stock_batch_id
-    stock_batch_dict = order_models.StockBatch.get_stock_dict_by_stock_batch_id(stock_batch_id)
+    stock_batch_count_id = qr_code_obj.stock_batch_count_id
+    obj = order_models.get_model_obj_by_pk(
+        order_models.StockBatchCount,
+        stock_batch_count_id,
+    )
+    stock_batch_dict = order_models.StockBatch.get_stock_dict_by_stock_batch_id(obj.stock_batch_id)
     recv_code = stock_batch_dict.get('recv_code')
     recv_addr = order_models.Recv.get_recv_addr_by_recv_code(recv_code)
     date = stock_batch_dict.get('create_time')
