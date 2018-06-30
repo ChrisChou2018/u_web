@@ -20,6 +20,7 @@ urlpatterns = [
     path('myadmin/edit_item_comment/', views.edit_item_comment, name='edit_item_comment'),
     path('myadmin/comment_image_manage/', views.item_comment_image_manage, name='comment_image_manage'),
     path('create_brand/', views.create_brand),
+    # path('create_recv/', )
 ]
 
 urlpatterns += [

@@ -11,6 +11,7 @@ from django.db.models import Count
 from ubskin_web_django.item import models as item_models
 from ubskin_web_django.common import photo
 from ubskin_web_django.common import common
+from ubskin_web_django.common import lib_data
 
 
 def my_render(request, templater_path, **kwargs):
@@ -180,7 +181,6 @@ def editor_item(request):
     else:
         form = EditorItemForm(request.POST)
         if not form.is_valid():
-            print(form.errors)
             return my_render(
                 request,
                 'item/a_add_item.html',
@@ -523,6 +523,7 @@ def item_comment_manage(request):
         if value:
             filter_args = '&search_value={0}'.format(value)
             item_id = item_models.Items.get_item_id_by_item_name(value)
+            search_value = None
             if item_id:
                 search_value = {'item_id': item_id}
             item_comments_list = item_models.ItemComments. \
@@ -603,3 +604,4 @@ def create_brand(request):
             {'cn_name': i['brand_name']}
         )
     return redirect('/myadmin/brand_manage/')
+

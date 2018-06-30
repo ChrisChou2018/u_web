@@ -9,16 +9,16 @@ from django.core.paginator import Paginator
 
 
 class UserProfileManager(BaseUserManager):
-    def create_user(self, telephone, member_name, password=None):
+    def create_user(self, user_name, member_name, password=None):
         """
         Creates and saves a User with the given email, date of
         birth and password.
         """
-        if not telephone:
-            raise ValueError('必须要注册手机号码')
+        if not user_name:
+            raise ValueError('必须要有用户名')
 
         user = self.model(
-            telephone=telephone,
+            user_name=user_name,
             member_name=member_name,
         )
 
@@ -26,12 +26,12 @@ class UserProfileManager(BaseUserManager):
         user.save(using=self._db)
         return user
 
-    def create_superuser(self, telephone, member_name, password):
+    def create_superuser(self, user_name, member_name, password):
         """
         Creates and saves a superuser with the given email, date of
         birth and password.
         """
-        user = self.create_user(telephone,
+        user = self.create_user(user_name,
             password=password,
             member_name=member_name
         )
@@ -42,10 +42,12 @@ class UserProfileManager(BaseUserManager):
 
 class Member(AbstractBaseUser, PermissionsMixin):
     member_id           = models.AutoField(db_column="member_id", primary_key=True, verbose_name="用户ID")
-    member_name         = models.CharField(db_column="member_name", max_length=255)
-    telephone           = models.CharField(db_column="telephone", max_length=255, unique=True)
+    member_name         = models.CharField(db_column="member_name", max_length=255, null=True, blank=True)
+    telephone           = models.CharField(db_column="telephone", max_length=255, null=True, blank=True)
+    user_name           = models.CharField(db_column="user_name", max_length=255, unique=True, null=True, blank=True)
+    wx_openid           = models.CharField(db_column="wx_openid", max_length=255, null=True, blank=True)
     status              = models.CharField(db_column="status", default='normal', max_length=255)
-    sessions            = models.CharField(db_column="sessions", max_length=255)
+    sessions            = models.CharField(db_column="sessions", max_length=255, null=True, blank=True)
     created_ip          = models.CharField(db_column="created_ip", null=True, blank=True, max_length=255)
     create_time         = models.IntegerField(db_column="create_time", default=int(time.time()))
     update_time         = models.IntegerField(db_column="update_time", default=int(time.time()))
@@ -56,7 +58,7 @@ class Member(AbstractBaseUser, PermissionsMixin):
     # role                = models.CharField(db_column="role", default="")
 
     objects = UserProfileManager()
-    USERNAME_FIELD = 'telephone'
+    USERNAME_FIELD = 'user_name'
     REQUIRED_FIELDS = ['member_name']
 
     def __str__(self):  # __unicode__ on Python 2
@@ -74,10 +76,22 @@ class Member(AbstractBaseUser, PermissionsMixin):
             member_id = '用户ID',
             member_name = '用户名',
             telephone = '手机号',
+            wx_openid = '微信openID',
             is_admin = '管理员身份',
             is_staff = '内部账号',
             more = '更多'
         )
+
+    @classmethod
+    def has_member_telephone(cls, telephone, member_id):
+        try:
+            member =  cls.objects.get(telephone=telephone, status='normal')
+            if member and member.member_id != int(member_id):
+                return True
+            else:
+                return False
+        except cls.DoesNotExist:
+            return False
     
     @classmethod
     def update_member_by_id(cls, member_id, data):
@@ -99,6 +113,16 @@ class Member(AbstractBaseUser, PermissionsMixin):
         try:
             return cls.objects.get(
             telephone = telephone,
+            status = 'normal'
+            )
+        except cls.DoesNotExist:
+            return None
+    
+    @classmethod
+    def get_member_by_wx_openid(cls, wx_openid):
+        try:
+            return cls.objects.get(
+            wx_openid = wx_openid,
             status = 'normal'
             )
         except cls.DoesNotExist:

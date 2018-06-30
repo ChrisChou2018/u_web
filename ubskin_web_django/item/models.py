@@ -68,7 +68,7 @@ class Items(models.Model):
     key_word                    = models.CharField(db_column="key_word", null=True, blank=True, verbose_name="搜索关键字", max_length=255)
     origin                      = models.CharField(db_column="origin", null=True, blank=True, verbose_name="生产地", max_length=255)
     shelf_life                  = models.CharField(db_column="shelf_life", null=True, blank=True, verbose_name="保质期", max_length=255)
-    capacity                    = models.CharField(db_column="capacity", null=True, blank=True, verbose_name="容量", max_length=255)
+    capacity                    = models.CharField(db_column="capacity", null=True, blank=True, verbose_name="规格", max_length=255)
     specifications_type_choices = (
         (0, '瓶'),
         (1, '包'),
@@ -79,8 +79,8 @@ class Items(models.Model):
         (6, '对'),
         (7, '盒')
     )
-    specifications_type_id      = models.SmallIntegerField(db_column="specifications_type_id", choices=specifications_type_choices, null=True, blank=True, verbose_name="规格类型")
-    specifications_type         = models.CharField(db_column="specifications_type", null=True, blank=True, verbose_name="规格", max_length=255)
+    specifications_type_id      = models.SmallIntegerField(db_column="specifications_type_id", choices=specifications_type_choices, null=True, blank=True, verbose_name="单位类型")
+    specifications_type         = models.CharField(db_column="specifications_type", null=True, blank=True, verbose_name="单位", max_length=255)
     categories_id               = models.BigIntegerField(db_column="categories_id", null=True, blank=True, verbose_name="分类ID")
     brand_id                    = models.BigIntegerField(db_column="brand_id", null=True, blank=True, verbose_name="品牌ID")
     brand_name                  = models.CharField(db_column="brand_name", null=True, blank=True, verbose_name="品牌名", max_length=255)
@@ -212,7 +212,7 @@ class ItemImages(models.Model):
         (1, "item_info"),
     )
     image_type      = models.IntegerField(db_column="image_type", choices=type_choces, verbose_name="图片类型", default=0)
-    photo_id        = models.CharField(db_column="photo_id", verbose_name="图片名", max_length=255)
+    photo_id        = models.CharField(db_column="photo_id", verbose_name="图片名", max_length=255, null=True, blank=True)
     file_size       = models.CharField(db_column="file_size", verbose_name="文件大小", max_length=255)
     resolution      = models.CharField(db_column="resolution", verbose_name="分辨率", max_length=255)
     file_type       = models.CharField(db_column="file_type", verbose_name="文件类型", max_length=255)
@@ -298,7 +298,8 @@ class Categories(models.Model):
         (3, '营养保健')
     )
     categorie_type  = models.SmallIntegerField(db_column="categorie_type", choices=type_choices, null=True, verbose_name="类别")
-    photo_id      = models.CharField(db_column="photo_id", null=True, verbose_name="缩略图路径", max_length=255)
+    photo_id        = models.CharField(db_column="photo_id", null=True, blank=True, verbose_name="缩略图路径", max_length=255)
+    status          = models.CharField(db_column="status", verbose_name="状态", default="normal", max_length=255)
 
 
     @classmethod
@@ -442,7 +443,7 @@ class CommentImages(models.Model):
     '''
     image_id        = models.AutoField(db_column="image_id", verbose_name="图片ID", primary_key=True)
     comment_id      = models.BigIntegerField(db_column="comment_id", verbose_name="所属评论ID")
-    photo_id        = models.CharField(db_column="photo_id", verbose_name="图片名", max_length=255)
+    photo_id        = models.CharField(db_column="photo_id", verbose_name="图片名", max_length=255, null=True, blank=True)
     file_size       = models.CharField(db_column="file_size", verbose_name="文件大小", max_length=255)
     resolution      = models.CharField(db_column="resolution", verbose_name="分辨率", max_length=255)
     file_type       = models.CharField(db_column="file_type", verbose_name="文件类型", default='.jpg', max_length=255)

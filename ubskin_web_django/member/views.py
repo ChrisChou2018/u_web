@@ -23,12 +23,24 @@ def member_signin(request):
             'member/a_signin.html',
         )
     else:
-        telephone = request.POST.get('username')
+        user_name = request.POST.get('username')
+        member = member_models.Member.get_member_by_telephone(user_name)
         password = request.POST.get('password')
-        user = authenticate(telephone=telephone, password=password)
+        user = authenticate(user_name=user_name, password=password)
         if user and user.is_admin:
             login(request, user)
             return redirect('/myadmin/index/')
+        elif member:
+            if member.check_password(password):
+                login(request, member)
+                return redirect('/myadmin/index/')
+            else:
+                return my_render(
+                    request,
+                    'member/a_signin.html',
+                    form_error = '用户名或者密码错误',
+                    form_data = request.POST
+                )
         else:
             return my_render(
                 request,
@@ -50,23 +62,6 @@ def index(request):
         )
 
 
-class UserChangeForm(forms.ModelForm):
-
-    password2 = forms.CharField(error_messages={'required': '新密码不能为空'})
-
-    class Meta:
-        model = member_models.Member
-        fields = set()
-
-    def clean_password(self):
-        password = self.cleaned_data["password2"]
-        return password
-
-    def update_pass(self):
-        user = super(UserChangeForm, self).save(commit=False)
-        user.set_password(self.cleaned_data["password2"])
-        user.save()
-
 
 @login_required(login_url='/myadmin/signin/')
 def change_pass(request):
@@ -77,24 +72,16 @@ def change_pass(request):
         )
     else:
         password = request.POST.get('password')
-        telephone = request.user.telephone
-        user = authenticate(telephone=telephone, password=password)
-        if not user:
+        pas = request.user.check_password(password)
+        if not pas:
             return my_render(
                 request,
                 'member/a_change_password.html',
                 form_error = '原密码错误',
                 form_data = request.POST
             )
-        form = UserChangeForm(request.POST)
-        if not form.is_valid():
-            return my_render(
-                request,
-                'member/a_change_password.html',
-                form_error = form.errors.get('password2'),
-                form_data = request.POST
-            )
-        form.update_pass()
+        request.user.set_password(request.POST.get('password2'))
+        request.user.save()
         return redirect('/myadmin/signin/')
 
 @login_required(login_url='/myadmin/signin/')

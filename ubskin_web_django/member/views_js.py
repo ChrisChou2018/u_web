@@ -19,7 +19,7 @@ class UserCreationForm(forms.ModelForm):
         error_messages={'required': '用户名不能为空'}
     )
     telephone = forms.CharField(
-        error_messages={'required': '手机号不能为空'}
+        error_messages={'required': '手机号不可为空'}
     )
 
     class Meta:
@@ -37,9 +37,10 @@ class UserCreationForm(forms.ModelForm):
 
     def clean_telephone(self):
         telephone = self.cleaned_data.get("telephone")
-        member = member_models.Member.get_member_by_telephone(telephone)
-        if member:
-            raise forms.ValidationError("手机号已经被注册")
+        if telephone:
+            member = member_models.Member.get_member_by_telephone(telephone)
+            if member:
+                raise forms.ValidationError("手机号已经被注册")
         return telephone
 
     def save(self, commit=True):
@@ -100,9 +101,14 @@ def editor_member(request):
                 return_value['message'] = ['两次密码不一致']
                 return JsonResponse(return_value)
             member_obj.set_password(password2)
+        telephone = request.POST.get('telephone')
+        if telephone:
+            if member_models.Member.has_member_telephone(
+                telephone, request.POST.get('member_id')):
+                return_value['message'] = ['该手机号已经存在']
+                return JsonResponse(return_value)
         clear_data = {
-            key:request.POST.get(key) for key in update_field 
-            if request.POST.get(key)
+            key:request.POST.get(key) for key in update_field
         }
         clear_data['is_admin'] = True if clear_data['is_admin'] == 'true' else False
         clear_data['is_staff'] = True if clear_data['is_staff'] == 'true' else False
