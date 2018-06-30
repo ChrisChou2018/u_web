@@ -203,6 +203,7 @@ def create_stock_bach(request):
 def jm_stock_batch_info(request):
     data_id = request.GET.get('data_id')
     if data_id:
+        
         code_data = order_models.ItemQRCode. \
             get_stock_batch_info_by_stock_batch_id(data_id)
         return my_render(

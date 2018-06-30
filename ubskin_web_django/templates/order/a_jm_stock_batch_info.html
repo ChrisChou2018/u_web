@@ -15,7 +15,7 @@
             <tr>
                 <td>{% if i.item_name %}{{ i.item_name }}{% else %}未查询到商品信息{% endif %}</td>
                 <td>{{ i.item_barcode }}</td>
-                <td>{{ i.c }}</td>
+                <td>{{ i.item_count }}</td>
             </tr>
             {% endfor %}
         </tbody>
