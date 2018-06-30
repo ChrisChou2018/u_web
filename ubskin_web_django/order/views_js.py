@@ -1,4 +1,5 @@
 import json
+import time
 
 from django import forms
 from django.http import JsonResponse
@@ -157,11 +158,14 @@ def create_stock_bach(request):
             {
                 "stock_batch_id": stock_batch_id,
                 "recv_code": recv_code,
-                "create_user": create_user_id
+                "create_user": create_user_id,
+                "create_time": int(time.time())
             }
         )
         if item_codes_dict:
             for key, item in item_codes_dict.items():
+                if not item:
+                    continue
                 for i in item:
                     if not (len(i) == 9 and i.startswith('U')):
                         return_value['message'] = '商品二维码格式错误'

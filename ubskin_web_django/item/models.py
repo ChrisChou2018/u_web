@@ -169,7 +169,7 @@ class Items(models.Model):
     def get_item_dict_by_barcode_api(cls, item_barcode):
         try:
             data_dict = dict()
-            model = cls.objects.get(item_barcode=item_barcode)
+            model = cls.objects.filter(item_barcode=item_barcode).last()
             model = model_to_dict(model)
             data_dict['item_name'] = model.get('item_name')
             data_dict['specifications_type'] = model.get('capacity') if model.get('capacity') else '无规格信息'
