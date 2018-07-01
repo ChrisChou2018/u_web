@@ -1,4 +1,5 @@
 import json
+import time
 
 from django import forms
 from django.http import JsonResponse
@@ -157,11 +158,14 @@ def create_stock_bach(request):
             {
                 "stock_batch_id": stock_batch_id,
                 "recv_code": recv_code,
-                "create_user": create_user_id
+                "create_user": create_user_id,
+                "create_time": int(time.time())
             }
         )
         if item_codes_dict:
             for key, item in item_codes_dict.items():
+                if not item:
+                    continue
                 for i in item:
                     if not (len(i) == 9 and i.startswith('U')):
                         return_value['message'] = '商品二维码格式错误'
@@ -185,6 +189,8 @@ def create_stock_bach(request):
                     )
         else:
             for key, item in nums_dict.items():
+                if int(item) == 0:
+                    continue 
                 order_models.create_model_data(
                     order_models.StockBatchCount,
                     {
@@ -199,6 +205,7 @@ def create_stock_bach(request):
 def jm_stock_batch_info(request):
     data_id = request.GET.get('data_id')
     if data_id:
+
         code_data = order_models.ItemQRCode. \
             get_stock_batch_info_by_stock_batch_id(data_id)
         return my_render(

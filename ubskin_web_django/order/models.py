@@ -78,6 +78,10 @@ class StockBatchCount(models.Model):
         id_list =  cls.objects.filter(stock_batch_id=stock_batch_id).values_list('stock_batch_count_id')
         id_list = [ i[0] for i in id_list]
         return id_list
+    
+    @classmethod
+    def get_stock_batch_count_by_stock_batch_id(cls, stock_batch_id):
+        return cls.objects.filter(stock_batch_id=stock_batch_id).values()
 
 class ItemQRCode(models.Model):
     qr_code_id = models.AutoField(db_column='qr_code_id', primary_key=True, verbose_name='qr_code_id')
@@ -106,15 +110,12 @@ class ItemQRCode(models.Model):
         data_dict['stock_batch_id'] = stock_batch_id
         data_dict['recv_addr'] = recv_addr
         data_dict['recv_code'] = stock['recv_code']
-        data_dict['item_code_list'] = cls.objects. \
-            filter(stock_batch_id=stock_batch_id, status='normal'). \
-            values('item_barcode').annotate(c=Count('item_barcode'))
-        all_count = 0
+        obj = StockBatchCount.get_stock_batch_count_by_stock_batch_id(stock_batch_id)
+        data_dict['item_code_list'] = obj
         if data_dict['item_code_list']:
             for i in data_dict['item_code_list']:
                 i['item_name'] = item_model.Items.get_item_name_by_barcode(i['item_barcode'])
-                all_count += int(i['c'])
-        data_dict['all_count'] = all_count
+        data_dict['all_count'] = StockBatchCount.get_item_count_by_stock_batch_id(stock_batch_id)
         return data_dict
 
 

@@ -1,6 +1,7 @@
 import json
 import string
 import random
+import time
 
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
@@ -51,9 +52,16 @@ def create_stock_batch_api(request):
             return JsonResponse(return_value)
         order_models.create_model_data(
             order_models.StockBatch,
-            {"stock_batch_id": stock_batch_id, "recv_code": recv_code, "create_user": member.member_id}
+            {
+                "stock_batch_id": stock_batch_id,
+                "recv_code": recv_code,
+                "create_user": member.member_id,
+                "create_time": int(time.time()),
+            }
         )
         for key, item in item_codes_dict.items():
+            if not item:
+                continue
             for i in item:
                 if not (len(i) == 9 and i.startswith('U')):
                     return_value['message'] = '商品二维码格式错误'

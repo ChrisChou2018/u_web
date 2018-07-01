@@ -167,17 +167,17 @@ class Items(models.Model):
     
     @classmethod
     def get_item_dict_by_barcode_api(cls, item_barcode):
-        try:
-            data_dict = dict()
-            model = cls.objects.get(item_barcode=item_barcode)
-            model = model_to_dict(model)
-            data_dict['item_name'] = model.get('item_name')
-            data_dict['specifications_type'] = model.get('capacity') if model.get('capacity') else '无规格信息'
-            data_dict['thumbicon'] = ItemImages.get_thumbicon_by_item_id(model.get('item_id'),True)
-            data_dict['item_barcode'] = model.get('item_barcode')
-            return data_dict
-        except cls.DoesNotExist:
+        data_dict = dict()
+        model = cls.objects.filter(item_barcode=item_barcode).last()
+        if not model:
             return None
+        model = model_to_dict(model)
+        data_dict['item_name'] = model.get('item_name')
+        data_dict['specifications_type'] = model.get('capacity') if model.get('capacity') else '无规格信息'
+        data_dict['thumbicon'] = ItemImages.get_thumbicon_by_item_id(model.get('item_id'),True)
+        data_dict['item_barcode'] = model.get('item_barcode')
+        return data_dict
+        
     
     @classmethod
     def has_exist_item_code(cls, item_code, item_id):
