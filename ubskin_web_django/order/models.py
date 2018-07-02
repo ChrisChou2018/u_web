@@ -3,6 +3,7 @@ import time
 from django.db import models
 from django.forms.models import model_to_dict
 from django.core.paginator import Paginator
+from django.core.paginator import EmptyPage
 from django.db.models import Count
 
 from ubskin_web_django.item import models as item_model
@@ -23,9 +24,14 @@ class Recv(models.Model):
             return None
     
     @classmethod
-    def get_recv_list(cls):
-        data_list = cls.objects.filter().values('recv_code', 'recv_addr')
-        return list(data_list)
+    def get_recv_list(cls, current_page=None):
+        current_page = int(current_page)
+        data_list = cls.objects.all().order_by('pk')
+        p = Paginator(data_list, 20)
+        if current_page > p.num_pages:
+            return list()
+        else:
+            return list(p.page(current_page).object_list.values('recv_code', 'recv_addr'))
     
     @classmethod
     def get_recv_obj_by_recv_code(cls, recv_code):

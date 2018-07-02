@@ -17,7 +17,8 @@ def get_recv(request):
             'status': 'error',
             'message': '',
         }
-        recv_list = order_models.Recv.get_recv_list()
+        current_page = request.GET.get('page', 1)
+        recv_list = order_models.Recv.get_recv_list(current_page)
         return_value['status'] = 'success'
         return_value['data'] = recv_list
         return JsonResponse(return_value)

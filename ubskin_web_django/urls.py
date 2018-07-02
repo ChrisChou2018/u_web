@@ -19,11 +19,6 @@ from django.urls import include
 from django.conf.urls.static import static
 from django.conf import settings
 
-# from . import views_api
-# ### API register
-# router = routers.DefaultRouter()
-# router.register('users', views_api.MemberViewSet)
-###
 
 
 urlpatterns = [
