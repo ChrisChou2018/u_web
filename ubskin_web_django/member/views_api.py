@@ -90,7 +90,6 @@ def wx_signin(request):
     }
     if request.method == 'POST':
         data = json.loads(request.body)
-        openid = data.get('openid')
         name = data.get('name')
         avatar = data.get('avatar')
         appid = data.get('appid')
@@ -102,16 +101,20 @@ def wx_signin(request):
         rep_dict = json.loads(rep)
         openid = rep_dict.get('openid')
         session_key = rep_dict.get('session_key') 
-        member = member_models.Member.get_member_by_wx_openid(openid)
-        if member:
-            member.member_name = name
-            member.avatar = avatar
-            member.save()
-            return_value['status'] = 'success'
-            return_value['data'] = [{'is_staff': member.is_staff, 'openid': member.wx_openid},]
-            return JsonResponse(return_value)
+        if openid is not None:
+            member = member_models.Member.get_member_by_wx_openid(openid)
+            if member:
+                member.member_name = name
+                member.avatar = avatar
+                member.save()
+                return_value['status'] = 'success'
+                return_value['data'] = [{'is_staff': member.is_staff, 'openid': member.wx_openid},]
+                return JsonResponse(return_value)
+            else:
+                return wx_regist_member(return_value, openid, name, avatar, session_key)
         else:
-            return wx_regist_member(return_value, openid, name, avatar, session_key)
+            return_value['message'] = '服务端微信验证接口出错'
+            return JsonResponse(return_value)
 
 class UserCreationForm(forms.ModelForm):
     password1 = forms.CharField(
