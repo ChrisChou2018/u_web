@@ -221,23 +221,17 @@ class ItemImages(models.Model):
 
     @classmethod
     def get_thumbicon_by_item_id(cls, item_id, for_api=False):
-        try:
-            image_obj = cls.objects.filter(
-                item_id = item_id,
-                status = "normal",
-                image_type = 0
-            ).first()
-            if image_obj:
-                image_obj = model_to_dict(image_obj)
-                if for_api:
-                    return common.build_photo_url(image_obj['photo_id'], cdn=True)
-                return common.build_photo_url(image_obj['photo_id'])
-            else:
-                if for_api:
-                    return common.build_photo_url(None,cdn=True)
-                else:
-                    return common.build_photo_url(None)
-        except cls.DoesNotExist:
+        image_obj = cls.objects.filter(
+            item_id = item_id,
+            status = "normal",
+            image_type = 0
+        ).first()
+        if image_obj:
+            image_obj = model_to_dict(image_obj)
+            if for_api:
+                return common.build_photo_url(image_obj['photo_id'], cdn=True)
+            return common.build_photo_url(image_obj['photo_id'])
+        else:
             if for_api:
                 return common.build_photo_url(None,cdn=True)
             else:
