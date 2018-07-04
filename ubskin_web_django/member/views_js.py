@@ -51,7 +51,7 @@ class UserCreationForm(forms.ModelForm):
             user.save()
         return user
 
-@decorators.api_authenticated
+@decorators.js_authenticated
 def create_member(request):
     return_value = {
         'status':'error',
@@ -66,7 +66,7 @@ def create_member(request):
         return_value['status'] = 'success'
         return JsonResponse(return_value)
 
-@decorators.api_authenticated
+@decorators.js_authenticated
 def delete_member(request):
     return_value = {
         'status':'error',
@@ -79,7 +79,7 @@ def delete_member(request):
         return JsonResponse(return_value)
 
 
-@decorators.api_authenticated
+@decorators.js_authenticated
 def editor_member(request):
     return_value = {
         'status':'error',

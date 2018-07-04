@@ -1,15 +1,29 @@
 import functools
+import json
 
 from django.http import JsonResponse
 from django.contrib.sessions.models import Session
 
-def api_authenticated(method):
-    @functools.wraps(method)
+from ubskin_web_django.member import models as member_model
+
+def js_authenticated(fuc):
+    @functools.wraps(fuc)
     def wrapper(request, *args, **kwargs):
         return_data = dict()
         if str(request.user) == "AnonymousUser":
             return_data["message"] = "你没有登陆"
             return_data["status"] = "error"
             return JsonResponse(return_data)
-        return method(request, *args, **kwargs)
+        return fuc(request, *args, **kwargs)
+    return wrapper
+
+
+def wx_api_authenticated(fuc):
+    @functools.wraps(fuc)
+    def wrapper(request, *args, **kwargs):
+        openid = request.COOKIES.get('openid')
+        member = member_model.Member.get_member_by_wx_openid(openid)
+        if not member:
+            return JsonResponse({'status': 'error', 'message': '未登陆无法操作'})
+        return fuc(request, *args, **kwargs)
     return wrapper
