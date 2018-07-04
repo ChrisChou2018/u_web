@@ -214,6 +214,8 @@ def create_shopping_cart(request):
         db_shopping_cart_info = shopping_cart.shopping_cart_info
         db_shopping_cart_info = json.loads(db_shopping_cart_info)
         db_shopping_cart_info.update = shopping_cart_info
+        shopping_cart.shopping_cart_info = json.dumps(db_shopping_cart_info)
+        shopping_cart.save()
         return_value['status'] = 'success'
         return JsonResponse(return_value)
         
