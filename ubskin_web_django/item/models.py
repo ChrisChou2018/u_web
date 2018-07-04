@@ -121,9 +121,12 @@ class Items(models.Model):
     
     @classmethod
     def get_items_list_for_api(cls, current_page):
+        '请求商品列表接口'
         item_obj = cls.objects.filter(status = 'normal').order_by('-item_id')
         p = Paginator(item_obj, 15)
-        items_list = p.page(current_page).object_list.values()
+        if current_page > p.num_pages:
+            return list()
+        items_list = p.page(current_page).object_list.values('item_id', "item_name", "price")
         items_list = list(items_list)
         for i in items_list:
             icon_obj = ItemImages.get_thumbicon_by_item_id(i['item_id'], True)
@@ -239,20 +242,14 @@ class ItemImages(models.Model):
 
     @classmethod
     def get_item_images_by_itemid(cls, item_id):
-        try:
-            image_obj = cls.objects.filter(item_id=item_id, status = "normal", image_type=0).values()
-            return image_obj
-        except cls.DoesNotExist:
-            return None
+        image_obj = cls.objects.filter(item_id=item_id, status = "normal", image_type=0).values()
+        return image_obj
     
     @classmethod
     def get_item_info_images_by_itemid(cls, item_id):
-        try:
-            image_obj = cls.objects.filter(item_id=item_id, status = "normal", image_type=1).values()
-            return image_obj
-        except cls.DoesNotExist:
-            return None
-    
+        image_obj = cls.objects.filter(item_id=item_id, status = "normal", image_type=1).first().values()
+        return image_obj
+        
 
     @classmethod
     def create_item_image(cls, datas):
@@ -464,6 +461,21 @@ class CommentImages(models.Model):
         db_table = "comment_images"
 
 
+class ShoppingCart(models.Model):
+    '''
+    购物车表
+    '''
+    shopping_cart_id = models.AutoField(db_column="shopping_cart_id", verbose_name="购物车ID", primary_key=True)
+    member_id = models.BigIntegerField(db_column="member_id", verbose_name="用户ID")
+    shopping_cart_info = models.CharField(db_column="item_info", verbose_name="购物车信息(维护一个json字典)", max_length=5255, null=True, blank=True)
+    create_time = models.IntegerField(db_column="create_time", verbose_name="创建时间", default=int(time.time()))
+    pay_status = models.CharField(db_column="pay_status", verbose_name="支付状态", max_length=255, default='not_pay')
+
+
+    class Meta:
+        db_table = "shopping_cart"
+
+
 def get_data_list(model, current_page, search_value=None, order_by="-pk", search_value_type='dict'):
     if search_value:
         if search_value_type == 'dict':
@@ -489,4 +501,10 @@ def get_data_count(model, search_value=None, search_value_type='dict'):
     return count
 
 def create_model_data(model, data):
-    model.objects.create(**data)
+    return model.objects.create(**data)
+
+def get_model_obj_by_pk(model, pk):
+    try:
+         return model.objects.get(pk=pk)
+    except model.DoesNotExist:
+        return None

@@ -33,10 +33,12 @@ urlpatterns += [
 ]
 
 urlpatterns += [
-    path('api/get_item_info/', views_api.get_item_info),
+    path('api/get_item_list/', views_api.get_item_list),
     path('api/get_categories/', views_api.api_get_categories),
     path('api/filter_items/', views_api.filter_items),
     path('api/get_item_comment/', views_api.get_item_comment),
     path('api/create_item_comment/', views_api.create_item_comment),
     path('api/get_item_info_by_code/', views_api.get_item_info_by_code),
+    path('api/create_shopping_cart/', views_api.create_shopping_cart),
+    path('api/get_item_info/<int:item_id>/', views_api.get_item_info),
 ]
