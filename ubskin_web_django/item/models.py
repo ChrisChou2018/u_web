@@ -91,6 +91,7 @@ class Items(models.Model):
     create_time                 = models.IntegerField(db_column="create_time", verbose_name="创建时间", default=int(time.time()))
     update_person               = models.CharField(db_column="update_person", null=True, blank=True, verbose_name="更新人", max_length=255)
     update_time                 = models.IntegerField(db_column="update_time", verbose_name="更新时间", default=int(time.time()))
+    stock_count                 = models.IntegerField(db_column="stock_count", verbose_name="库存", default=0)
     status                      = models.CharField(db_column="status", verbose_name="状态", default="normal", max_length=255)
     
 
@@ -116,7 +117,7 @@ class Items(models.Model):
     @classmethod
     def get_item_id_by_item_name(cls, item_name):
         try:
-            return cls.objects.get(item_name = item_name).item_id
+            return cls.objects.get(item_name__icontains = item_name).item_id
         except cls.DoesNotExist:
             return None
     
@@ -127,7 +128,7 @@ class Items(models.Model):
         p = Paginator(item_obj, 15)
         if current_page > p.num_pages:
             return list()
-        items_list = p.page(current_page).object_list.values('item_id', "item_name", "price")
+        items_list = p.page(current_page).object_list.values('item_id', "item_name", "price", "stock_count")
         items_list = list(items_list)
         for i in items_list:
             icon_obj = ItemImages.get_thumbicon_by_item_id(i['item_id'], True)
@@ -250,7 +251,7 @@ class ItemImages(models.Model):
     
     @classmethod
     def get_item_info_images_by_itemid(cls, item_id):
-        image_obj = cls.objects.filter(item_id=item_id, status = "normal", image_type=1).first().values()
+        image_obj = cls.objects.filter(item_id=item_id, status = "normal", image_type=1).values().first()
         return image_obj
         
 
@@ -476,7 +477,7 @@ class ShoppingCart(models.Model):
     '''
     shopping_cart_id = models.AutoField(db_column="shopping_cart_id", verbose_name="购物车ID", primary_key=True)
     member_id = models.BigIntegerField(db_column="member_id", verbose_name="用户ID")
-    shopping_cart_info = models.CharField(db_column="item_info", verbose_name="购物车信息(维护一个json字典)", max_length=5255, null=True, blank=True)
+    shopping_cart_info = models.CharField(db_column="item_info", verbose_name="购物车信息(维护一个json字典)", max_length=10000, null=True, blank=True)
     create_time = models.IntegerField(db_column="create_time", verbose_name="创建时间", default=int(time.time()))
     pay_status = models.CharField(db_column="pay_status", verbose_name="支付状态", max_length=255, default='not_pay')
 

@@ -20,7 +20,7 @@ def order_manage(request):
         filter_args = None
         if value:
             filter_args = '&search_value={0}'.format(value)
-            search_value = {"stock_batch_id" : value}
+            search_value = {"stock_batch_id__icontains" : value}
             data_list = order_models.get_data_list(
                 order_models.StockBatch, current_page, search_value
             )
@@ -100,7 +100,7 @@ def recv_manage(request):
         filter_args = None
         if value:
             filter_args = '&search_value={0}'.format(value)
-            search_value = {"recv_addr" : value}
+            search_value = {"recv_addr__icontains" : value}
             data_list = order_models.get_data_list(
                 order_models.Recv, current_page, search_value,
             )
