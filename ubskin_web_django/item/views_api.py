@@ -48,26 +48,28 @@ def get_item_info(request, item_id):
                 item_models. \
                     ItemImages.get_item_images_by_itemid(item_dict['item_id'])
             )
-            item_info_image = list(
-                item_models.ItemImages. \
-                    get_item_info_images_by_itemid(item_dict['item_id'])
-            )
-            for i in item_image:
-                i['image_path'] = common.build_photo_url(
-                    i['photo_id'],
-                    pic_version="title",
-                    cdn=True
-                )
-            item_dict['item_image'] = item_image
-            for i in item_info_image:
-                i['image_path'] = common.build_photo_url(
-                    i['photo_id'],
+            item_info_image = item_models.ItemImages. \
+                get_item_info_images_by_itemid(item_dict['item_id'])
+            
+            if item_image:
+                for i in item_image:
+                    i['image_path'] = common.build_photo_url(
+                        i['photo_id'],
+                        pic_version="title",
+                        cdn=True
+                    )
+                item_dict['item_image'] = item_image
+            
+            if item_info_image:
+                item_info_image['image_path'] = common.build_photo_url(
+                    item_info_image['photo_id'],
                     pic_version="item",
                     cdn=True
                 )
-            item_dict['item_info_image'] = item_info_image
+                item_dict['item_info_image'] = item_info_image
             return_value['status'] = 'success'
             return_value['data'] = item_dict
+            return JsonResponse(return_value)
         else:
             return_value['message'] = "无次商品信息"
             return JsonResponse(return_value)
