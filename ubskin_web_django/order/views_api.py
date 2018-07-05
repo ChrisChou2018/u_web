@@ -9,6 +9,7 @@ from django.views.decorators.csrf import csrf_exempt
 from ubskin_web_django.order import models as order_models
 from ubskin_web_django.member import models as member_models
 from ubskin_web_django.common import lib_data 
+from ubskin_web_django.common import decorators
 
 
 def get_recv(request):
@@ -24,6 +25,7 @@ def get_recv(request):
         return JsonResponse(return_value)
 
 @csrf_exempt
+@decorators.wx_api_authenticated
 def create_stock_batch_api(request):
     return_value = {
         'status': 'error',
@@ -46,7 +48,7 @@ def create_stock_batch_api(request):
         data = json.loads(request.body)
         recv_code = data.get('shop_id')
         item_codes_dict = data.get('item_codes_dict')
-        openid = data.get('openid')
+        openid = request.COOKIES.get('openid')
         member = member_models.Member.get_member_by_wx_openid(openid)
         if not member and not member.is_staff:
             return_value['message'] = '无权限'

@@ -94,8 +94,8 @@ def member_manage(request):
         if value:
             filter_args = '&search_value={0}'.format(value)
             search_value = (
-                Q(member_name = value) | \
-                Q(telephone = value)
+                Q(member_name__icontains = value) | \
+                Q(telephone__icontains = value)
             )
             member_list = member_models.get_data_list(
                 member_models.Member,
