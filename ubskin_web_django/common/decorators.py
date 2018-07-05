@@ -22,8 +22,11 @@ def wx_api_authenticated(fuc):
     @functools.wraps(fuc)
     def wrapper(request, *args, **kwargs):
         openid = request.COOKIES.get('openid')
-        member = member_model.Member.get_member_by_wx_openid(openid)
-        if not member:
+        if openid is not None:
+            member = member_model.Member.get_member_by_wx_openid(openid)
+            if not member:
+                return JsonResponse({'status': 'error', 'message': '未登陆无法操作'})
+        else:
             return JsonResponse({'status': 'error', 'message': '未登陆无法操作'})
         return fuc(request, *args, **kwargs)
     return wrapper

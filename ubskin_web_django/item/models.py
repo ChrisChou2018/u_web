@@ -4,6 +4,7 @@ from django.db import models
 from django.core.paginator import Paginator
 from django.forms import model_to_dict
 from django.conf import settings
+from django.db.models import Q
 
 from ubskin_web_django.member import models as member_models
 from ubskin_web_django.common import common
@@ -139,7 +140,9 @@ class Items(models.Model):
         item_obj = cls.objects. \
             filter(categories_id = categorie_id, status = 'normal').order_by('-item_id')
         p = Paginator(item_obj, 15)
-        items_list =  list(p.page(current_page).object_list.values())
+        items_list =  list(
+            p.page(current_page).object_list.values('item_id', "item_name", "price")
+        )
         for i in items_list:
             icon_obj = ItemImages.get_thumbicon_by_item_id(i['item_id'], True)
             if icon_obj:
@@ -334,12 +337,18 @@ class Categories(models.Model):
     
     @classmethod
     def get_categoreis_for_api(cls):
-        data_list = list()
+        data_dict = dict()
         for i in cls.type_choices:
-            temp = cls.objects.filter(categorie_type = i[0]).values()
+            temp = cls.objects.filter(categorie_type = i[0]).values('categorie_id', 'categorie_name', 'photo_id')
             temp = list(temp)
-            data_list.append({i[1]: temp})
-        return data_list
+            for j in temp:
+                j['image_path'] = common.build_photo_url(j['photo_id'], pic_version='thumbicon', cdn=True)
+            data_dict[i[1]] = temp
+        # brands = Brands.objects.filter(status='normal').values('brand_id', 'cn_name', 'photo_id')
+        # for i in brands:
+        #     i['image_path'] = common.build_photo_url(i['photo_id'], pic_version='thumbicon', cdn=True)
+        # data_dict['热门品牌'] = list(brands)
+        return data_dict
 
 
     class Meta:
@@ -470,6 +479,11 @@ class ShoppingCart(models.Model):
     shopping_cart_info = models.CharField(db_column="item_info", verbose_name="购物车信息(维护一个json字典)", max_length=5255, null=True, blank=True)
     create_time = models.IntegerField(db_column="create_time", verbose_name="创建时间", default=int(time.time()))
     pay_status = models.CharField(db_column="pay_status", verbose_name="支付状态", max_length=255, default='not_pay')
+
+
+    @classmethod
+    def get_shopping_cart_by_member_id(cls, member_id):
+        return cls.objects.filter(member_id=member_id).first()
 
 
     class Meta:
