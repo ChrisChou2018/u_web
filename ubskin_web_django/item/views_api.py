@@ -1,19 +1,24 @@
 import os
 import random
+import json
+import time
 
 from django.views.decorators.csrf import csrf_exempt
 from django import forms
 from django.http import JsonResponse
 from django.conf import settings
+from django.forms.models import model_to_dict
 
 from ubskin_web_django.common import photo
 from ubskin_web_django.common import decorators
 from ubskin_web_django.item import models as item_models
+from ubskin_web_django.member import models as member_models
 from ubskin_web_django.common import lib_data
+from ubskin_web_django.common import common
 
 
-@decorators.api_authenticated
-def get_item_info(request):
+
+def get_item_list(request):
     return_value  = {
         'status': 'error',
         'message': '',
@@ -26,7 +31,24 @@ def get_item_info(request):
         return_value['data'] = items
         return JsonResponse(return_value)
 
-@decorators.api_authenticated
+def get_item_info(request, item_id):
+    item_obj = item_models.get_model_obj_by_pk(
+        item_models.Items,
+        item_id
+    )
+    item_dict = model_to_dict(item_obj)
+    item_image = item_models.ItemImages.get_item_images_by_itemid(item_dict['item_id'])
+    item_info_image = item_models.ItemImages.get_item_info_images_by_itemid(item_dict['item_id'])
+    for i in item_image:
+        i['image_path'] = common.build_photo_url(i['photo_id'], pic_version="title", cdn=True)
+    for i in item_info_image:
+        i['image_path'] = common.build_photo_url(i['photo_id'], pic_version="item", cdn=True)
+    item_dict['item_image'] = item_image
+    item_info_image['']
+    
+    
+    
+
 def api_get_categories(request):
     return_value  = {
         'status': 'error',
@@ -39,7 +61,7 @@ def api_get_categories(request):
         return_value['data'] = data_list
         return JsonResponse(return_value)
 
-@decorators.api_authenticated
+
 def filter_items(request):
     return_value  = {
         'status': 'error',
@@ -55,7 +77,7 @@ def filter_items(request):
         return_value['data'] = datas
         return JsonResponse(return_value)
 
-@decorators.api_authenticated
+
 def get_item_comment(request):
     return_value  = {
         'status': 'error',
@@ -85,7 +107,6 @@ class CreateCommentForm(forms.ModelForm):
         return user
 
 
-@decorators.api_authenticated
 @csrf_exempt
 def create_item_comment(request):
     return_value = {
@@ -136,3 +157,65 @@ def get_item_info_by_code(request):
         return_value['status'] = 'success'
         return_value['data'] = [item_dict,]
         return JsonResponse(return_value)
+
+@csrf_exempt
+@decorators.wx_api_authenticated
+def create_shopping_cart(request):
+    return_value = {
+        'status': 'error',
+        'message': '',
+    }
+    if request.method == 'GET':
+        openid = request.COOKIES.get('openid')
+        shopping_cart_id = request.GET.get('shopping_cart_id')
+        if not shopping_cart_id:
+            member = member_models.Member.get_member_by_wx_openid(openid)
+            model_obj = item_models.create_model_data(
+                item_models.ShoppingCart,
+                {'member_id': member.member_id, 'create_time': int(time.time())}
+            )
+            return_value['status'] = 'success'
+            return_value['data'] = {
+                'shopping_cart_id': model_obj.pk,
+                'shopping_cart_info': json.dumps(list()),
+            }
+            return JsonResponse(return_value)
+        if shopping_cart_id:
+            model_obj = item_models.get_model_obj_by_pk(
+                item_models.ShoppingCart,
+                shopping_cart_id
+            )
+            if not model_obj:
+                return_value['message'] = '无法找到购物车数据'
+                return JsonResponse(return_value)
+            shopping_cart_info = model_obj.shopping_cart_info
+            shopping_cart_info = json.loads(shopping_cart_info)
+            return_value['status'] = 'success'
+            return_value['data'] = {
+                'shopping_cart_id': model_obj.pk,
+                'shopping_cart_info': shopping_cart_info,
+            }
+            return JsonResponse(return_value)
+    
+    else:
+        data = json.loads(request.body)
+        shopping_cart_id = data.get('shopping_cart_id')
+        shopping_cart_info = data.get('shopping_cart_info')
+        if not shopping_cart_id or not shopping_cart_info:
+            return_value['message'] = '提交数据缺失，请重试'
+            return JsonResponse(return_value)
+        shopping_cart = item_models.get_model_obj_by_pk(
+            item_models.ShoppingCart,
+            shopping_cart_id
+        )
+        if not shopping_cart:
+            return_value['message'] = '购物车数据查找出错'
+            return JsonResponse(return_value)
+        db_shopping_cart_info = shopping_cart.shopping_cart_info
+        db_shopping_cart_info = json.loads(db_shopping_cart_info)
+        db_shopping_cart_info.update = shopping_cart_info
+        shopping_cart.shopping_cart_info = json.dumps(db_shopping_cart_info)
+        shopping_cart.save()
+        return_value['status'] = 'success'
+        return JsonResponse(return_value)
+        

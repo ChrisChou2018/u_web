@@ -1,6 +1,7 @@
 import os
 import random
 import json
+from json import JSONDecodeError
 
 from django.views.decorators.csrf import csrf_exempt
 from django import forms
@@ -39,7 +40,6 @@ def signin(request):
         return_value['message'] = '账号或者密码错误'
         return JsonResponse(return_value)
 
-@decorators.api_authenticated
 @csrf_exempt
 def signin_out(request):
     return_value  = {
@@ -95,10 +95,9 @@ def wx_signin(request):
         appid = data.get('appid')
         js_code = data.get('js_code')
         secret = data.get('secret')
-        rep =  request_wx_openid.request_user_session_key(
+        rep_dict =  request_wx_openid.request_user_session_key(
             appid, js_code, secret
         )
-        rep_dict = json.loads(rep)
         openid = rep_dict.get('openid')
         session_key = rep_dict.get('session_key') 
         if openid is not None:
@@ -113,7 +112,7 @@ def wx_signin(request):
             else:
                 return wx_regist_member(return_value, openid, name, avatar, session_key)
         else:
-            return_value['message'] = '服务端微信验证接口出错'
+            return_value['message'] = '微信接口验证出错,请重新登陆'
             return JsonResponse(return_value)
 
 class UserCreationForm(forms.ModelForm):

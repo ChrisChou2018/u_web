@@ -58,18 +58,13 @@ include /Users/matt/Projects/ubskin_web/conf/vhost_dev.conf;
 `本地启动项目`
 直接命令运行
 ```
-python3 start_web.py
+python3 run_server_local.py
 ```
 
 `线上启动`
-nginx和uwsgi配置文件配置好之后
-先切换到项目根目录下的/you_project/conf/script/下，执行
+执行
 ```
-uwsgi --ini uwsgi.ini
+python3 run_server.py
 ```
-再启动nginx
+确认nginx配置文件没有问题后再启动nginx
 
-**HOST**:
-```
-127.0.0.1       www-local.ubskin.net
-```

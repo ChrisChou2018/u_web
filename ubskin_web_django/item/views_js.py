@@ -8,13 +8,13 @@ from ubskin_web_django.common import photo
 from ubskin_web_django.common import decorators
 
 
-@decorators.api_authenticated
+@decorators.js_authenticated
 def delete_items(request):
     item_id_list = request.POST.getlist('item_id_list[]')
     item_models.Items.delete_item_by_item_ids(item_id_list)
     return JsonResponse({'status': 'success'})
 
-@decorators.api_authenticated
+@decorators.js_authenticated
 def item_image_create(request):
     return_value = {
         'status':'error',
@@ -45,28 +45,28 @@ def item_image_create(request):
             return_value['result'] = 'success'
             return JsonResponse(return_value)
 
-@decorators.api_authenticated
+@decorators.js_authenticated
 def delete_item_images(request):
     image_id_list = request.POST.getlist('image_id_list[]')
     item_models.ItemImages. \
         update_images_by_image_id_list(image_id_list, {'status': 'deleted'})
     return JsonResponse({'status': 'success'})
 
-@decorators.api_authenticated
+@decorators.js_authenticated
 def delete_brands(request):
     if request.method == 'POST':
         brand_ids_list = request.POST.getlist('brand_ids_list[]')
         item_models.Brands.delete_brands_by_id_list(brand_ids_list)
         return JsonResponse({'status': 'success'})
 
-@decorators.api_authenticated
+@decorators.js_authenticated
 def delete_categories(request):
     if request.method == 'POST':
         categorie_ids_list = request.POST.getlist('categorie_ids_list[]')
         item_models.Categories.delete_categories_by_id_list(categorie_ids_list)
         return JsonResponse({'status': 'success'})
 
-@decorators.api_authenticated
+@decorators.js_authenticated
 def delete_item_comments(request):
     if request.method == 'POST':
         comment_ids_list = request.POST.getlist('comment_ids_list[]')
