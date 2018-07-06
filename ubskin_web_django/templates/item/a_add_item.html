@@ -68,6 +68,10 @@
             <input type="text" class="form-control" name="capacity" value="{% if form_data.capacity %}{{ form_data.capacity }}{% endif %}">
         </div>
         <div class="form-group">
+            <label class="control-label">库存:</label>
+            <input type="text" onkeyup="value=value.replace(/[^\d]/g,'')" class="form-control" name="stock_count" value="{% if form_data.stock_count is not None %}{{ form_data.stock_count }}{% endif %}">
+        </div>
+        <div class="form-group">
             <label class="control-label">单位类型:</label>
             <select name="specifications_type_id" class="form-control">
                 <option value="" selected>选择单位</option>

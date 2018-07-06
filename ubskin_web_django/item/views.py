@@ -25,7 +25,7 @@ def items_manage(request):
         filter_args = None
         if value:
             filter_args = '&search_value={0}'.format(value)
-            search_value = {"item_name" : value}
+            search_value = {"item_name__icontains" : value}
             item_list = item_models.get_data_list(
                 item_models.Items,
                 current_page,
@@ -74,7 +74,7 @@ class AddItemForm(forms.ModelForm):
             "foreign_price", "key_word", "origin",
             "shelf_life", "capacity", "specifications_type_id",
             "for_people", "weight", "brand_id",
-            "categories_id"
+            "categories_id", 'stock_count'
         )
     def save(self, commit=True, request=None):
         item = super(AddItemForm, self).save(commit=False)
@@ -132,6 +132,7 @@ class EditorItemForm(forms.Form):
     weight = forms.IntegerField(required=False)
     brand_id = forms.IntegerField(required=False)
     categories_id = forms.IntegerField(required=False)
+    stock_count = forms.IntegerField(required=False)
 
 
     def clean_item_code(self):
@@ -198,25 +199,26 @@ def item_image_manage(request):
     if request.method == "GET":
         item_id = request.GET.get('item_id')
         item_image_list = item_models.ItemImages.get_item_images_by_itemid(item_id)
-        item_info_image_list = item_models.ItemImages.get_item_info_images_by_itemid(item_id)
+        item_info_image = item_models.ItemImages.get_item_info_images_by_itemid(item_id)
         item_obj  = item_models.Items.get_item_by_id(item_id)
         item_image_dict = {}
-        for i in item_image_list:
-            if "title" not in item_image_dict:
-                item_image_dict['title'] = [{
-                    'image_path': common.build_photo_url(i['photo_id'], pic_version='title'),
-                    'image_id': i['image_id']
-                }]
-            else:
-                item_image_dict["title"].append({
-                    'image_path': common.build_photo_url(i['photo_id'], pic_version='title'),
-                    'image_id': i['image_id']
-                })
-        for i in item_info_image_list:
+        if item_image_list:
+            for i in item_image_list:
+                if "title" not in item_image_dict:
+                    item_image_dict['title'] = [{
+                        'image_path': common.build_photo_url(i['photo_id'], pic_version='title'),
+                        'image_id': i['image_id']
+                    }]
+                else:
+                    item_image_dict["title"].append({
+                        'image_path': common.build_photo_url(i['photo_id'], pic_version='title'),
+                        'image_id': i['image_id']
+                    })
+        if item_info_image:
             if "item" not in item_image_dict:
                 item_image_dict['item'] = [{
-                    'image_path': common.build_photo_url(i['photo_id'], pic_version='item'),
-                    'image_id': i['image_id']
+                    'image_path': common.build_photo_url(item_info_image['photo_id'], pic_version='item'),
+                    'image_id': item_info_image['image_id']
                 }]
             else:
                 item_image_dict["item"].append({
@@ -238,7 +240,7 @@ def brand_manage(request):
         filter_args = None
         if value:
             filter_args = '&search_value={0}'.format(value)
-            search_value = {"cn_name": value}
+            search_value = {"cn_name__icontains": value}
             brands_list = item_models.get_data_list(
                 item_models.Brands,
                 current_page,
@@ -379,7 +381,7 @@ def categorie_manage(request):
         categorie_choices = dict(item_models.Categories.type_choices)
         if value:
             filter_args = '&search_value={0}'.format(value)
-            search_value = {'categorie_name': value}
+            search_value = {'categorie_name__icontains': value}
             categories_list = item_models.Categories. \
                 get_list_categories(current_page, search_value)
             categories_list = item_models.get_data_list(

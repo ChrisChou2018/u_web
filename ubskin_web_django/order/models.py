@@ -81,7 +81,7 @@ class StockBatchCount(models.Model):
 
     @classmethod
     def get_obj_by_stock_batch_id(cls, stock_batch_id):
-        id_list =  cls.objects.filter(stock_batch_id=stock_batch_id).values_list('stock_batch_count_id')
+        id_list =  cls.objects.filter(stock_batch_id__icontains=stock_batch_id).values_list('stock_batch_count_id')
         id_list = [ i[0] for i in id_list]
         return id_list
     
