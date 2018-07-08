@@ -38,6 +38,13 @@ def item_image_create(request):
                     'status': 'normal'
                 })
                 item_models.ItemImages.create_item_image(data)
+                if int(image_type) == 0:
+                    item_obj = item_models.get_model_obj_by_pk(
+                    item_models.Items,
+                    item_id
+                    )
+                    item_obj.photo_id = data.get('photo_id')
+                    item_obj.save()
             else:
                 return_value['message'] = '上传失败'
                 return JsonResponse(return_value)
