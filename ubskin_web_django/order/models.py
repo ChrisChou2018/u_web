@@ -24,9 +24,12 @@ class Recv(models.Model):
             return None
     
     @classmethod
-    def get_recv_list(cls, current_page=None):
+    def get_recv_list(cls, current_page, search_value):
         current_page = int(current_page)
-        data_list = cls.objects.all().order_by('pk')
+        if search_value:
+            data_list = cls.objects.filter(recv_addr__icontains=search_value).order_by('pk')
+        else:
+            data_list = cls.objects.filter().order_by('pk')
         p = Paginator(data_list, 20)
         if current_page > p.num_pages:
             return list()
