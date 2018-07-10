@@ -34,7 +34,7 @@
             <div class="col-md-8">
                 <form action="" method="GET" class="search_input">
                 <div class="input-group">
-                    <input type="text" class="form-control" placeholder="搜索收货方" name="search_value" value="{{ search_value }}">
+                    <input type="text" class="form-control" placeholder="搜索用户ID" name="search_value" value="{{ search_value }}">
                     <span class="input-group-btn">
                         <button class="btn btn-default search_input_btn" type="submit">搜索</button>
                     </span>
@@ -72,7 +72,6 @@
                     <tr>
                       <th>ID</th>
                       <th>用户ID</th>
-                      <th>收货地址</th>
                       <th>操作</th>
                     </tr>
                   </thead>
@@ -109,14 +108,7 @@
     <script>
     $(function(){
         $('.recv_manage').addClass('active')
-        $('.add_recv_btn').click(function(){
-            $('.modal-title').text('创建收货方')
-            $('.submit_btn').unbind()
-            $('.submit_btn').click(function(){
-                add_or_edit_recv(false)
-            })
-            
-        })
+        
     })
     
        
