@@ -82,9 +82,8 @@
                         <td>{{ code.member_id }}</td>
                         <td>{{ code.addr_name }}</td>
                         <td>
-                            <a href="javascript:;" class="edit_recv"  data-toggle="modal" data-target="#exampleModal">详细</a>
+                            <td><a href="#modalItemCodes" data-toggle="modal" data-target="#modalItemCodes" data-batchid="{{ stock.stock_batch_id }}">详情</a></td>
                         </td>
-                        <td style='display: none'><input type='checkbox'></td>
                     </tr>
                     {% endfor %}
                   </tbody>
@@ -100,6 +99,22 @@
         </ul>
     </nav>
 </div>
+<div id="modalItemCodes" class="modal fade" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content" id="id_modal_content">
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <h4 class="modal-title">出库单</h4>
+        </div>
+        <div class="modal-body" id="id_modal_body">
+            <p><i class="fa fa-refresh fa-spin" style="font-size: 24px;"></i></p>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
 
 
 {% endblock %}
