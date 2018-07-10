@@ -134,6 +134,21 @@ class Member(AbstractBaseUser, PermissionsMixin):
         permissions = ()
 
 
+class RecvAddr(models.Model):
+    '''
+    用户收货地址表
+    '''
+    recv_addr_id = models.AutoField(db_column="recv_addr_id", verbose_name="用户收获地址ID", primary_key=True)
+    addr_name = models.CharField(db_column="addr_name", verbose_name="收货地址", max_length=255)
+    member_id = models.BigIntegerField(db_column="member_id", verbose_name="用户ID")
+    status = models.CharField(db_column="status", verbose_name="状态", default="normal", max_length=255)
+
+
+    class Meta:
+        db_table = 'recv_addr'
+
+
+
 def get_data_list(model, current_page, search_value=None, order_by="-pk", search_value_type='dict'):
     if search_value:
         if search_value_type == 'dict':

@@ -129,3 +129,39 @@ def member_manage(request):
             table_head = table_head,
             search_value = value
         )
+
+
+def recv_addr(request):
+    if request.method == "GET":
+        current_page = request.GET.get('page', 1)
+        value = request.GET.get('search_value', '')
+        filter_args = None
+        if value:
+            filter_args = '&search_value={0}'.format(value)
+            search_value = {"order_num__icontains" : value}
+            data_list = member_models.get_data_list(
+                member_models.RecvAddr,
+                current_page,
+                search_value
+            )
+            data_count = member_models.get_data_count(
+                member_models.RecvAddr,
+                search_value
+            )
+        else:
+            data_list = member_models.get_data_list(
+                member_models.RecvAddr,
+                current_page
+            )
+            data_count = member_models.get_data_count(
+                member_models.RecvAddr
+            )
+        return my_render(
+            request,
+            'item/a_recv_addr_manage.html',
+            current_page = current_page,
+            filter_args = filter_args,
+            data_list = data_list,
+            data_count = data_count,
+            search_value = value,
+        )

@@ -595,6 +595,41 @@ def edit_item_comment(request):
         back_url = request.GET.get('back_url')
         return redirect(back_url)
 
+@login_required(login_url='/myadmin/signin/')
+def user_order_manage(request):
+    if request.method == 'GET':
+        current_page = request.GET.get('page', 1)
+        value = request.GET.get('search_value', '')
+        filter_args = None
+        if value:
+            filter_args = '&search_value={0}'.format(value)
+            search_value = {"order_num__icontains" : value}
+            data_list = item_models.get_data_list(
+                item_models.UserOrder,
+                current_page,
+                search_value
+            )
+            data_count = item_models.get_data_count(
+                item_models.UserOrder,
+                search_value
+            )
+        else:
+            data_list = item_models.get_data_list(
+                item_models.UserOrder,
+                current_page
+            )
+            data_count = item_models.get_data_count(
+                item_models.UserOrder
+            )
+        return my_render(
+            request,
+            'item/a_user_order_manage.html',
+            current_page = current_page,
+            filter_args = filter_args,
+            data_list = data_list,
+            data_count = data_count,
+            search_value = value,
+        )
 
 def create_brand(request):
     obj = item_models.Items.objects.values('brand_name').annotate(c=Count('brand_name'))

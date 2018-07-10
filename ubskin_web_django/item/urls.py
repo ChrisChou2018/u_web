@@ -19,6 +19,7 @@ urlpatterns = [
     path('myadmin/item_comment_manage/', views.item_comment_manage, name='item_comment_manage'),
     path('myadmin/edit_item_comment/', views.edit_item_comment, name='edit_item_comment'),
     path('myadmin/comment_image_manage/', views.item_comment_image_manage, name='comment_image_manage'),
+    path('myadmin/user_order_manage/', views.user_order_manage, name="user_order_manage"),
     path('create_brand/', views.create_brand),
     # path('create_recv/', )
 ]
