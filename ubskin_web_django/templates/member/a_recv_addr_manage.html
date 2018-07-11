@@ -65,21 +65,21 @@
                   <colgroup>
                     <col class="col-xs-1">
                     <col class="col-xs-1">
+                    <col class="col-xs-1">
                   </colgroup>
                   <thead>
                     <tr>
                       <th>用户ID</th>
+                      <th>用户名</th>
                       <th>操作</th>
                     </tr>
                   </thead>
                   <tbody>
-                    {% for code in data_list %}
+                    {% for data in data_list %}
                     <tr>
-                        <td>{{ code.member_id }}</td>
-                        <td>{{ code.addr_name }}</td>
-                        <td>
-                            <td><a href="#modalItemCodes" data-toggle="modal" data-target="#modalItemCodes" data-batchid="{{ stock.stock_batch_id }}">详情</a></td>
-                        </td>
+                        <td>{{ data.member_id }}</td>
+                        <td>{{ data.member_name }}</td>
+                        <td><a href="#modalItemCodes" data-toggle="modal" data-target="#modalItemCodes" data-batchid="{{ stock.stock_batch_id }}">详情</a></td>
                     </tr>
                     {% endfor %}
                   </tbody>
@@ -119,7 +119,7 @@
     <script>
     $(function(){
         $('.recv_addr_manage').addClass('active')
-        
+
     })
     
        

@@ -2,6 +2,7 @@ import os
 import random
 import json
 from json import JSONDecodeError
+import string
 
 from django.views.decorators.csrf import csrf_exempt
 from django import forms
@@ -247,7 +248,7 @@ def delete_recv_addr(request):
     if request.method == 'POST':
         data = request.body
         data = json.loads(data)
-        recv_addr_id_list = data.ger('recv_addr_id_list')
+        recv_addr_id_list = data.get('recv_addr_id_list')
         for i in recv_addr_id_list:
             member_models.update_model_data_by_pk(
                 member_models.RecvAddr,
@@ -264,7 +265,20 @@ def update_recv_addr(request):
         'status': 'error',
         'message': '',
     }
-    if request.method == 'POST':
+    if request.method == 'GET':
+        recv_addr_id = int(request.GET.get('recv_addr_id'))
+        recv_addr = member_models.get_model_dict_by_pk(
+            member_models.RecvAddr,
+            recv_addr_id
+        )
+        if recv_addr:
+            return_value['status'] = 'success'
+            return_value['data'] = recv_addr
+            return JsonResponse(return_value)
+        else:
+            return_value['message'] = "数据出错"
+            return JsonResponse(return_value)
+    else:
         openid = request.COOKIES.get('openid')
         member = member_models.Member.get_member_by_wx_openid(openid)
         data = request.body
@@ -293,5 +307,29 @@ def get_user_order(request):
 
 def create_user_order(request):
     if request.method == 'POST':
-        pass
+        openid = request.COOKIES.get('openid')
+        member = member_models.Member.get_member_by_wx_openid(openid)
+        data = request.body
+        data = json.loads(data)
+        recv_addr = data.get('recv_addr')
+        order_num = None
+        while True:
+            order_num = ''.join(
+                random.choice(string.ascii_lowercase + string.digits) \
+                for i in range(8)
+            )
+            if member_models.UserOrder.has_order_num(order_num):
+                pass
+            else:
+                break
+        
+        
+        
+        
+
+
+def success_recv(request):
+    if request.method == 'POST':
+        data = request.body
+        data = json.loads(data)
 
