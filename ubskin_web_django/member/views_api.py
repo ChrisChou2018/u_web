@@ -301,12 +301,17 @@ def update_recv_addr(request):
         return_value['status'] = 'success'
         return JsonResponse(return_value)
 
+
 def get_user_order(request):
     if request.method == 'GET':
         pass
 
 @decorators.wx_api_authenticated
 def create_user_order(request):
+    return_value = {
+        'status': 'error',
+        'message': ''
+    }
     if request.method == 'POST':
         openid = request.COOKIES.get('openid')
         member = member_models.Member.get_member_by_wx_openid(openid)
@@ -334,6 +339,8 @@ def create_user_order(request):
                 member_models.RecvAddr,
                 i
             )
+        return_value['status'] = 'success'
+        return JsonResponse(return_value)
         
 
 def success_recv(request):
