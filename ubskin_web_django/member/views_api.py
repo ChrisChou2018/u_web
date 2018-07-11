@@ -174,3 +174,19 @@ def register(request):
 @csrf_exempt
 def change_password(request):
     pass
+
+
+def check_is_staff(request, openid):
+    return_value = {
+        'status': 'error',
+        'message': ''
+    }
+    if request.method == "GET":
+        member = member_models.Member.get_member_by_wx_openid(openid)
+        if member and member.is_staff:
+            return_value['status'] = 'success'
+            return_value['data'] = {'is_staff': True}
+        else:
+            return_value['status'] = 'success'
+            return_value['data'] = {'is_staff': False}
+        return JsonResponse(return_value)
