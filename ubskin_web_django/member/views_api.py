@@ -283,7 +283,7 @@ def update_recv_addr(request):
         member = member_models.Member.get_member_by_wx_openid(openid)
         data = request.body
         data = json.loads(data)
-        recv_addr_id = int(data.ger('recv_addr_id'))
+        recv_addr_id = int(data.get('recv_addr_id'))
         update_data = data.get('update_data')
         if 'is_default' in update_data:
             is_default = update_data.pop('is_default')
@@ -305,13 +305,15 @@ def get_user_order(request):
     if request.method == 'GET':
         pass
 
+@decorators.wx_api_authenticated
 def create_user_order(request):
     if request.method == 'POST':
         openid = request.COOKIES.get('openid')
         member = member_models.Member.get_member_by_wx_openid(openid)
         data = request.body
         data = json.loads(data)
-        recv_addr = data.get('recv_addr')
+        recv_addr_id = data.get('recv_addr_id')
+        order_info = data.get('order_info')
         order_num = None
         while True:
             order_num = ''.join(
@@ -322,11 +324,17 @@ def create_user_order(request):
                 pass
             else:
                 break
+        for i in order_info:
+            i.update({
+                'member_id': member.member_id,
+                'recv_addr_id': recv_addr_id,
+                'order_num': order_num
+            })
+            member_models.create_model_data(
+                member_models.RecvAddr,
+                i
+            )
         
-        
-        
-        
-
 
 def success_recv(request):
     if request.method == 'POST':

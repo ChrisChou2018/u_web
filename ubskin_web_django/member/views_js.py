@@ -115,3 +115,7 @@ def editor_member(request):
         member_models.Member.update_member_by_id(member_id, clear_data)
         return_value['status'] = 'success'
         return JsonResponse(return_value)
+
+
+def jm_recv_addr_info(request):
+    pass

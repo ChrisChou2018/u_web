@@ -148,7 +148,7 @@ class RecvAddr(models.Model):
     is_default = models.BooleanField(db_column="is_default", verbose_name="是否默认收货地址", default=False)
     member_id = models.BigIntegerField(db_column="member_id", verbose_name="用户ID")
     status = models.CharField(db_column="status", verbose_name="状态", default="normal", max_length=255)
-
+    
 
     @classmethod
     def get_recv_addr_data_list(cls, current_page, search_value=None):
