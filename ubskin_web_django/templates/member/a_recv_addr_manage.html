@@ -17,11 +17,11 @@
 </style>
 {% endblock %}
 {% block title %}
-收获方管理            
+用户地址管理            
 {% endblock %}
 {% block page_header %}
 <ol class="breadcrumb">
-    <li><a href="#"><i class="fa fa-dashboard"></i> 收获方管理</a></li>
+    <li><a href="#"><i class="fa fa-dashboard"></i>用户地址管理</a></li>
 </ol>
 {% endblock %}
 
@@ -65,12 +65,9 @@
                   <colgroup>
                     <col class="col-xs-1">
                     <col class="col-xs-1">
-                    <col class="col-xs-4">
-                    <col class="col-xs-2">
                   </colgroup>
                   <thead>
                     <tr>
-                      <th>ID</th>
                       <th>用户ID</th>
                       <th>操作</th>
                     </tr>
@@ -78,7 +75,6 @@
                   <tbody>
                     {% for code in data_list %}
                     <tr>
-                        <th scope="row">{{ code.recv_addr_id }}</th>
                         <td>{{ code.member_id }}</td>
                         <td>{{ code.addr_name }}</td>
                         <td>
@@ -104,7 +100,7 @@
         <div class="modal-content" id="id_modal_content">
         <div class="modal-header">
             <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-            <h4 class="modal-title">出库单</h4>
+            <h4 class="modal-title">用户收货地址</h4>
         </div>
         <div class="modal-body" id="id_modal_body">
             <p><i class="fa fa-refresh fa-spin" style="font-size: 24px;"></i></p>
@@ -122,7 +118,7 @@
 {% block js %}
     <script>
     $(function(){
-        $('.recv_manage').addClass('active')
+        $('.recv_addr_manage').addClass('active')
         
     })
     
