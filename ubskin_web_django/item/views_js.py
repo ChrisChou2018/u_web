@@ -24,6 +24,7 @@ def item_image_create(request):
         files_dict = request.FILES
         image_type = request.POST.get('image_type')
         item_id = request.POST.get('item_id')
+        photo_id = None
         for k in files_dict:
             if not os.path.exists(settings.MEDIA_ROOT):
                 os.makedirs(settings.MEDIA_ROOT)
@@ -38,10 +39,18 @@ def item_image_create(request):
                     'status': 'normal'
                 })
                 item_models.ItemImages.create_item_image(data)
+                photo_id = data.get('photo_id')
             else:
                 return_value['message'] = '上传失败'
                 return JsonResponse(return_value)
         else:
+            if int(image_type) == 0:
+                item_obj = item_models.get_model_obj_by_pk(
+                item_models.Items,
+                item_id
+                )
+                item_obj.photo_id = photo_id
+                item_obj.save()
             return_value['result'] = 'success'
             return JsonResponse(return_value)
 

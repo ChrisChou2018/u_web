@@ -6,6 +6,7 @@ from django.contrib.auth.models import (
 )
 from django.forms.models import model_to_dict
 from django.core.paginator import Paginator
+from django.db.models import Count
 
 
 class UserProfileManager(BaseUserManager):
@@ -134,6 +135,141 @@ class Member(AbstractBaseUser, PermissionsMixin):
         permissions = ()
 
 
+class RecvAddr(models.Model):
+    '''
+    用户收货地址表
+    '''
+    recv_addr_id = models.AutoField(db_column="recv_addr_id", verbose_name="用户收获地址ID", primary_key=True)
+    addr_name = models.CharField(db_column="addr_name", verbose_name="收货地址", max_length=255)
+    member_id = models.BigIntegerField(db_column="member_id", verbose_name="用户ID")
+    status = models.CharField(db_column="status", verbose_name="状态", default="normal", max_length=255)
+
+
+    @classmethod
+    def get_recv_addr_data_list(cls, current_page, search_value=None):
+        if search_value:
+            data_list = cls.objects.filter(**search_value, status='normal'). \
+                values(
+                    'member_id',
+                ).annotate(
+                    c = Count('member_id'),
+                    )
+        else:
+            data_list = cls.objects.filter(status='normal'). \
+                values(
+                    'member_id',
+                ).annotate(
+                    c = Count('member_id'),
+                    )
+        p = Paginator(data_list, 15)
+        return p.page(current_page).object_list
+    
+    @classmethod
+    def get_recv_addr_count(cls, search_value=None):
+        if search_value:
+            data_count = cls.objects.filter(**search_value, status='normal'). \
+                values(
+                    'member_id',
+                ).annotate(
+                    c = Count('member_id'),
+                    ).count()
+        else:
+            data_count = cls.objects.filter(status='normal'). \
+                values(
+                    'member_id',
+                ).annotate(
+                    c = Count('member_id'),
+                    ).count()
+        return data_count
+    
+    @classmethod
+    def get_recv_addr_by_member_id(cls, member_id):
+        data_list = cls.objects.filter(
+            member_id=member_id,
+            status='normal'
+        ).values('recv_addr_id', 'addr_name')
+        data_list = list(data_list)
+        return data_list
+
+
+    class Meta:
+        db_table = 'recv_addr'
+
+
+class UserOrder(models.Model):
+    '''
+    用户订单表
+    '''
+    user_order_id           = models.AutoField(db_column="user_order_id", verbose_name="用户订单表ID", primary_key=True)
+    order_num               = models.CharField(db_column="order_num", verbose_name="订单号", null=True, blank=True, max_length=255)
+    item_id                 = models.BigIntegerField(db_column="item_id", verbose_name="商品ID", null=True, blank=True)
+    item_name               = models.CharField(db_column="item_name", verbose_name="支付状态", max_length=255, null=True, blank=True)
+    item_count              = models.IntegerField(db_column="item_count", verbose_name="购买数量")
+    price                   = models.FloatField(db_column="price", verbose_name="商品单价")
+    status_choices = (
+        ('new', '等待支付订单'),
+        ('paid', '等待发货（已经支付）'),
+        ('shipped', '等待收获（已经支付）'),
+        ('received', '确认收获（已经支付）'),
+    )
+    order_status            = models.CharField(db_column="order_status", verbose_name="订单状态", choices=status_choices, default="new", max_length=255)
+    member_id               = models.BigIntegerField(db_column="member_id", verbose_name="用户ID")
+    recv_addr               = models.CharField(db_column="recv_addr", verbose_name="到货地址", max_length=255, null=True, blank=True)
+    create_time             = models.IntegerField(db_column="create_time", verbose_name="创建时间", default=int(time.time()))
+    status                  = models.CharField(db_column="status", verbose_name="状态", default="normal", max_length=255)
+
+
+    @classmethod
+    def get_user_order_by_member_id(cls, member_id):
+        return cls.objects.filter(member_id=member_id, status='normal').values()
+    
+    @classmethod
+    def get_user_order_data_list(cls, current_page, search_value=None):
+        if search_value:
+            data_list = cls.objects.filter(**search_value, status='normal'). \
+                values(
+                    'order_num', 'order_status', 'member_id',
+                    'create_time'
+                ).annotate(
+                    c = Count('order_num'),
+                    )
+        else:
+            data_list = cls.objects.filter(status='normal'). \
+                values(
+                    'order_num', 'order_status', 'member_id',
+                    'create_time'
+                ).annotate(
+                    c = Count('order_num'),
+                    )
+        p = Paginator(data_list, 15)
+        return p.page(current_page).object_list
+    
+    @classmethod
+    def get_user_order_count(cls, search_value=None):
+        if search_value:
+            data_count = cls.objects.filter(**search_value, status='normal'). \
+                values(
+                    'order_num', 'order_status', 'member_id',
+                    'create_time'
+                ).annotate(
+                    c = Count('order_num'),
+                    ).count()
+        else:
+            data_count = cls.objects.filter(status='normal'). \
+                values(
+                    'order_num', 'order_status', 'member_id',
+                    'create_time'
+                ).annotate(
+                    c = Count('order_num'),
+                    ).count()
+        
+        return data_count
+
+
+    class Meta:
+        db_table = "user_order"
+
+
 def get_data_list(model, current_page, search_value=None, order_by="-pk", search_value_type='dict'):
     if search_value:
         if search_value_type == 'dict':
@@ -158,3 +294,9 @@ def get_data_count(model, search_value=None, search_value_type='dict'):
     else:
         count = model.objects.filter(status='normal').count()
     return count
+
+def create_model_data(model, data):
+    return model.objects.create(**data)
+
+def update_model_data_by_pk(model, pk, data):
+    model.objects.filter(pk=pk).update(**data)

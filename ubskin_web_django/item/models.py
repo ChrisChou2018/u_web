@@ -93,6 +93,7 @@ class Items(models.Model):
     update_time                 = models.IntegerField(db_column="update_time", verbose_name="更新时间", default=int(time.time()))
     stock_count                 = models.IntegerField(db_column="stock_count", verbose_name="库存", default=0)
     status                      = models.CharField(db_column="status", verbose_name="状态", default="normal", max_length=255)
+    photo_id                    = models.CharField(db_column="photo_id", verbose_name="图片名", max_length=255, null=True, blank=True)
     
 
     @classmethod
@@ -126,14 +127,15 @@ class Items(models.Model):
         '请求商品列表接口'
         item_obj = cls.objects.filter(status = 'normal').order_by('-item_id')
         p = Paginator(item_obj, 15)
+        current_page = int(current_page)
         if current_page > p.num_pages:
             return list()
-        items_list = p.page(current_page).object_list.values('item_id', "item_name", "price", "stock_count")
+        items_list = p.page(current_page).object_list.values(
+            'item_id', "item_name", "price", "stock_count", "photo_id"
+        )
         items_list = list(items_list)
         for i in items_list:
-            icon_obj = ItemImages.get_thumbicon_by_item_id(i['item_id'], True)
-            if icon_obj:
-                i['item_thumbicon'] = icon_obj
+            i['item_thumbicon'] = common.build_photo_url(i['photo_id'], cdn=True)
         return items_list
     
     @classmethod
@@ -142,12 +144,12 @@ class Items(models.Model):
             filter(categories_id = categorie_id, status = 'normal').order_by('-item_id')
         p = Paginator(item_obj, 15)
         items_list =  list(
-            p.page(current_page).object_list.values('item_id', "item_name", "price")
+            p.page(current_page).object_list.values(
+                'item_id', "item_name", "price", "stock_count", "photo_id"
+            )
         )
         for i in items_list:
-            icon_obj = ItemImages.get_thumbicon_by_item_id(i['item_id'], True)
-            if icon_obj:
-                i['item_thumbicon'] = icon_obj
+            i['item_thumbicon'] = common.build_photo_url(i['photo_id'], cdn=True)
         return items_list
     
     @classmethod
@@ -181,7 +183,7 @@ class Items(models.Model):
         model = model_to_dict(model)
         data_dict['item_name'] = model.get('item_name')
         data_dict['specifications_type'] = model.get('capacity') if model.get('capacity') else '无规格信息'
-        data_dict['thumbicon'] = ItemImages.get_thumbicon_by_item_id(model.get('item_id'),True)
+        data_dict['thumbicon'] = common.build_photo_url(model.get('photo_id'))
         data_dict['item_barcode'] = model.get('item_barcode')
         return data_dict
         
@@ -227,24 +229,6 @@ class ItemImages(models.Model):
 
 
     @classmethod
-    def get_thumbicon_by_item_id(cls, item_id, for_api=False):
-        image_obj = cls.objects.filter(
-            item_id = item_id,
-            status = "normal",
-            image_type = 0
-        ).first()
-        if image_obj:
-            image_obj = model_to_dict(image_obj)
-            if for_api:
-                return common.build_photo_url(image_obj['photo_id'], cdn=True)
-            return common.build_photo_url(image_obj['photo_id'])
-        else:
-            if for_api:
-                return common.build_photo_url(None,cdn=True)
-            else:
-                return common.build_photo_url(None)
-
-    @classmethod
     def get_item_images_by_itemid(cls, item_id):
         image_obj = cls.objects.filter(item_id=item_id, status = "normal", image_type=0).values()
         return image_obj
@@ -261,7 +245,12 @@ class ItemImages(models.Model):
 
     @classmethod
     def update_images_by_image_id_list(cls, image_id_list, item_dict):
-        cls.objects.filter(image_id__in = image_id_list).update(**item_dict)
+        obj_list =  cls.objects.filter(image_id__in = image_id_list)
+        obj_list.update(**item_dict)
+        item_id_list = obj_list.values_list('item_id')
+        item_id_list = [  i[0] for i in item_id_list ]
+        Items.objects.filter(item_id__in = item_id_list).update(photo_id=None)
+
 
     class Meta:
         db_table = "item_images"
@@ -475,11 +464,11 @@ class ShoppingCart(models.Model):
     '''
     购物车表
     '''
-    shopping_cart_id = models.AutoField(db_column="shopping_cart_id", verbose_name="购物车ID", primary_key=True)
-    member_id = models.BigIntegerField(db_column="member_id", verbose_name="用户ID")
-    shopping_cart_info = models.CharField(db_column="item_info", verbose_name="购物车信息(维护一个json字典)", max_length=10000, null=True, blank=True)
-    create_time = models.IntegerField(db_column="create_time", verbose_name="创建时间", default=int(time.time()))
-    pay_status = models.CharField(db_column="pay_status", verbose_name="支付状态", max_length=255, default='not_pay')
+    shopping_cart_id        = models.AutoField(db_column="shopping_cart_id", verbose_name="购物车ID", primary_key=True)
+    member_id               = models.BigIntegerField(db_column="member_id", verbose_name="用户ID")
+    shopping_cart_info      = models.CharField(db_column="item_info", verbose_name="购物车信息(维护一个json字典)", max_length=10000, null=True, blank=True)
+    create_time             = models.IntegerField(db_column="create_time", verbose_name="创建时间", default=int(time.time()))
+    pay_status              = models.CharField(db_column="pay_status", verbose_name="支付状态", max_length=255, default='not_pay')
 
 
     @classmethod
@@ -489,6 +478,10 @@ class ShoppingCart(models.Model):
 
     class Meta:
         db_table = "shopping_cart"
+
+
+
+
 
 
 def get_data_list(model, current_page, search_value=None, order_by="-pk", search_value_type='dict'):

@@ -4,6 +4,7 @@ from django import template
 from django.conf import settings
 
 from ubskin_web_django.item import models as item_models
+from ubskin_web_django.common import common
 
 
 register = template.Library()
@@ -114,10 +115,8 @@ def get_value_by_key(a_dict, key):
 
 
 @register.simple_tag
-def get_thumbicon_by_id(item_id):
-    item_image_obj = item_models.ItemImages.get_thumbicon_by_item_id(item_id)
-    if item_image_obj:
-        return item_image_obj
+def get_thumbicon_by_id(photo_id):
+    return common.build_photo_url(photo_id)
 
 @register.simple_tag
 def parse_timestamps(timestamps):

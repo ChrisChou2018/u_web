@@ -260,4 +260,5 @@ def shopping_cart(request):
                 shopping_cart_obj.save()
                 return_value['status'] = 'success'
                 return JsonResponse(return_value)
+
             

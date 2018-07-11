@@ -596,6 +596,7 @@ def edit_item_comment(request):
         return redirect(back_url)
 
 
+
 def create_brand(request):
     obj = item_models.Items.objects.values('brand_name').annotate(c=Count('brand_name'))
     brand_model = item_models.Brands

@@ -129,3 +129,61 @@ def member_manage(request):
             table_head = table_head,
             search_value = value
         )
+
+
+def recv_addr(request):
+    if request.method == "GET":
+        current_page = request.GET.get('page', 1)
+        value = request.GET.get('search_value', '')
+        filter_args = None
+        if value:
+            filter_args = '&search_value={0}'.format(value)
+            search_value = {"order_num__icontains" : value}
+            data_list = member_models.RecvAddr.get_recv_addr_data_list(
+                current_page,
+                search_value
+            )
+            data_count = member_models.RecvAddr. \
+                get_recv_addr_count(search_value)
+        else:
+            data_list = member_models.RecvAddr. \
+                get_recv_addr_data_list(current_page)
+            data_count = member_models.RecvAddr.get_recv_addr_count()
+        return my_render(
+            request,
+            'member/a_recv_addr_manage.html',
+            current_page = current_page,
+            filter_args = filter_args,
+            data_list = data_list,
+            data_count = data_count,
+            search_value = value,
+        )
+
+@login_required(login_url='/myadmin/signin/')
+def user_order_manage(request):
+    if request.method == 'GET':
+        current_page = request.GET.get('page', 1)
+        value = request.GET.get('search_value', '')
+        filter_args = None
+        if value:
+            filter_args = '&search_value={0}'.format(value)
+            search_value = {"order_num__icontains" : value}
+            data_list = member_models.UserOrder.get_user_order_data_list(
+                current_page,
+                search_value
+            )
+            data_count = member_models.UserOrder. \
+                get_user_order_count(search_value)
+        else:
+            data_list = member_models.UserOrder. \
+                get_user_order_data_list(current_page)
+            data_count = member_models.UserOrder.get_user_order_count()
+        return my_render(
+            request,
+            'member/a_user_order_manage.html',
+            current_page = current_page,
+            filter_args = filter_args,
+            data_list = data_list,
+            data_count = data_count,
+            search_value = value,
+        )
