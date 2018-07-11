@@ -1,5 +1,4 @@
 <div id="">
-    <p><strong>用户名：{{ code_data.stock_batch_id }}</strong></p>
     <p></p>
     <hr>
     <p></p>
@@ -11,11 +10,12 @@
                 <th>收件人姓名</th>
                 <th>默认收件地址</th>
             </tr>
-            {% for i in code_data.item_code_list %}
+            {% for i in data_list %}
             <tr>
-                <td>{% if i.item_name %}{{ i.item_name }}{% else %}未查询到商品信息{% endif %}</td>
-                <td>{{ i.item_barcode }}</td>
-                <td>{{ i.item_count }}</td>
+                <td>{{ i.address }}{{ i.area }}</td>
+                <td>{{ i.telephone }}</td>
+                <td>{{ i.username }}</td>
+                <td>{{ i.is_default }}</td>
             </tr>
             {% endfor %}
         </tbody>
@@ -23,6 +23,5 @@
     <p></p>
     <hr>
     <p></p>
-    <p>共计: {{ code_data.all_count }}</p>
 </div>
     

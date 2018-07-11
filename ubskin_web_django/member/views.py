@@ -138,7 +138,7 @@ def recv_addr(request):
         filter_args = None
         if value:
             filter_args = '&search_value={0}'.format(value)
-            search_value = {"order_num__icontains" : value}
+            search_value = {"member_id__icontains" : value}
             data_list = member_models.RecvAddr.get_recv_addr_data_list(
                 current_page,
                 search_value

@@ -195,7 +195,11 @@ class RecvAddr(models.Model):
         data_list = cls.objects.filter(
             member_id=member_id,
             status='normal'
-        ).values('recv_addr_id', 'address', 'area_code', 'area', 'telephone', 'username')
+        ).values(
+            'recv_addr_id', 'address', 'area_code',
+            'area', 'telephone', 'username',
+            'is_default'
+        )
         data_list = list(data_list)
         return data_list
     
