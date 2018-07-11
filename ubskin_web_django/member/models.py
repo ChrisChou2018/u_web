@@ -140,7 +140,12 @@ class RecvAddr(models.Model):
     用户收货地址表
     '''
     recv_addr_id = models.AutoField(db_column="recv_addr_id", verbose_name="用户收获地址ID", primary_key=True)
-    addr_name = models.CharField(db_column="addr_name", verbose_name="收货地址", max_length=255)
+    address = models.CharField(db_column="address", verbose_name="街区", max_length=255, null=True, blank=True)
+    area = models.CharField(db_column="area", verbose_name="详细", max_length=255, null=True, blank=True)
+    area_code = models .CharField(db_column="area_code", verbose_name="区号", max_length=255, null=True, blank=True)
+    telephone = models.CharField(db_column="telephone", verbose_name="收货地址手机号码", max_length=255, null=True, blank=True)
+    username = models.CharField(db_column="username", verbose_name="收件人姓名", max_length=255, null=True, blank=True)
+    is_default = models.BooleanField(db_column="is_default", verbose_name="是否默认收货地址", default=False)
     member_id = models.BigIntegerField(db_column="member_id", verbose_name="用户ID")
     status = models.CharField(db_column="status", verbose_name="状态", default="normal", max_length=255)
 
@@ -187,9 +192,14 @@ class RecvAddr(models.Model):
         data_list = cls.objects.filter(
             member_id=member_id,
             status='normal'
-        ).values('recv_addr_id', 'addr_name')
+        ).values('recv_addr_id', 'address', 'area_code', 'area', 'telephone', 'name')
         data_list = list(data_list)
         return data_list
+    
+    @classmethod
+    def set_is_default(cls, member_id, recv_addr_id, is_default):
+        cls.objects.filter(member_id=member_id, status='normal').update(is_default=False)
+        cls.objects.filter(member_id=member_id, pk=recv_addr_id).update(is_default=is_default)
 
 
     class Meta:
