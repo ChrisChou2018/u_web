@@ -1,6 +1,7 @@
 import os
 
 from django.http import JsonResponse
+from django.shortcuts import render
 from django import forms
 from django.forms.models import model_to_dict
 
@@ -115,3 +116,13 @@ def editor_member(request):
         member_models.Member.update_member_by_id(member_id, clear_data)
         return_value['status'] = 'success'
         return JsonResponse(return_value)
+
+
+def jm_recv_addr_info(request):
+    data_id = request.GET.get('data_id')
+    data_list = member_models.RecvAddr.get_recv_addr_by_member_id(data_id)
+    return render(
+        request,
+        'member/a_jm_recv_addr_info.html',
+        {'data_list': data_list}
+    )

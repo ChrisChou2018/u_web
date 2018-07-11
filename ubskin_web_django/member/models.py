@@ -140,10 +140,15 @@ class RecvAddr(models.Model):
     用户收货地址表
     '''
     recv_addr_id = models.AutoField(db_column="recv_addr_id", verbose_name="用户收获地址ID", primary_key=True)
-    addr_name = models.CharField(db_column="addr_name", verbose_name="收货地址", max_length=255)
+    address = models.CharField(db_column="address", verbose_name="街区", max_length=255, null=True, blank=True)
+    area = models.CharField(db_column="area", verbose_name="详细", max_length=255, null=True, blank=True)
+    area_code = models .CharField(db_column="area_code", verbose_name="区号", max_length=255, null=True, blank=True)
+    telephone = models.CharField(db_column="telephone", verbose_name="收货地址手机号码", max_length=255, null=True, blank=True)
+    username = models.CharField(db_column="username", verbose_name="收件人姓名", max_length=255, null=True, blank=True)
+    is_default = models.BooleanField(db_column="is_default", verbose_name="是否默认收货地址", default=False)
     member_id = models.BigIntegerField(db_column="member_id", verbose_name="用户ID")
     status = models.CharField(db_column="status", verbose_name="状态", default="normal", max_length=255)
-
+    
 
     @classmethod
     def get_recv_addr_data_list(cls, current_page, search_value=None):
@@ -162,7 +167,10 @@ class RecvAddr(models.Model):
                     c = Count('member_id'),
                     )
         p = Paginator(data_list, 15)
-        return p.page(current_page).object_list
+        data_list = p.page(current_page).object_list
+        for i in data_list:
+            i['member_name'] =  Member.get_member_by_id(i['member_id']).member_name
+        return data_list
     
     @classmethod
     def get_recv_addr_count(cls, search_value=None):
@@ -187,9 +195,18 @@ class RecvAddr(models.Model):
         data_list = cls.objects.filter(
             member_id=member_id,
             status='normal'
-        ).values('recv_addr_id', 'addr_name')
+        ).values(
+            'recv_addr_id', 'address', 'area_code',
+            'area', 'telephone', 'username',
+            'is_default'
+        )
         data_list = list(data_list)
         return data_list
+    
+    @classmethod
+    def set_is_default(cls, member_id, recv_addr_id, is_default):
+        cls.objects.filter(member_id=member_id, status='normal').update(is_default=False)
+        cls.objects.filter(member_id=member_id, pk=recv_addr_id).update(is_default=is_default)
 
 
     class Meta:
@@ -214,7 +231,7 @@ class UserOrder(models.Model):
     )
     order_status            = models.CharField(db_column="order_status", verbose_name="订单状态", choices=status_choices, default="new", max_length=255)
     member_id               = models.BigIntegerField(db_column="member_id", verbose_name="用户ID")
-    recv_addr               = models.CharField(db_column="recv_addr", verbose_name="到货地址", max_length=255, null=True, blank=True)
+    recv_addr_id            = models.BigIntegerField(db_column="recv_addr", verbose_name="到货地址", null=True, blank=True)
     create_time             = models.IntegerField(db_column="create_time", verbose_name="创建时间", default=int(time.time()))
     status                  = models.CharField(db_column="status", verbose_name="状态", default="normal", max_length=255)
 
@@ -262,8 +279,12 @@ class UserOrder(models.Model):
                 ).annotate(
                     c = Count('order_num'),
                     ).count()
-        
         return data_count
+    
+    @classmethod
+    def has_order_num(cls, order_num):
+        obj = cls.objects.filter(order_num=order_num).first()
+        return True if obj else False
 
 
     class Meta:
@@ -296,7 +317,13 @@ def get_data_count(model, search_value=None, search_value_type='dict'):
     return count
 
 def create_model_data(model, data):
+    print(data)
     return model.objects.create(**data)
 
 def update_model_data_by_pk(model, pk, data):
     model.objects.filter(pk=pk).update(**data)
+
+def get_model_dict_by_pk(model, pk):
+    obj = model.objects.filter(pk=pk).first()
+    obj = model_to_dict(obj) if obj else None
+    return obj
