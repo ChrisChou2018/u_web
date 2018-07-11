@@ -2,6 +2,7 @@ import os
 import random
 import json
 from json import JSONDecodeError
+import string
 
 from django.views.decorators.csrf import csrf_exempt
 from django import forms
@@ -115,6 +116,7 @@ def wx_signin(request):
             return_value['message'] = '微信接口验证出错,请重新登陆'
             return JsonResponse(return_value)
 
+
 class UserCreationForm(forms.ModelForm):
     password1 = forms.CharField(
         error_messages={'required': '不能为空'}
@@ -129,9 +131,11 @@ class UserCreationForm(forms.ModelForm):
         error_messages={'required': '手机号不能为空'}
     )
 
+
     class Meta:
         model = member_models.Member
         fields = ('member_name', 'telephone',)
+
 
     def clean_password2(self):
         # Check that the two password entries match
@@ -175,7 +179,6 @@ def register(request):
 def change_password(request):
     pass
 
-
 def check_is_staff(request, openid):
     return_value = {
         'status': 'error',
@@ -190,3 +193,158 @@ def check_is_staff(request, openid):
             return_value['status'] = 'success'
             return_value['data'] = {'is_staff': False}
         return JsonResponse(return_value)
+
+@csrf_exempt
+@decorators.wx_api_authenticated
+def create_recv_addr(request):
+    return_value = {
+        'status': 'error',
+        'message': '',
+    }
+    if request.method == 'POST':
+        openid = request.COOKIES.get('openid')
+        data = json.loads(request.body)
+        address = data.get('address')
+        area = data.get('area')
+        area_code = data.get('area_code')
+        username = data.get('username')
+        telephone = data.get('telephone')
+        member = member_models.Member.get_member_by_wx_openid(openid)
+        member_models.create_model_data(
+            member_models.RecvAddr,
+            {'member_id': member.member_id,
+            'address': address,
+            'area': area,
+            'area_code': area_code,
+            'username': username,
+            'telephone': telephone}
+        )
+        return_value['status'] = 'success'
+        return JsonResponse(return_value)
+
+@decorators.wx_api_authenticated
+
+def get_recv_addr(request):
+    return_value = {
+        'status': 'error',
+        'message': '',
+    }
+    if request.method == 'GET':
+        openid = request.COOKIES.get('openid')
+        member = member_models.Member.get_member_by_wx_openid(openid)
+        data_list = member_models.RecvAddr. \
+            get_recv_addr_by_member_id(member.member_id)
+        return_value['status'] = 'success'
+        return_value['data'] = data_list
+        return JsonResponse(return_value)
+
+@csrf_exempt
+@decorators.wx_api_authenticated
+def delete_recv_addr(request):
+    return_value = {
+        'status': 'error',
+        'message': '',
+    }
+    if request.method == 'POST':
+        data = request.body
+        data = json.loads(data)
+        recv_addr_id_list = data.get('recv_addr_id_list')
+        for i in recv_addr_id_list:
+            member_models.update_model_data_by_pk(
+                member_models.RecvAddr,
+                i,
+                {'status': 'deleted'}
+            )
+        return_value['status'] = 'success'
+        return JsonResponse(return_value)
+
+@csrf_exempt
+@decorators.wx_api_authenticated
+def update_recv_addr(request):
+    return_value = {
+        'status': 'error',
+        'message': '',
+    }
+    if request.method == 'GET':
+        recv_addr_id = int(request.GET.get('recv_addr_id'))
+        recv_addr = member_models.get_model_dict_by_pk(
+            member_models.RecvAddr,
+            recv_addr_id
+        )
+        if recv_addr:
+            return_value['status'] = 'success'
+            return_value['data'] = recv_addr
+            return JsonResponse(return_value)
+        else:
+            return_value['message'] = "数据出错"
+            return JsonResponse(return_value)
+    else:
+        openid = request.COOKIES.get('openid')
+        member = member_models.Member.get_member_by_wx_openid(openid)
+        data = request.body
+        data = json.loads(data)
+        recv_addr_id = int(data.get('recv_addr_id'))
+        update_data = data.get('update_data')
+        if 'is_default' in update_data:
+            is_default = update_data.pop('is_default')
+            member_models.RecvAddr.set_is_default(
+                member.member_id,
+                recv_addr_id,
+                is_default
+            )
+            
+        member_models.update_model_data_by_pk(
+            member_models.RecvAddr,
+            recv_addr_id,
+            update_data
+        )
+        return_value['status'] = 'success'
+        return JsonResponse(return_value)
+
+
+def get_user_order(request):
+    if request.method == 'GET':
+        pass
+
+@decorators.wx_api_authenticated
+def create_user_order(request):
+    return_value = {
+        'status': 'error',
+        'message': ''
+    }
+    if request.method == 'POST':
+        openid = request.COOKIES.get('openid')
+        member = member_models.Member.get_member_by_wx_openid(openid)
+        data = request.body
+        data = json.loads(data)
+        recv_addr_id = data.get('recv_addr_id')
+        order_info = data.get('order_info')
+        order_num = None
+        while True:
+            order_num = ''.join(
+                random.choice(string.ascii_lowercase + string.digits) \
+                for i in range(8)
+            )
+            if member_models.UserOrder.has_order_num(order_num):
+                pass
+            else:
+                break
+        for i in order_info:
+            i.update({
+                'member_id': member.member_id,
+                'recv_addr_id': recv_addr_id,
+                'order_num': order_num
+            })
+            member_models.create_model_data(
+                member_models.RecvAddr,
+                i
+            )
+        return_value['status'] = 'success'
+        return JsonResponse(return_value)
+        
+
+def success_recv(request):
+    if request.method == 'POST':
+        data = request.body
+        data = json.loads(data)
+

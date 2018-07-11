@@ -1,0 +1,27 @@
+<div id="">
+    <p></p>
+    <hr>
+    <p></p>
+    <table class="table table-bordered">
+        <tbody>
+            <tr>
+                <th>地址</th>
+                <th>手机号</th>
+                <th>收件人姓名</th>
+                <th>默认收件地址</th>
+            </tr>
+            {% for i in data_list %}
+            <tr>
+                <td>{{ i.address }}{{ i.area }}</td>
+                <td>{{ i.telephone }}</td>
+                <td>{{ i.username }}</td>
+                <td>{{ i.is_default }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <p></p>
+    <hr>
+    <p></p>
+</div>
+    

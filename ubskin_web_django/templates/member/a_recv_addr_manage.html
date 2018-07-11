@@ -17,11 +17,11 @@
 </style>
 {% endblock %}
 {% block title %}
-收获方管理            
+用户地址管理            
 {% endblock %}
 {% block page_header %}
 <ol class="breadcrumb">
-    <li><a href="#"><i class="fa fa-dashboard"></i> 收获方管理</a></li>
+    <li><a href="#"><i class="fa fa-dashboard"></i>用户地址管理</a></li>
 </ol>
 {% endblock %}
 
@@ -65,25 +65,21 @@
                   <colgroup>
                     <col class="col-xs-1">
                     <col class="col-xs-1">
-                    <col class="col-xs-4">
-                    <col class="col-xs-2">
+                    <col class="col-xs-1">
                   </colgroup>
                   <thead>
                     <tr>
-                      <th>ID</th>
                       <th>用户ID</th>
+                      <th>用户名</th>
                       <th>操作</th>
                     </tr>
                   </thead>
                   <tbody>
-                    {% for code in data_list %}
+                    {% for data in data_list %}
                     <tr>
-                        <th scope="row">{{ code.recv_addr_id }}</th>
-                        <td>{{ code.member_id }}</td>
-                        <td>{{ code.addr_name }}</td>
-                        <td>
-                            <td><a href="#modalItemCodes" data-toggle="modal" data-target="#modalItemCodes" data-batchid="{{ stock.stock_batch_id }}">详情</a></td>
-                        </td>
+                        <td>{{ data.member_id }}</td>
+                        <td>{{ data.member_name }}</td>
+                        <td><a href="#modalItemCodes" data-toggle="modal" data-target="#modalItemCodes" data-dataid="{{ data.member_id }}">详情</a></td>
                     </tr>
                     {% endfor %}
                   </tbody>
@@ -104,7 +100,7 @@
         <div class="modal-content" id="id_modal_content">
         <div class="modal-header">
             <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-            <h4 class="modal-title">出库单</h4>
+            <h4 class="modal-title">用户收货地址</h4>
         </div>
         <div class="modal-body" id="id_modal_body">
             <p><i class="fa fa-refresh fa-spin" style="font-size: 24px;"></i></p>
@@ -122,8 +118,17 @@
 {% block js %}
     <script>
     $(function(){
-        $('.recv_manage').addClass('active')
-        
+        $('.recv_addr_manage').addClass('active')
+        $('#modalItemCodes').on('show.bs.modal', (e) => {
+            let btn = $(e.relatedTarget);
+            let data_id = btn.data('dataid');
+            $('#id_modal_body').load('{% url "jm_recv_addr_info" %}?data_id=' + data_id, (res, status, xhr) => {
+                if (status == "error") {
+                    $('#id_modal_body').html('<p>加载数据时出错, 请稍后再试</p>');
+                    return;
+                }
+            });
+        });  
     })
     
        

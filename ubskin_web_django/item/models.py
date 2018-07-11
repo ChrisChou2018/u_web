@@ -481,36 +481,7 @@ class ShoppingCart(models.Model):
 
 
 
-class UserOrder(models.Model):
-    '''
-    用户订单表
-    '''
-    user_order_id           = models.AutoField(db_column="user_order_id", verbose_name="用户订单表ID", primary_key=True)
-    order_num               = models.CharField(db_column="order_num", verbose_name="订单号", null=True, blank=True, max_length=255)
-    item_id                 = models.BigIntegerField(db_column="item_id", verbose_name="商品ID", null=True, blank=True)
-    item_name               = models.CharField(db_column="item_name", verbose_name="支付状态", max_length=255, null=True, blank=True)
-    item_count              = models.IntegerField(db_column="item_count", verbose_name="购买数量")
-    price                   = models.FloatField(db_column="price", verbose_name="商品单价")
-    status_choices = (
-        ('new', '等待支付订单'),
-        ('paid', '等待发货（已经支付）'),
-        ('shipped', '等待收获（已经支付）'),
-        ('received', '确认收获（已经支付）'),
-    )
-    order_status            = models.CharField(db_column="order_status", verbose_name="订单状态", choices=status_choices, default="new", max_length=255)
-    member_id               = models.BigIntegerField(db_column="member_id", verbose_name="用户ID")
-    recv_addr               = models.CharField(db_column="recv_addr", verbose_name="到货地址", max_length=255, null=True, blank=True)
-    create_time             = models.IntegerField(db_column="create_time", verbose_name="创建时间", default=int(time.time()))
-    status                  = models.CharField(db_column="status", verbose_name="状态", default="normal", max_length=255)
 
-
-    @classmethod
-    def get_user_order_by_member_id(cls, member_id):
-        return cls.objects.filter(member_id=member_id, status='normal').values()
-
-
-    class Meta:
-        db_table = "user_order"
 
 
 def get_data_list(model, current_page, search_value=None, order_by="-pk", search_value_type='dict'):
