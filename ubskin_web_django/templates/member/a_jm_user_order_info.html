@@ -1,0 +1,28 @@
+<div id="">
+    <p><strong>订单单号：{{ code_data.stock_batch_id }}</strong></p>
+    <p>收货地址: {{ code_data.recv_code }} - {{ code_data.recv_addr }}</p>
+    <p></p>
+    <hr>
+    <p></p>
+    <table class="table table-bordered">
+        <tbody>
+            <tr>
+                <th>商品名</th>
+                <th>条码号</th>
+                <th>数量</th>
+            </tr>
+            {% for i in code_data.item_code_list %}
+            <tr>
+                <td>{% if i.item_name %}{{ i.item_name }}{% else %}未查询到商品信息{% endif %}</td>
+                <td>{{ i.item_barcode }}</td>
+                <td>{{ i.item_count }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <p></p>
+    <hr>
+    <p></p>
+    <p>共计: {{ code_data.all_count }}</p>
+</div>
+    

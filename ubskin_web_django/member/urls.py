@@ -32,4 +32,7 @@ urlpatterns += [
     path('api/get_recv_addr/', views_api.get_recv_addr),
     path('api/delete_recv_addr/', views_api.delete_recv_addr),
     path('api/update_recv_addr/', views_api.update_recv_addr),
+    path('api/create_user_order/', views_api.create_user_order),
+    path('api/get_user_order/', views_api.get_user_order),
+    path('api/get_user_orer_info/<str:order_num>/', views_api.get_user_order_info),
 ]
