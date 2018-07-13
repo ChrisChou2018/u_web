@@ -243,7 +243,7 @@ class UserOrder(models.Model):
 
 
     @classmethod
-    def get_user_order_by_member_id(cls, member_id, current_page, order_status=None):
+    def get_user_order_by_member_id(cls, member_id, current_page, order_status):
         order_num_list = cls.objects.filter(member_id=member_id, status='normal'). \
             values('order_num').annotate(c = Count('order_num')).order_by('-pk')
         p = Paginator(order_num_list, 10)
@@ -251,7 +251,7 @@ class UserOrder(models.Model):
         data_list = list()
         for i in order_num_list:
             order_num = i['order_num']
-            if order_status is not None:
+            if order_status:
                 obj = cls.objects.filter(
                     order_num=order_num,
                     order_status=order_status,
@@ -259,7 +259,7 @@ class UserOrder(models.Model):
                 ).values()
             else:
                 obj = cls.objects.filter(order_num=order_num, status = "normal").values()
-            if obj is not None:
+            if obj:
                 recv_addr = get_model_dict_by_pk(
                         RecvAddr,
                         obj.first()['recv_addr_id']
