@@ -259,26 +259,28 @@ class UserOrder(models.Model):
                 ).values()
             else:
                 obj = cls.objects.filter(order_num=order_num, status = "normal").values()
-            recv_addr = get_model_dict_by_pk(
-                    RecvAddr,
-                    obj[0]['recv_addr_id']
-            )
-            data_dict[i] = {
-                    'recv_addr': recv_addr,
-                    'goods': []
-            }
-            for j in obj:
-                item = item_models.Items.get_item_by_id(j['item_id'])
-                image_path = common.build_photo_url(item.photo_id, cdn=True)
-                data_dict[i]['goods'].append({
-                    'image_path': image_path,
-                    'item_name': j['item_name'],
-                    'item_count': j['item_count'],
-                    'price': j['price'],
-                    'order_status': dict(cls.status_choices)[j['order_status']],
-                })
+            if obj is not None:
+                recv_addr = get_model_dict_by_pk(
+                        RecvAddr,
+                        obj.first()['recv_addr_id']
+                )
+                data_dict[i['order_num']] = {
+                        'recv_addr': recv_addr,
+                        'goods': list()
+                }
+                for j in obj:
+                    item = item_models.Items.get_item_by_id(j['item_id'])
+                    image_path = common.build_photo_url(item.photo_id, cdn=True)
+                    data_dict[i['order_num']]['goods'].append({
+                        'image_path': image_path,
+                        'item_name': j['item_name'],
+                        'item_count': j['item_count'],
+                        'price': j['price'],
+                        'order_status': dict(cls.status_choices)[j['order_status']],
+                    })
+            else:
+                return list()
         return data_dict
-
     @classmethod
     def get_user_order_by_order_num(cls, order_num, order_status=None):
         if order_status is not None:

@@ -293,7 +293,6 @@ def update_recv_addr(request):
                 recv_addr_id,
                 is_default
             )
-            
         member_models.update_model_data_by_pk(
             member_models.RecvAddr,
             recv_addr_id,
