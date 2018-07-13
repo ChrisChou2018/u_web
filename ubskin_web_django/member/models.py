@@ -243,13 +243,22 @@ class UserOrder(models.Model):
 
 
     @classmethod
-    def get_user_order_by_member_id(cls, member_id):
+    def get_user_order_by_member_id(cls, member_id, current_page, order_status=None):
         data_dict = dict()
         order_num_list = cls.objects.filter(member_id=member_id, status='normal'). \
-            values('order_num').annotate(c = Count('member_id'))
+            values('order_num').annotate(c = Count('order_num'))
+        p = Paginator(order_num_list, 10)
+        order_num_list = p.page(current_page).object_list
         for i in order_num_list:
             order_num = i['order_num']
-            obj = cls.objects.filter(order_num=order_num).values()
+            if order_status is not None:
+                obj = cls.objects.filter(
+                    order_num=order_num,
+                    order_status=order_status,
+                    status = "normal"
+                ).values()
+            else:
+                obj = cls.objects.filter(order_num=order_num, status = "normal").values()
             recv_addr = get_model_dict_by_pk(
                     RecvAddr,
                     obj[0]['recv_addr_id']
@@ -274,10 +283,12 @@ class UserOrder(models.Model):
     def get_user_order_by_order_num(cls, order_num, order_status=None):
         if order_status is not None:
             obj = cls.objects.filter(
-                order_num=order_num, order_status=order_status
+                order_num=order_num,
+                order_status=order_status,
+                status = "normal"
             ).values()
         else:
-            obj = cls.objects.filter(order_num=order_num).values()
+            obj = cls.objects.filter(order_num=order_num, status = "normal").values()
         recv_addr = get_model_dict_by_pk(
                 RecvAddr,
                 obj[0]['recv_addr_id']

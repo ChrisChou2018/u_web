@@ -309,9 +309,13 @@ def get_user_order(request):
         'message': ''
     }
     if request.method == 'GET':
+        order_status = request.GET.get('order_status')
         openid = request.COOKIES.get('openid')
+        current_page = request.GET.get('page', 1)
         member = member_models.Member.get_member_by_wx_openid(openid)
-        data_dict = member_models.UserOrder.get_user_order_by_member_id(member.member_id)
+        data_dict = member_models.UserOrder.get_user_order_by_member_id(
+            member.member_id, current_page, order_status
+        )
         return_value['status'] = 'success'
         return_value['data'] = data_dict
         return JsonResponse(return_value)
