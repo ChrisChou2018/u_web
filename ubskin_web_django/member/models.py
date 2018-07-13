@@ -145,7 +145,6 @@ class RecvAddr(models.Model):
     '''
     recv_addr_id = models.AutoField(db_column="recv_addr_id", verbose_name="用户收获地址ID", primary_key=True)
     address = models.CharField(db_column="address", verbose_name="街区", max_length=255, null=True, blank=True)
-    area = models.CharField(db_column="area", verbose_name="详细", max_length=255, null=True, blank=True)
     area_code = models .CharField(db_column="area_code", verbose_name="区号", max_length=255, null=True, blank=True)
     telephone = models.CharField(db_column="telephone", verbose_name="收货地址手机号码", max_length=255, null=True, blank=True)
     username = models.CharField(db_column="username", verbose_name="收件人姓名", max_length=255, null=True, blank=True)
@@ -201,7 +200,7 @@ class RecvAddr(models.Model):
             status='normal'
         ).values(
             'recv_addr_id', 'address', 'area_code',
-            'area', 'telephone', 'username',
+            'telephone', 'username',
             'is_default'
         )
         data_list = list(data_list)
