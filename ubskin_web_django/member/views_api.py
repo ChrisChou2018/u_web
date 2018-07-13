@@ -323,7 +323,8 @@ def get_user_order_info(request, order_num):
         'message': ''
     }
     if request.method == 'GET':
-        user_order = member_models.UserOrder.get_user_order_by_order_num(order_num)
+        order_status = request.GET.get('order_status')
+        user_order = member_models.UserOrder.get_user_order_by_order_num(order_num, order_status)
         return_value['status'] = 'success'
         return_value['data'] = user_order
         return JsonResponse(return_value)
