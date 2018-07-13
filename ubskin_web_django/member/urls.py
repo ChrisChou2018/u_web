@@ -12,6 +12,7 @@ urlpatterns = [
     path('myadmin/member_manage/', views.member_manage, name='member_manage'),
     path('myadmin/user_order_manage/', views.user_order_manage, name="user_order_manage"),
     path('myadmin/recv_addr_manage/', views.recv_addr, name='recv_addr_manage'),
+    path('myadmin/out_order_manage/', views.out_order_manage, name='out_order_manage'),
     path('myadmin/', views.index),
 ]
 
@@ -20,6 +21,7 @@ urlpatterns += [
     path('js/delete_member/', views_js.delete_member, name='delete_member'),
     path('js/edit_member/', views_js.editor_member, name='edit_member'),
     path('js/jm_recv_addr_info/', views_js.jm_recv_addr_info, name='jm_recv_addr_info'),
+    path('js/jm_user_order_info/', views_js.jm_user_order_info, name='jm_user_order_info'),
 ]
 
 urlpatterns += [
@@ -32,4 +34,7 @@ urlpatterns += [
     path('api/get_recv_addr/', views_api.get_recv_addr),
     path('api/delete_recv_addr/', views_api.delete_recv_addr),
     path('api/update_recv_addr/', views_api.update_recv_addr),
+    path('api/create_user_order/', views_api.create_user_order),
+    path('api/get_user_order/', views_api.get_user_order),
+    path('api/get_user_orer_info/<str:order_num>/', views_api.get_user_order_info),
 ]

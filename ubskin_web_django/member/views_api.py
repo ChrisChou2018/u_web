@@ -3,6 +3,7 @@ import random
 import json
 from json import JSONDecodeError
 import string
+import time
 
 from django.views.decorators.csrf import csrf_exempt
 from django import forms
@@ -301,11 +302,38 @@ def update_recv_addr(request):
         return_value['status'] = 'success'
         return JsonResponse(return_value)
 
-
+@decorators.wx_api_authenticated
 def get_user_order(request):
+    return_value = {
+        'status': 'error',
+        'message': ''
+    }
     if request.method == 'GET':
-        pass
+        order_status = request.GET.get('order_status')
+        openid = request.COOKIES.get('openid')
+        current_page = request.GET.get('page', 1)
+        member = member_models.Member.get_member_by_wx_openid(openid)
+        data_dict = member_models.UserOrder.get_user_order_by_member_id(
+            member.member_id, current_page, order_status
+        )
+        return_value['status'] = 'success'
+        return_value['data'] = data_dict
+        return JsonResponse(return_value)
 
+@decorators.wx_api_authenticated
+def get_user_order_info(request, order_num):
+    return_value = {
+        'status': 'error',
+        'message': ''
+    }
+    if request.method == 'GET':
+        order_status = request.GET.get('order_status')
+        user_order = member_models.UserOrder.get_user_order_by_order_num(order_num, order_status)
+        return_value['status'] = 'success'
+        return_value['data'] = user_order
+        return JsonResponse(return_value)
+
+@csrf_exempt
 @decorators.wx_api_authenticated
 def create_user_order(request):
     return_value = {
@@ -320,10 +348,11 @@ def create_user_order(request):
         recv_addr_id = data.get('recv_addr_id')
         order_info = data.get('order_info')
         order_num = None
+        print(data)
         while True:
             order_num = ''.join(
-                random.choice(string.ascii_lowercase + string.digits) \
-                for i in range(8)
+                random.choice(string.digits) \
+                for i in range(19)
             )
             if member_models.UserOrder.has_order_num(order_num):
                 pass
@@ -331,12 +360,13 @@ def create_user_order(request):
                 break
         for i in order_info:
             i.update({
+                'create_time': int(time.time()),
                 'member_id': member.member_id,
                 'recv_addr_id': recv_addr_id,
                 'order_num': order_num
             })
             member_models.create_model_data(
-                member_models.RecvAddr,
+                member_models.UserOrder,
                 i
             )
         return_value['status'] = 'success'

@@ -7,6 +7,10 @@ from django.contrib.auth.models import (
 from django.forms.models import model_to_dict
 from django.core.paginator import Paginator
 from django.db.models import Count
+from django.db.models import Q
+
+from ubskin_web_django.item import models as item_models
+from ubskin_web_django.common import common
 
 
 class UserProfileManager(BaseUserManager):
@@ -203,6 +207,7 @@ class RecvAddr(models.Model):
         data_list = list(data_list)
         return data_list
     
+    
     @classmethod
     def set_is_default(cls, member_id, recv_addr_id, is_default):
         cls.objects.filter(member_id=member_id, status='normal').update(is_default=False)
@@ -220,25 +225,92 @@ class UserOrder(models.Model):
     user_order_id           = models.AutoField(db_column="user_order_id", verbose_name="用户订单表ID", primary_key=True)
     order_num               = models.CharField(db_column="order_num", verbose_name="订单号", null=True, blank=True, max_length=255)
     item_id                 = models.BigIntegerField(db_column="item_id", verbose_name="商品ID", null=True, blank=True)
-    item_name               = models.CharField(db_column="item_name", verbose_name="支付状态", max_length=255, null=True, blank=True)
+    item_name               = models.CharField(db_column="item_name", verbose_name="商品名", max_length=255, null=True, blank=True)
     item_count              = models.IntegerField(db_column="item_count", verbose_name="购买数量")
     price                   = models.FloatField(db_column="price", verbose_name="商品单价")
     status_choices = (
         ('new', '等待支付订单'),
         ('paid', '等待发货（已经支付）'),
-        ('shipped', '等待收获（已经支付）'),
-        ('received', '确认收获（已经支付）'),
+        ('shipped', '等待收货（已经支付）'),
+        ('received', '确认收货（已经支付）'),
     )
     order_status            = models.CharField(db_column="order_status", verbose_name="订单状态", choices=status_choices, default="new", max_length=255)
     member_id               = models.BigIntegerField(db_column="member_id", verbose_name="用户ID")
-    recv_addr_id            = models.BigIntegerField(db_column="recv_addr", verbose_name="到货地址", null=True, blank=True)
+    is_shopping_cart        = models.BooleanField(db_column="is_shupping_cart", verbose_name="是否来自购物车", default=False)
+    recv_addr_id            = models.BigIntegerField(db_column="recv_addr", verbose_name="到货地址ID", null=True, blank=True)
     create_time             = models.IntegerField(db_column="create_time", verbose_name="创建时间", default=int(time.time()))
     status                  = models.CharField(db_column="status", verbose_name="状态", default="normal", max_length=255)
 
 
     @classmethod
-    def get_user_order_by_member_id(cls, member_id):
-        return cls.objects.filter(member_id=member_id, status='normal').values()
+    def get_user_order_by_member_id(cls, member_id, current_page, order_status=None):
+        data_dict = dict()
+        order_num_list = cls.objects.filter(member_id=member_id, status='normal'). \
+            values('order_num').annotate(c = Count('order_num'))
+        p = Paginator(order_num_list, 10)
+        order_num_list = p.page(current_page).object_list
+        for i in order_num_list:
+            order_num = i['order_num']
+            if order_status is not None:
+                obj = cls.objects.filter(
+                    order_num=order_num,
+                    order_status=order_status,
+                    status = "normal"
+                ).values()
+            else:
+                obj = cls.objects.filter(order_num=order_num, status = "normal").values()
+            recv_addr = get_model_dict_by_pk(
+                    RecvAddr,
+                    obj[0]['recv_addr_id']
+            )
+            data_dict[i] = {
+                    'recv_addr': recv_addr,
+                    'goods': []
+            }
+            for j in obj:
+                item = item_models.Items.get_item_by_id(j['item_id'])
+                image_path = common.build_photo_url(item.photo_id, cdn=True)
+                data_dict[i]['goods'].append({
+                    'image_path': image_path,
+                    'item_name': j['item_name'],
+                    'item_count': j['item_count'],
+                    'price': j['price'],
+                    'order_status': dict(cls.status_choices)[j['order_status']],
+                })
+        return data_dict
+
+    @classmethod
+    def get_user_order_by_order_num(cls, order_num, order_status=None):
+        if order_status is not None:
+            obj = cls.objects.filter(
+                order_num=order_num,
+                order_status=order_status,
+                status = "normal"
+            ).values()
+        else:
+            obj = cls.objects.filter(order_num=order_num, status = "normal").values()
+        recv_addr = get_model_dict_by_pk(
+                RecvAddr,
+                obj[0]['recv_addr_id']
+        )
+        data_dict = {
+            'order_num': order_num,
+            'recv_addr': recv_addr,
+            'goods': list()
+        }
+        data_dict['all_price'] = 0
+        for i in obj:
+            item = item_models.Items.get_item_by_id(i['item_id'])
+            image_path = common.build_photo_url(item.photo_id, cdn=True)
+            data_dict['goods'].append({
+                'image_path': image_path,
+                'item_name': i['item_name'],
+                'item_count': i['item_count'],
+                'price': i['price'],
+                'order_status': dict(cls.status_choices)[i['order_status']],
+            })
+            data_dict['all_price'] += float(i['price']) * int(i['item_count'])
+        return data_dict
     
     @classmethod
     def get_user_order_data_list(cls, current_page, search_value=None):
@@ -290,6 +362,57 @@ class UserOrder(models.Model):
     class Meta:
         db_table = "user_order"
 
+class OutOrder(models.Model):
+    out_order_id = models.AutoField(db_column="out_order_id", verbose_name="外部订单表ID", primary_key=True)
+    member_nickname = models.CharField(db_column='member_nickname', verbose_name='用户昵称', max_length=255, null=True, blank=True)
+    wechat_id = models.CharField(db_column='wechat_id', verbose_name='微信号', max_length=255, null=True, blank=True)
+    wechat_nickname = models.CharField(db_column='wechat_nickname', verbose_name='微信昵称', max_length=2555, null=True, blank=True)
+    source = models.CharField(db_column='source', verbose_name='发货地', max_length=255, null=True, blank=True)
+    order_id = models.CharField(db_column='order_id', verbose_name='订单ID', max_length=255, null=True, blank=True)
+    place_date = models.IntegerField(db_column='place_date', verbose_name='地方时间', null=True, blank=True)
+    placed_at = models.CharField(db_column='placed_at', verbose_name='地方标准时间', max_length=255, null=True, blank=True)
+    member_level = models.CharField(db_column='member_level', verbose_name='会员等级', max_length=255, null=True, blank=True)
+    order_status = models.CharField(db_column='order_status', verbose_name='订单状态', max_length=255, null=True, blank=True)
+    member_phone = models.CharField(db_column='member_phone', verbose_name='手机号', max_length=255, null=True, blank=True)
+    status = models.CharField(db_column="status", verbose_name="状态", default="normal", max_length=255)
+
+    @classmethod
+    def default_table_head(cls):
+        head = {
+            'order_id': '订单ID',
+            'member_nickname': '用户昵称',
+            'wechat_id': '微信号',
+            'wechat_nickname': '微信昵称',
+            'order_id': '发货地',
+            'placed_at': '地方时间',
+            'member_level': '会员等级',
+            'order_status': '订单状态',
+            'member_phone': '手机号',
+        }
+        return head
+
+    @classmethod
+    def list_out_order(cls):
+        # conds = {
+        #     "status": "normal",
+        #     # "order_status": {"$in": export_weike_orders},
+        #     "source": {"$regex": u"微客"},
+        #     "order_status": {"$regex": u"(交易完成|已发货)"},
+        #     "$and": [{"place_date": {"$lte": 20180531}}, {"place_date": {"$gte": 20180501}}]
+        # }
+        data_list = cls.objects.filter(
+            (Q(order_status__icontains='交易完成') | Q(order_status__icontains='已发货')), 
+            status="normal",
+            source__icontains='微客',
+            place_date__range=[20180501, 20180531]
+        ).values("order_id", "member_nickname", "source", "member_level", "placed_at")
+        for i in data_list:
+            i['member_nickname'] = eval(i['member_nickname']).decode()
+        return data_list
+
+
+    class Meta:
+        db_table = "out_order"
 
 def get_data_list(model, current_page, search_value=None, order_by="-pk", search_value_type='dict'):
     if search_value:
@@ -317,7 +440,6 @@ def get_data_count(model, search_value=None, search_value_type='dict'):
     return count
 
 def create_model_data(model, data):
-    print(data)
     return model.objects.create(**data)
 
 def update_model_data_by_pk(model, pk, data):

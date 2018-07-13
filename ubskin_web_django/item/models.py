@@ -316,7 +316,7 @@ class Categories(models.Model):
             return cls.objects.get(pk=categorie_id)
         except cls.DoesNotExist:
             return None
-    
+
     @classmethod
     def update_categorie_by_id(cls, categorie_id, data):
         cls.objects.filter(pk=categorie_id).update(**data)
@@ -478,10 +478,6 @@ class ShoppingCart(models.Model):
 
     class Meta:
         db_table = "shopping_cart"
-
-
-
-
 
 
 def get_data_list(model, current_page, search_value=None, order_by="-pk", search_value_type='dict'):

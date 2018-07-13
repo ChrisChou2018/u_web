@@ -74,6 +74,29 @@ def get_item_info(request, item_id):
             return_value['message'] = "无次商品信息"
             return JsonResponse(return_value)
 
+@csrf_exempt
+def get_item_info_list(request):
+    return_value = {
+        'status': 'error',
+        'message': ''
+    }
+    if  request.method == 'POST':
+        data = json.loads(request.body)
+        data_list = list()
+        item_id_list = data.get('item_id_list')
+        for i in item_id_list:
+            item_obj = item_models.get_model_obj_by_pk(
+                item_models.Items,
+                i
+            )
+            if item_obj:
+                item_dict = model_to_dict(item_obj)
+                item_dict['image_path'] = common.build_photo_url(item_dict['photo_id'], cdn=True)
+                data_list.append(item_dict)
+        return_value['status'] = 'success'
+        return_value['data'] = data_list
+        return JsonResponse(return_value)
+
 def api_get_categories(request):
     return_value  = {
         'status': 'error',
