@@ -12,6 +12,7 @@ urlpatterns = [
     path('myadmin/member_manage/', views.member_manage, name='member_manage'),
     path('myadmin/user_order_manage/', views.user_order_manage, name="user_order_manage"),
     path('myadmin/recv_addr_manage/', views.recv_addr, name='recv_addr_manage'),
+    path('myadmin/out_order_manage/', views.out_order_manage, name='out_order_manage'),
     path('myadmin/', views.index),
 ]
 

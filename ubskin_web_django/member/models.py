@@ -351,13 +351,27 @@ class OutOrder(models.Model):
     wechat_nickname = models.CharField(db_column='wechat_nickname', verbose_name='微信昵称', max_length=2555, null=True, blank=True)
     source = models.CharField(db_column='source', verbose_name='发货地', max_length=255, null=True, blank=True)
     order_id = models.CharField(db_column='order_id', verbose_name='订单ID', max_length=255, null=True, blank=True)
-    place_date = models.IntegerField(db_column='place_date', verbose_name='地点坐标', null=True, blank=True)
-    placed_at = models.CharField(db_column='placed_at', verbose_name='时间', max_length=255, null=True, blank=True)
+    place_date = models.IntegerField(db_column='place_date', verbose_name='地方时间', null=True, blank=True)
+    placed_at = models.CharField(db_column='placed_at', verbose_name='地方标准时间', max_length=255, null=True, blank=True)
     member_level = models.CharField(db_column='member_level', verbose_name='会员等级', max_length=255, null=True, blank=True)
     order_status = models.CharField(db_column='order_status', verbose_name='订单状态', max_length=255, null=True, blank=True)
     member_phone = models.CharField(db_column='member_phone', verbose_name='手机号', max_length=255, null=True, blank=True)
     status = models.CharField(db_column="status", verbose_name="状态", default="normal", max_length=255)
 
+    @classmethod
+    def default_table_head(cls):
+        head = {
+            'order_id': '订单ID',
+            'member_nickname': '用户昵称',
+            'wechat_id': '微信号',
+            'wechat_nickname': '微信昵称',
+            'order_id': '发货地',
+            'placed_at': '地方时间',
+            'member_level': '会员等级',
+            'order_status': '订单状态',
+            'member_phone': '手机号',
+        }
+        return head
 
     @classmethod
     def list_out_order(cls):
