@@ -1,3 +1,5 @@
+import time
+
 from django.conf import settings
 
 
@@ -20,3 +22,8 @@ def build_photo_url(photo_id, pic_version="thumb", pic_type="photos", cdn=False)
         else:
             return "".join([settings.SERVERHOST, "/static/", "images/", "user-default", ".jpg"])
 
+
+def parse_timestamps(timestamps):
+    t = time.localtime(timestamps)
+    time_str = time.strftime(r'%Y-%m-%d %H:%M:%S', t)
+    return time_str

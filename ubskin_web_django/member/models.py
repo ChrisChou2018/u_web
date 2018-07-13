@@ -244,11 +244,11 @@ class UserOrder(models.Model):
 
     @classmethod
     def get_user_order_by_member_id(cls, member_id, current_page, order_status=None):
-        data_dict = dict()
         order_num_list = cls.objects.filter(member_id=member_id, status='normal'). \
-            values('order_num').annotate(c = Count('order_num'))
+            values('order_num').annotate(c = Count('order_num')).order_by('-pk')
         p = Paginator(order_num_list, 10)
         order_num_list = p.page(current_page).object_list
+        data_list = list()
         for i in order_num_list:
             order_num = i['order_num']
             if order_status is not None:
@@ -264,23 +264,28 @@ class UserOrder(models.Model):
                         RecvAddr,
                         obj.first()['recv_addr_id']
                 )
-                data_dict[i['order_num']] = {
-                        'recv_addr': recv_addr,
-                        'goods': list()
+                data_dict = {
+                    'order_num': i['order_num'],
+                    'recv_addr': recv_addr,
+                    'all_price': 0,
+                    'create_time': common.parse_timestamps(obj.first()['create_time']),
+                    'order_status': dict(cls.status_choices)[obj.first()['order_status']],
+                    'goods': list()
                 }
                 for j in obj:
                     item = item_models.Items.get_item_by_id(j['item_id'])
                     image_path = common.build_photo_url(item.photo_id, cdn=True)
-                    data_dict[i['order_num']]['goods'].append({
+                    data_dict['goods'].append({
                         'image_path': image_path,
                         'item_name': j['item_name'],
                         'item_count': j['item_count'],
                         'price': j['price'],
-                        'order_status': dict(cls.status_choices)[j['order_status']],
                     })
+                    data_dict['all_price'] += float(j['price']) * int(j['item_count'])
+                data_list.append(data_dict)
             else:
                 return list()
-        return data_dict
+        return data_list
     @classmethod
     def get_user_order_by_order_num(cls, order_num, order_status=None):
         if order_status is not None:
