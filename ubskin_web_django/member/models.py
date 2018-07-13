@@ -278,19 +278,21 @@ class UserOrder(models.Model):
                 obj['recv_addr_id']
         )
         data_dict = {
+            'order_num': order_num,
             'recv_addr': recv_addr,
             'goods': list()
         }
-        for i in obj:
-            item = item_models.Items.get_item_by_id(i['item_id'])
-            image_path = common.build_photo_url(item.photo_id, cdn=True)
-            data_dict['goods'].append({
-                'image_path': image_path,
-                'item_name': i['item_name'],
-                'item_count': i['item_count'],
-                'price': i['price'],
-                'order_status': dict(cls.status_choices)[i['order_status']],
-            })
+        
+        item = item_models.Items.get_item_by_id(obj['item_id'])
+        image_path = common.build_photo_url(item.photo_id, cdn=True)
+        data_dict['goods'].append({
+            'image_path': image_path,
+            'item_name': obj['item_name'],
+            'item_count': obj['item_count'],
+            'price': obj['price'],
+            'order_status': dict(cls.status_choices)[obj['order_status']],
+        })
+        data_dict['all_price'] = float(obj['price']) * int(obj['item_count'])
         return data_dict
 
     

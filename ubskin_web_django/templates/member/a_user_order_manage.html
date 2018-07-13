@@ -82,7 +82,7 @@
                     <td>{{ data.member_id }}</td>
                     <td>{{ data.order_status }}</td>
                     <td>{% parse_timestamps data.create_time %}</td>
-                    <td><a href="#modalItemCodes" data-toggle="modal" data-target="#modalItemCodes" data-batchid="{{ stock.stock_batch_id }}">详情</a></td>
+                    <td><a href="#modalItemCodes" data-toggle="modal" data-target="#modalItemCodes" data-ordernum="{{ data.order_num }}">详情</a></td>
                 </tr>
                 {% endfor %}
                 </tbody>
@@ -126,9 +126,8 @@
             $('.user_order_manage').addClass('active')
             $('#modalItemCodes').on('show.bs.modal', (e) => {
                 let btn = $(e.relatedTarget);
-                let batchId = btn.data('batchid');
-                
-                $('#id_modal_body').load('{% url "a_jm_stock_batch_info" %}?data_id=' + batchId, (res, status, xhr) => {
+                let ordernum = btn.data('ordernum');
+                $('#id_modal_body').load('{% url "jm_user_order_info" %}?data_id=' + ordernum, (res, status, xhr) => {
                     if (status == "error") {
                         $('#id_modal_body').html('<p>加载数据时出错, 请稍后再试</p>');
                         return;

@@ -1,6 +1,6 @@
 <div id="">
-    <p><strong>订单单号：{{ code_data.stock_batch_id }}</strong></p>
-    <p>收货地址: {{ code_data.recv_code }} - {{ code_data.recv_addr }}</p>
+    <p><strong>订单单号:{{ data_list.order_num }}</strong></p>
+    <p>收货地址: {{ data_list.recv_addr.address }} - {{ data_list.recv_addr.area }}</p>
     <p></p>
     <hr>
     <p></p>
@@ -8,14 +8,16 @@
         <tbody>
             <tr>
                 <th>商品名</th>
-                <th>条码号</th>
+                <th>价格</th>
                 <th>数量</th>
+                <th>订单状态</th>
             </tr>
-            {% for i in code_data.item_code_list %}
+            {% for i in data_list.goods %}
             <tr>
                 <td>{% if i.item_name %}{{ i.item_name }}{% else %}未查询到商品信息{% endif %}</td>
-                <td>{{ i.item_barcode }}</td>
+                <td>{{ i.price }}</td>
                 <td>{{ i.item_count }}</td>
+                <td>{{ i.order_status }}</td>
             </tr>
             {% endfor %}
         </tbody>
@@ -23,6 +25,6 @@
     <p></p>
     <hr>
     <p></p>
-    <p>共计: {{ code_data.all_count }}</p>
+    <p>共计: {{ data_list.all_price }}</p>
 </div>
     

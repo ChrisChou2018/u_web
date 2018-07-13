@@ -21,6 +21,7 @@ urlpatterns += [
     path('js/delete_member/', views_js.delete_member, name='delete_member'),
     path('js/edit_member/', views_js.editor_member, name='edit_member'),
     path('js/jm_recv_addr_info/', views_js.jm_recv_addr_info, name='jm_recv_addr_info'),
+    path('js/jm_user_order_info/', views_js.jm_user_order_info, name='jm_user_order_info'),
 ]
 
 urlpatterns += [
