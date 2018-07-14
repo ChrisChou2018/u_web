@@ -145,7 +145,6 @@ class RecvAddr(models.Model):
     '''
     recv_addr_id = models.AutoField(db_column="recv_addr_id", verbose_name="用户收获地址ID", primary_key=True)
     address = models.CharField(db_column="address", verbose_name="街区", max_length=255, null=True, blank=True)
-    area = models.CharField(db_column="area", verbose_name="详细", max_length=255, null=True, blank=True)
     area_code = models .CharField(db_column="area_code", verbose_name="区号", max_length=255, null=True, blank=True)
     telephone = models.CharField(db_column="telephone", verbose_name="收货地址手机号码", max_length=255, null=True, blank=True)
     username = models.CharField(db_column="username", verbose_name="收件人姓名", max_length=255, null=True, blank=True)
@@ -201,7 +200,7 @@ class RecvAddr(models.Model):
             status='normal'
         ).values(
             'recv_addr_id', 'address', 'area_code',
-            'area', 'telephone', 'username',
+            'telephone', 'username',
             'is_default'
         )
         data_list = list(data_list)
@@ -243,15 +242,15 @@ class UserOrder(models.Model):
 
 
     @classmethod
-    def get_user_order_by_member_id(cls, member_id, current_page, order_status=None):
-        data_dict = dict()
+    def get_user_order_by_member_id(cls, member_id, current_page, order_status):
         order_num_list = cls.objects.filter(member_id=member_id, status='normal'). \
-            values('order_num').annotate(c = Count('order_num'))
+            values('order_num').annotate(c = Count('order_num')).order_by('-pk')
         p = Paginator(order_num_list, 10)
         order_num_list = p.page(current_page).object_list
+        data_list = list()
         for i in order_num_list:
             order_num = i['order_num']
-            if order_status is not None:
+            if order_status:
                 obj = cls.objects.filter(
                     order_num=order_num,
                     order_status=order_status,
@@ -259,26 +258,33 @@ class UserOrder(models.Model):
                 ).values()
             else:
                 obj = cls.objects.filter(order_num=order_num, status = "normal").values()
-            recv_addr = get_model_dict_by_pk(
-                    RecvAddr,
-                    obj[0]['recv_addr_id']
-            )
-            data_dict[i] = {
+            if obj:
+                recv_addr = get_model_dict_by_pk(
+                        RecvAddr,
+                        obj.first()['recv_addr_id']
+                )
+                data_dict = {
+                    'order_num': i['order_num'],
                     'recv_addr': recv_addr,
-                    'goods': []
-            }
-            for j in obj:
-                item = item_models.Items.get_item_by_id(j['item_id'])
-                image_path = common.build_photo_url(item.photo_id, cdn=True)
-                data_dict[i]['goods'].append({
-                    'image_path': image_path,
-                    'item_name': j['item_name'],
-                    'item_count': j['item_count'],
-                    'price': j['price'],
-                    'order_status': dict(cls.status_choices)[j['order_status']],
-                })
-        return data_dict
-
+                    'all_price': 0,
+                    'create_time': common.parse_timestamps(obj.first()['create_time']),
+                    'order_status': dict(cls.status_choices)[obj.first()['order_status']],
+                    'goods': list()
+                }
+                for j in obj:
+                    item = item_models.Items.get_item_by_id(j['item_id'])
+                    image_path = common.build_photo_url(item.photo_id, cdn=True)
+                    data_dict['goods'].append({
+                        'image_path': image_path,
+                        'item_name': j['item_name'],
+                        'item_count': j['item_count'],
+                        'price': j['price'],
+                    })
+                    data_dict['all_price'] += float(j['price']) * int(j['item_count'])
+                data_list.append(data_dict)
+            else:
+                return list()
+        return data_list
     @classmethod
     def get_user_order_by_order_num(cls, order_num, order_status=None):
         if order_status is not None:

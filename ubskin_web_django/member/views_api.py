@@ -206,7 +206,6 @@ def create_recv_addr(request):
         openid = request.COOKIES.get('openid')
         data = json.loads(request.body)
         address = data.get('address')
-        area = data.get('area')
         area_code = data.get('area_code')
         username = data.get('username')
         telephone = data.get('telephone')
@@ -215,7 +214,6 @@ def create_recv_addr(request):
             member_models.RecvAddr,
             {'member_id': member.member_id,
             'address': address,
-            'area': area,
             'area_code': area_code,
             'username': username,
             'telephone': telephone}
@@ -293,7 +291,6 @@ def update_recv_addr(request):
                 recv_addr_id,
                 is_default
             )
-            
         member_models.update_model_data_by_pk(
             member_models.RecvAddr,
             recv_addr_id,
