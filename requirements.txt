@@ -5,5 +5,5 @@ mysqlclient==1.3.12
 xlrd==1.1.0
 requests==2.18.4
 xlwt==1.3.0
-bs4==4.6.0
+beautifulsoup4==4.6.0
 lxml==4.2.3

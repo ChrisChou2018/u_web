@@ -126,3 +126,12 @@ def jm_recv_addr_info(request):
         'member/a_jm_recv_addr_info.html',
         {'data_list': data_list}
     )
+
+def jm_user_order_info(request):
+    data_id = request.GET.get('data_id')
+    data_list = member_models.UserOrder.get_user_order_by_order_num(data_id)
+    return render(
+        request,
+        'member/a_jm_user_order_info.html',
+        {'data_list': data_list},
+    )

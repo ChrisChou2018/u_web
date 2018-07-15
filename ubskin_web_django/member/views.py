@@ -187,3 +187,43 @@ def user_order_manage(request):
             data_count = data_count,
             search_value = value,
         )
+
+def out_order_manage(request):
+    if request.method == 'GET':
+        current_page = request.GET.get('page', 1)
+        value = request.GET.get('search_value', '')
+        filter_args = None
+        if value:
+            filter_args = '&search_value={0}'.format(value)
+            search_value = {"cn_name__icontains": value}
+            data_list = member_models.get_data_list(
+                member_models.OutOrder,
+                current_page,
+                search_value
+            )
+            data_count = member_models.get_data_count(
+                member_models.OutOrder,
+                search_value
+            )
+        else:
+            data_list = member_models.get_data_list(
+                member_models.OutOrder,
+                current_page,
+            )
+            data_count = member_models.get_data_count(
+                member_models.OutOrder,
+            )
+        for i in data_list:
+            for j in i:
+                if  type(i[j]) is str and i[j].startswith('b'):
+                    i[j] = eval(i[j]).decode()
+        return my_render(
+            request,
+            'member/a_out_order_manage.html',
+            search_value = value,
+            current_page = current_page,
+            filter_args = filter_args,
+            data_list = data_list,
+            data_count = data_count,
+            default_table_head = member_models.OutOrder.default_table_head(),
+        )

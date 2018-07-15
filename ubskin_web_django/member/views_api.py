@@ -206,7 +206,6 @@ def create_recv_addr(request):
         openid = request.COOKIES.get('openid')
         data = json.loads(request.body)
         address = data.get('address')
-        area = data.get('area')
         area_code = data.get('area_code')
         username = data.get('username')
         telephone = data.get('telephone')
@@ -215,7 +214,6 @@ def create_recv_addr(request):
             member_models.RecvAddr,
             {'member_id': member.member_id,
             'address': address,
-            'area': area,
             'area_code': area_code,
             'username': username,
             'telephone': telephone}
@@ -293,7 +291,6 @@ def update_recv_addr(request):
                 recv_addr_id,
                 is_default
             )
-            
         member_models.update_model_data_by_pk(
             member_models.RecvAddr,
             recv_addr_id,
@@ -309,9 +306,13 @@ def get_user_order(request):
         'message': ''
     }
     if request.method == 'GET':
+        order_status = request.GET.get('order_status')
         openid = request.COOKIES.get('openid')
+        current_page = request.GET.get('page', 1)
         member = member_models.Member.get_member_by_wx_openid(openid)
-        data_dict = member_models.UserOrder.get_user_order_by_member_id(member.member_id)
+        data_dict = member_models.UserOrder.get_user_order_by_member_id(
+            member.member_id, current_page, order_status
+        )
         return_value['status'] = 'success'
         return_value['data'] = data_dict
         return JsonResponse(return_value)
@@ -323,7 +324,8 @@ def get_user_order_info(request, order_num):
         'message': ''
     }
     if request.method == 'GET':
-        user_order = member_models.UserOrder.get_user_order_by_order_num(order_num)
+        order_status = request.GET.get('order_status')
+        user_order = member_models.UserOrder.get_user_order_by_order_num(order_num, order_status)
         return_value['status'] = 'success'
         return_value['data'] = user_order
         return JsonResponse(return_value)
