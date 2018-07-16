@@ -237,6 +237,7 @@ class UserOrder(models.Model):
     member_id               = models.BigIntegerField(db_column="member_id", verbose_name="用户ID")
     is_shopping_cart        = models.BooleanField(db_column="is_shupping_cart", verbose_name="是否来自购物车", default=False)
     recv_addr_id            = models.BigIntegerField(db_column="recv_addr", verbose_name="到货地址ID", null=True, blank=True)
+    member_message          = models.CharField(db_column="member_message", verbose_name="用户留言", max_length=1000, null=True, blank=True)
     create_time             = models.IntegerField(db_column="create_time", verbose_name="创建时间", default=int(time.time()))
     status                  = models.CharField(db_column="status", verbose_name="状态", default="normal", max_length=255)
 
@@ -266,6 +267,7 @@ class UserOrder(models.Model):
                 data_dict = {
                     'order_num': i['order_num'],
                     'recv_addr': recv_addr,
+                    'member_message': obj.first()['member_message'],
                     'all_price': 0,
                     'create_time': common.parse_timestamps(obj.first()['create_time']),
                     'order_status': dict(cls.status_choices)[obj.first()['order_status']],
@@ -285,6 +287,7 @@ class UserOrder(models.Model):
             else:
                 return list()
         return data_list
+
     @classmethod
     def get_user_order_by_order_num(cls, order_num, order_status=None):
         if order_status is not None:
@@ -301,6 +304,8 @@ class UserOrder(models.Model):
         )
         data_dict = {
             'order_num': order_num,
+            'member_message': obj.first()['member_message'],
+            'create_time': common.parse_timestamps(obj.first()['create_time']),
             'recv_addr': recv_addr,
             'goods': list()
         }
