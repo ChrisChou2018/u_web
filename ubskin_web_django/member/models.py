@@ -161,14 +161,14 @@ class RecvAddr(models.Model):
                     'member_id',
                 ).annotate(
                     c = Count('member_id'),
-                    )
+                    ).order_by('-pk')
         else:
             data_list = cls.objects.filter(status='normal'). \
                 values(
                     'member_id',
                 ).annotate(
                     c = Count('member_id'),
-                    )
+                    ).order_by('-pk')
         p = Paginator(data_list, 15)
         data_list = p.page(current_page).object_list
         for i in data_list:
@@ -312,15 +312,20 @@ class UserOrder(models.Model):
         data_dict['all_price'] = 0
         for i in obj:
             item = item_models.Items.get_item_by_id(i['item_id'])
-            image_path = common.build_photo_url(item.photo_id, cdn=True)
-            data_dict['goods'].append({
-                'image_path': image_path,
-                'item_name': i['item_name'],
-                'item_count': i['item_count'],
-                'price': i['price'],
-                'order_status': dict(cls.status_choices)[i['order_status']],
-            })
-            data_dict['all_price'] += float(i['price']) * int(i['item_count'])
+            if item:
+                image_path = common.build_photo_url(item.photo_id, cdn=True)
+                data_dict['goods'].append({
+                    'image_path': image_path,
+                    'item_name': i['item_name'],
+                    'item_count': i['item_count'],
+                    'price': i['price'],
+                    'order_status': dict(cls.status_choices)[i['order_status']],
+                })
+                data_dict['all_price'] += float(i['price']) * int(i['item_count'])
+            else:
+                data_dict['goods'].append({
+                    'item_name': '商品已经下架',
+                })
         return data_dict
     
     @classmethod
@@ -332,7 +337,7 @@ class UserOrder(models.Model):
                     'create_time'
                 ).annotate(
                     c = Count('order_num'),
-                    )
+                    ).order_by('-pk')
         else:
             data_list = cls.objects.filter(status='normal'). \
                 values(
@@ -340,7 +345,7 @@ class UserOrder(models.Model):
                     'create_time'
                 ).annotate(
                     c = Count('order_num'),
-                    )
+                    ).order_by('-pk')
         p = Paginator(data_list, 15)
         return p.page(current_page).object_list
     
@@ -368,6 +373,10 @@ class UserOrder(models.Model):
     def has_order_num(cls, order_num):
         obj = cls.objects.filter(order_num=order_num).first()
         return True if obj else False
+    
+    @classmethod
+    def get_user_order_obj_by_order_num(cls, order_num):
+        return cls.objects.filter(order_num=order_num).first()
 
 
     class Meta:

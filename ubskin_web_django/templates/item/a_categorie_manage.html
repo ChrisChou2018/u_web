@@ -55,10 +55,10 @@
                 <div class="media-body">
                     <div class="row">
                         <div class="col-md-10">
-                            类别：{% get_value_by_key categorie_choices i.categorie_type %}
+                            类别：{{ i.categorie_type }}
                         </div>
                         <div class="col-md-2">
-                            <a  href="{% url 'editor_categorie' %}?categorie_id={{i.categorie_id}}&back_url={{request.get_full_path}}" style='cursor:pointer;text-decoration:none;'><span class="glyphicon glyphicon-pencil"></span> 编辑</a>
+                            <a  href="{% url 'editor_categorie' %}?categorie_id={{i.categories_id}}&back_url={{request.get_full_path}}" style='cursor:pointer;text-decoration:none;'><span class="glyphicon glyphicon-pencil"></span> 编辑</a>
                         </div>
                     </div>
                 </div>

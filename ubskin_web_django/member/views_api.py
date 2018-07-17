@@ -370,10 +370,25 @@ def create_user_order(request):
             )
         return_value['status'] = 'success'
         return JsonResponse(return_value)
-        
 
-def success_recv(request):
+@csrf_exempt
+def change_order_status(request):
+    return_value = {
+        'status': 'error',
+        'message': ''
+    }
     if request.method == 'POST':
+        stautus_choices = ('new', 'paid', 'shipped', 'received')
         data = request.body
         data = json.loads(data)
+        order_num = data.get('order_num')
+        order_status = data.get('order_status')
+        user_order = member_models.UserOrder.get_user_order_obj_by_order_num(order_num)
+        if order_status not in stautus_choices:
+            return_value['message'] = '状态参数错误'
+            return JsonResponse(return_value)
+        user_order.order_status = order_status
+        user_order.save()
+        return_value['status'] = 'success'
+        return JsonResponse(return_value)
 

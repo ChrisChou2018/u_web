@@ -378,7 +378,7 @@ def categorie_manage(request):
         current_page = request.GET.get('page', 1)
         value = request.GET.get('search_value', '')
         filter_args = None
-        categorie_choices = dict(item_models.Categories.type_choices)
+        # categorie_choices = dict(item_models.Categories.type_choices)
         if value:
             filter_args = '&search_value={0}'.format(value)
             search_value = {'categorie_name__icontains': value}
@@ -403,7 +403,7 @@ def categorie_manage(request):
             current_page = current_page,
             search_value = value,
             filter_args = filter_args,
-            categorie_choices = categorie_choices,
+            # categorie_choices = categorie_choices,
             categories_list = categories_list,
             categories_count = categories_count,
         )
@@ -463,14 +463,12 @@ def add_categorie(request):
 
 class EditorCategorieForm(forms.ModelForm):
     categorie_name = forms.CharField(error_messages={'required': '不可以为空'})
-    categorie_type = forms.IntegerField(error_messages={'required': '请选择一个所属分类'})
 
     class Meta:
         model = item_models.Categories
         fields = (
             'categorie_name', 'categorie_type',
         )
-
 
     def update(self, categorie_id):
         categorie = self._meta.model
@@ -483,13 +481,13 @@ def editor_categorie(request):
     categorie_id = request.GET.get('categorie_id')
     categorie = item_models.Categories.get_categorie_by_id(categorie_id)
     form_data = model_to_dict(categorie)
-    categorie_choices = dict(item_models.Categories.type_choices)
+    # categorie_choices = dict(item_models.Categories.type_choices)
     if request.method == 'GET':
         return my_render(
             request,
             'item/a_add_categorie.html',
             form_data = form_data,
-            categorie_choices = categorie_choices,
+            # categorie_choices = categorie_choices,
         )
     else:
         form = EditorCategorieForm(request.POST)
@@ -497,8 +495,9 @@ def editor_categorie(request):
             return my_render(
                 request,
                 'item/a_add_categorie.html',
+                form_data = form_data,
                 form_errors = form.errors,
-                categorie_choices = categorie_choices,
+                # categorie_choices = categorie_choices,
             )
         form.update(categorie_id)
         files = request.FILES
