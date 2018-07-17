@@ -34,8 +34,6 @@ def import_item_data(f_path=None):
     )
 
     sh1 = book.sheet_by_index(0)
-    print(sh1.nrows)
-    print(sh1.ncols, len(sh1_key))
     if sh1.ncols != len(sh1_key):
         print(sh1.ncols, len(sh1_key))
         print("Sheet 1 wrong format!(", sh1.ncols, ") exiting...")
