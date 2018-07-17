@@ -161,14 +161,14 @@ class RecvAddr(models.Model):
                     'member_id',
                 ).annotate(
                     c = Count('member_id'),
-                    )
+                    ).order_by('-pk')
         else:
             data_list = cls.objects.filter(status='normal'). \
                 values(
                     'member_id',
                 ).annotate(
                     c = Count('member_id'),
-                    )
+                    ).order_by('-pk')
         p = Paginator(data_list, 15)
         data_list = p.page(current_page).object_list
         for i in data_list:
@@ -332,7 +332,7 @@ class UserOrder(models.Model):
                     'create_time'
                 ).annotate(
                     c = Count('order_num'),
-                    )
+                    ).order_by('-pk')
         else:
             data_list = cls.objects.filter(status='normal'). \
                 values(
@@ -340,7 +340,7 @@ class UserOrder(models.Model):
                     'create_time'
                 ).annotate(
                     c = Count('order_num'),
-                    )
+                    ).order_by('-pk')
         p = Paginator(data_list, 15)
         return p.page(current_page).object_list
     
@@ -368,6 +368,10 @@ class UserOrder(models.Model):
     def has_order_num(cls, order_num):
         obj = cls.objects.filter(order_num=order_num).first()
         return True if obj else False
+    
+    @classmethod
+    def get_user_order_obj_by_order_num(cls, order_num):
+        return cls.objects.filter(order_num=order_num).first()
 
 
     class Meta:

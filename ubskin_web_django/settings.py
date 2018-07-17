@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django_crontab',
     'ubskin_web_django.member',
     'ubskin_web_django.item',
     'ubskin_web_django.global_app',
@@ -147,3 +148,9 @@ MEDIA_URL = "/media/"
 ALLOWED_HOSTS = ['*',]
 
 SERVERHOST = os.getenv("SERVERHOST", "https://store.ubskin.net")
+
+
+CRONJOBS = [
+    # 分 时 天 月 星期
+    ('0 */12 * * *', 'django.core.management.call_command', ['success_recv_item']),
+]
