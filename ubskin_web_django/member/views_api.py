@@ -344,6 +344,7 @@ def create_user_order(request):
         data = json.loads(data)
         recv_addr_id = data.get('recv_addr_id')
         order_info = data.get('order_info')
+        member_message = data.get('member_message')
         order_num = None
         print(data)
         while True:
@@ -360,7 +361,8 @@ def create_user_order(request):
                 'create_time': int(time.time()),
                 'member_id': member.member_id,
                 'recv_addr_id': recv_addr_id,
-                'order_num': order_num
+                'order_num': order_num,
+                'member_message': member_message,
             })
             member_models.create_model_data(
                 member_models.UserOrder,
