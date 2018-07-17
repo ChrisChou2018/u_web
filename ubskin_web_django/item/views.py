@@ -378,7 +378,7 @@ def categorie_manage(request):
         current_page = request.GET.get('page', 1)
         value = request.GET.get('search_value', '')
         filter_args = None
-        categorie_choices = dict(item_models.Categories.type_choices)
+        # categorie_choices = dict(item_models.Categories.type_choices)
         if value:
             filter_args = '&search_value={0}'.format(value)
             search_value = {'categorie_name__icontains': value}
@@ -403,7 +403,7 @@ def categorie_manage(request):
             current_page = current_page,
             search_value = value,
             filter_args = filter_args,
-            categorie_choices = categorie_choices,
+            # categorie_choices = categorie_choices,
             categories_list = categories_list,
             categories_count = categories_count,
         )

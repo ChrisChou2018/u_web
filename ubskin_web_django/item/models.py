@@ -57,7 +57,7 @@ class Items(models.Model):
     item_id                     = models.AutoField(db_column="item_id", primary_key=True, verbose_name='商品ID')
     item_name                   = models.CharField(db_column="item_name", verbose_name='商品名称', max_length=255)
     item_info                   = models.CharField(db_column="item_info", null=True, blank=True, verbose_name='商品信息', max_length=255)
-    item_code                   = models.CharField(db_column="item_code", null=True, blank=True, verbose_name="商品编码", max_length=255, unique=True)
+    item_code                   = models.CharField(db_column="item_code", null=True, blank=True, verbose_name="商品编码", max_length=255)
     item_barcode                = models.CharField(db_column="item_barcode", null=True, blank=True, verbose_name="商品条码", max_length=255, unique=True)
     price                       = models.FloatField(db_column="price", null=True, blank=True, verbose_name="商品售价")
     current_price               = models.FloatField(db_column='current_price', null=True, blank=True, verbose_name="批发价")
@@ -78,7 +78,9 @@ class Items(models.Model):
         (4, '支'),
         (5, '袋'),
         (6, '对'),
-        (7, '盒')
+        (7, '盒'),
+        (8, '个'),
+        (9, '罐'),
     )
     specifications_type_id      = models.SmallIntegerField(db_column="specifications_type_id", choices=specifications_type_choices, null=True, blank=True, verbose_name="单位类型")
     specifications_type         = models.CharField(db_column="specifications_type", null=True, blank=True, verbose_name="单位", max_length=255)
@@ -273,31 +275,25 @@ class Categories(models.Model):
     '''
     商品分类表
     '''
-    categorie_id    = models.AutoField(db_column="categorie_id", verbose_name="分类ID", primary_key=True)
+    categories_id    = models.AutoField(db_column="categories_id", verbose_name="分类ID", primary_key=True)
     categorie_name  = models.CharField(db_column="categorie_name", verbose_name="分类名", max_length=255)
-    type_choices    = (
-        (0, '功效专区'),
-        (1, '基础护理'),
-        (2, '个性彩妆'),
-        (3, '营养保健')
-    )
-    categorie_type  = models.SmallIntegerField(db_column="categorie_type", choices=type_choices, null=True, verbose_name="类别")
+    categorie_type  = models.CharField(db_column="categorie_type", null=True, blank=True, verbose_name="类别", max_length=255)
     photo_id        = models.CharField(db_column="photo_id", null=True, blank=True, verbose_name="缩略图路径", max_length=255)
     status          = models.CharField(db_column="status", verbose_name="状态", default="normal", max_length=255)
 
 
     @classmethod
     def get_categoreis_dict_for_all(cls):
-        all_obj =  cls.objects.all().values_list("categorie_id", "categorie_name")
+        all_obj =  cls.objects.all().values_list("categories_id", "categorie_name")
         return dict(all_obj)
 
     @classmethod
     def get_list_categories(cls, current_page, search_value=None):
         if search_value:
             obj = cls.objects.filter(**search_value). \
-                order_by('-categorie_id')
+                order_by('-pk')
         else:
-            obj = cls.objects.all().order_by('-categorie_id')
+            obj = cls.objects.all().order_by('-pk')
         
         p = Paginator(obj, 15)
         return p.page(current_page).object_list.values() 

@@ -154,3 +154,7 @@ CRONJOBS = [
     # 分 时 天 月 星期
     ('0 */12 * * *', 'django.core.management.call_command', ['success_recv_item']),
 ]
+
+FIXTURE_DIRS = (
+   os.path.join(BASE_DIR, 'ubskin_web_django/member/fixtures'),
+)
