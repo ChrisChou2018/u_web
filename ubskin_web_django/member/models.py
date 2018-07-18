@@ -229,9 +229,10 @@ class UserOrder(models.Model):
     price                   = models.FloatField(db_column="price", verbose_name="商品单价")
     status_choices = (
         ('new', '等待支付订单'),
-        ('paid', '等待发货（已经支付）'),
-        ('shipped', '等待收货（已经支付）'),
-        ('received', '确认收货（已经支付）'),
+        ('paid', '等待发货'),
+        ('shipped', '等待收货'),
+        ('received', '确认收货'),
+        ('close', '订单关闭'),
     )
     order_status            = models.CharField(db_column="order_status", verbose_name="订单状态", choices=status_choices, default="new", max_length=255)
     member_id               = models.BigIntegerField(db_column="member_id", verbose_name="用户ID")
@@ -239,6 +240,7 @@ class UserOrder(models.Model):
     recv_addr_id            = models.BigIntegerField(db_column="recv_addr", verbose_name="到货地址ID", null=True, blank=True)
     member_message          = models.CharField(db_column="member_message", verbose_name="用户留言", max_length=1000, null=True, blank=True)
     create_time             = models.IntegerField(db_column="create_time", verbose_name="创建时间", default=int(time.time()))
+    pay_time                = models.IntegerField(db_column="pay_time", verbose_name="支付时间", null=True, blank=True)
     status                  = models.CharField(db_column="status", verbose_name="状态", default="normal", max_length=255)
 
 
@@ -289,6 +291,47 @@ class UserOrder(models.Model):
         return data_list
 
     @classmethod
+    def get_user_order_list(cls, current_page, search_value=None):
+        data_list =  get_data_list(cls, current_page, search_value=search_value)
+        data_list = data_list.values('order_num').annotate(c = Count('order_num'))
+        my_list = list()
+        for i in data_list:
+            order_num = i['order_num']
+            obj = cls.objects.filter(order_num=order_num, status = "normal").values()
+            if obj:
+                recv_addr = get_model_dict_by_pk(
+                        RecvAddr,
+                        obj.first()['recv_addr_id']
+                )
+                data_dict = {
+                    'member_id': obj.first()['member_id'],
+                    'order_num': i['order_num'],
+                    'recv_addr': recv_addr,
+                    'member_message': obj.first()['member_message'],
+                    'all_price': 0,
+                    'create_time': common.parse_timestamps(obj.first()['create_time']),
+                    'order_status': dict(cls.status_choices)[obj.first()['order_status']],
+                    'goods': list()
+                }
+                for j in obj:
+                    item = item_models.Items.get_item_by_id(j['item_id'])
+                    photo_id = item.photo_id if item else None
+                    image_path = common.build_photo_url(photo_id, cdn=True)
+                    data_dict['goods'].append({
+                        'image_path': image_path,
+                        'item_name': j['item_name'],
+                        'item_count': j['item_count'],
+                        'price': j['price'],
+                    })
+                    data_dict['all_price'] += float(j['price']) * int(j['item_count'])
+                my_list.append(data_dict)
+            else:
+                return list()
+        return my_list
+        
+
+
+    @classmethod
     def get_user_order_by_order_num(cls, order_num, order_status=None):
         if order_status is not None:
             obj = cls.objects.filter(
@@ -324,8 +367,12 @@ class UserOrder(models.Model):
                 data_dict['all_price'] += float(i['price']) * int(i['item_count'])
             else:
                 data_dict['goods'].append({
-                    'item_name': '商品已经下架',
+                    'item_name': i['item_name'] + '（商品已经下架）',
+                    'item_count': i['item_count'],
+                    'price': i['price'],
+                    'order_status': dict(cls.status_choices)[i['order_status']],
                 })
+                data_dict['all_price'] += float(i['price']) * int(i['item_count'])
         return data_dict
     
     @classmethod

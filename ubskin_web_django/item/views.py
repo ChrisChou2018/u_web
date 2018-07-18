@@ -138,16 +138,18 @@ class EditorItemForm(forms.Form):
     def clean_item_code(self):
         item_code = self.cleaned_data['item_code']
         item_id = self.cleaned_data['item_id']
-        if item_models.Items.has_exist_item_code(item_code, item_id):
-            raise forms.ValidationError("当前商品编码已经存在")
-        return item_code
+        if item_code:
+            if item_models.Items.has_exist_item_code(item_code, item_id):
+                raise forms.ValidationError("当前商品编码已经存在")
+            return item_code
     
     def clean_item_barcode(self):
         item_barcode = self.cleaned_data['item_barcode']
         item_id = self.cleaned_data['item_id']
-        if item_models.Items.has_exist_item_barcode(item_barcode, item_id):
-            raise forms.ValidationError("当前商品条码已经存在")
-        return item_barcode
+        if item_barcode:
+            if item_models.Items.has_exist_item_barcode(item_barcode, item_id):
+                raise forms.ValidationError("当前商品条码已经存在")
+            return item_barcode
 
     def update(self, item_id, request=None):
         item = item_models.Items
@@ -525,7 +527,7 @@ def item_comment_manage(request):
             item_id = item_models.Items.get_item_id_by_item_name(value)
             search_value = None
             if item_id:
-                search_value = {'item_id': item_id}
+                search_value = {'item_id__in': item_id}
             item_comments_list = item_models.ItemComments. \
                 get_item_comments_list(current_page, search_value)
             count = item_models.ItemComments. \

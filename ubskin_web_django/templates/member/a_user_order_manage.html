@@ -1,6 +1,7 @@
 {% extends '../a_layout.html' %}
 {% load ui_method %}
 {% block css %}
+<link rel="stylesheet" href="/static/css/myadmin/daterangepicker.css">
 <style>
     table{
     table-layout:auto;
@@ -27,67 +28,113 @@
 
 {% block content_title %}
 
-<div class="row">
-    <div class="col-md-8">
-        <div "row">
-            <div class="col-md-8">
-                <form action="" method="GET" class="search_input">
-                <div class="input-group">
-                    <input type="text" class="form-control" placeholder="搜索订单号" name="search_value" value="{{ search_value }}">
-                    <span class="input-group-btn">
-                        <button class="btn btn-default search_input_btn" type="submit">搜索</button>
-                    </span>
-                  </div><!-- /input-group -->
-                </form>
+<form action="" method="GET" class="filter_form">
+    <div class="row">
+        <div class="col-md-8">
+            <div "row">
+                <div class="col-md-3" style="padding-right: 0">
+                    <select name="datetime_typpe" id="" class="form-control">
+                        <option value="">按创建时间</option>
+                        <option value="">按支付时间</option>
+                    </select>
+                </div>
+                <div class="col-md-6" style="padding-left: 0">
+                    <!-- <div class="input-group"> -->
+                        <input type="datetime" class="form-control datetime" name="datetime">
+                        <!-- <span class="input-group-btn">
+                            <button class="btn btn-default" type="submit">过滤</button>
+                        </span> -->
+                    <!-- </div> -->
+                </div>
             </div>
-            <div class="col-md-4">
-
+        </div>
+        <div class="col-md-4">     
+        <div class="input-group">
+            <input type="text" class="form-control" placeholder="搜索订单号" name="search_value" value="{{ from_data.search_value }}">
+            <span class="input-group-btn">
+                <button class="btn btn-default search_input_btn" type="submit">搜索</button>
+            </span>
+        </div><!-- /input-group -->
+        </div>
+    </div>
+    <div "row">
+        <!-- 更多过滤条件 -->
+        <br>
+        <br>
+        <div class="col-md-6">
+            <div class="row">
+                <div class="col-md-4" style="padding-right: 0">
+                    <select name="order_status" class="form-control filter_select">
+                        <option value="">订单状态</option>
+                        {% for i in order_status %}
+                            {% if i.0 == from_data.order_status %}
+                                <option value="{{ i.0 }}" selected>{{ i.1 }}</option>
+                            {% else %}
+                                <option value="{{ i.0 }}">{{ i.1 }}</option>
+                            {% endif %}
+                        {% endfor %}
+                    </select>
+                </div>
+                <!-- <div class="col-md-4" style="padding-right: 0">
+                    <select name="order_status" class="form-control">
+                        <option value="new">支付状态</option>
+                    </select>
+                </div> -->
             </div>
         </div>
     </div>
-    <!-- <div class="col-md-4">
-        <a type="button" class="btn btn-info add_member_btn" type="button" href="{% url 'stock_batch' %}" >开始扫码出库 <span class="glyphicon glyphicon-plus"></span></a>
-    </div> -->
-</div>
+</form>
 {% endblock %}
 
 {% block content %}
 
     <div class="row" style="padding: 15px">
     <div class="col-md-12" role="main" >
-    
+        
     <div class="bs-docs-section">
-        <div class="table-responsive">
-            <table class="table table-bordered table-striped">
-                <colgroup>
-                <col class="col-xs-1">
-                <col class="col-xs-1">
-                <col class="col-xs-1">
-                <col class="col-xs-1">
-                <col class="col-xs-1">
-                </colgroup>
-                <thead>
-                <tr>
-                    <th>订单号</th>
-                    <th>用户ID</th>
-                    <th>订单状态</th>
-                    <th>创建时间</th>
-                    <th>操作</th>
-                </tr>
-                </thead>
-                <tbody>
-                {% for data in data_list %}
-                <tr>
-                    <th scope="row">{{ data.order_num }}</th>
-                    <td>{{ data.member_id }}</td>
-                    <td>{{ data.order_status }}</td>
-                    <td>{% parse_timestamps data.create_time %}</td>
-                    <td><a href="#modalItemCodes" data-toggle="modal" data-target="#modalItemCodes" data-ordernum="{{ data.order_num }}">详情</a></td>
-                </tr>
-                {% endfor %}
-                </tbody>
-            </table>
+        {% for i in data_list %}
+        <div class="panel panel-success categories_list">
+            <div class="panel-heading"><input type="checkbox" class="item_checkbox" item-id={{i.categorie_id}}>订单号:{{i.order_num}}  <span style="padding-left: 30px">下单时间:{{i.create_time}}</span><span style="padding-left: 30px">客户:{{i.member_id}}</span></div>
+            <div class="panel-body">
+                <div class="media-left">
+                    <!-- <a href="#">
+                        <img class="media-object" src="{% build_photo_url i.photo_id %}" style="width: 100px; height: 100px;">
+                    </a> -->
+                </div>
+                <div class="media-body">
+                    <div class="row">
+                        <div class="col-md-1"></div>
+                        <div class="col-md-5">
+                            包裹信息
+                            <br>
+                            {% for j in i.goods %}
+                                <div style="">
+                                </div>
+                                <div class="row">
+                                    {{j.item_name}}
+                                </div>
+                                <div class="row">
+                                    <span style="color: darkgray;font-size: 12px">数量：{{j.item_count}} 单价：{{j.price}}</span>
+                                </div>
+                                
+                            {% endfor %}
+                        </div>
+                        <div class="col-md-2">
+                            {{i.all_price}}
+                        </div>
+                        <div class="col-md-2">
+                            <br>
+                            {{ i.order_status }}
+                        </div>
+                        <div class="col-md-2">
+                            <a  href="{% url 'editor_categorie' %}?categorie_id={{i.categorie_id}}&back_url={{request.get_full_path}}" style='cursor:pointer;text-decoration:none;'><span class="glyphicon glyphicon-pencil"></span> 编辑</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
+        {% endfor %}
+        
     </div>
 
     <div id="modalItemCodes" class="modal fade" tabindex="-1" role="dialog">
@@ -97,7 +144,7 @@
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
                 <h4 class="modal-title">订单信息</h4>
             </div>
-            <div class="modal-body" id="id_modal_body">
+            <div class="modal-body" id="id_modal_body" style="overflow: auto">
                 <p><i class="fa fa-refresh fa-spin" style="font-size: 24px;"></i></p>
             </div>
             <div class="modal-footer">
@@ -121,6 +168,7 @@
 {% endblock %}
 
 {% block js %}
+    <script src="/static/js/myadmin/daterangepicker.js"></script>
     <script>
         $(function(){
             $('.user_order_manage').addClass('active')
@@ -131,12 +179,38 @@
                     if (status == "error") {
                         $('#id_modal_body').html('<p>加载数据时出错, 请稍后再试</p>');
                         return;
-                    }
+                    };
                 });
-            });  
+            });
+            $('.datetime').daterangepicker({
+                locale : {  
+                        applyLabel : '确定',  
+                        cancelLabel : '取消',  
+                        fromLabel : '起始时间',  
+                        toLabel : '结束时间',  
+                        customRangeLabel : '自定义',  
+                        daysOfWeek : [ '日', '一', '二', '三', '四', '五', '六' ],  
+                        monthNames : [ '一月', '二月', '三月', '四月', '五月', '六月',  
+                                    '七月', '八月', '九月', '十月', '十一月', '十二月' ],  
+                        firstDay : 1  
+                },
+            });
+            var datevalue = '{{from_data.datetime}}'
+            if(datevalue){ 
+                datevalue = datevalue.split(' - ')
+                $('.datetime').data('daterangepicker').setStartDate(datevalue[0])
+                $('.datetime').data('daterangepicker').setEndDate(datevalue[1])
+            }
+            $('.filter_form .filter_select').change(
+                function(){
+                    $('.filter_form').submit()
+                }
+            )
+            $('.filter_form .datetime').change(
+                function(){
+                    $('.filter_form').submit()
+                }
+            )
         })
-        
- 
-
     </script>
 {% endblock %}

@@ -58,7 +58,7 @@ class Items(models.Model):
     item_name                   = models.CharField(db_column="item_name", verbose_name='商品名称', max_length=255)
     item_info                   = models.CharField(db_column="item_info", null=True, blank=True, verbose_name='商品信息', max_length=255)
     item_code                   = models.CharField(db_column="item_code", null=True, blank=True, verbose_name="商品编码", max_length=255)
-    item_barcode                = models.CharField(db_column="item_barcode", null=True, blank=True, verbose_name="商品条码", max_length=255, unique=True)
+    item_barcode                = models.CharField(db_column="item_barcode", null=True, blank=True, verbose_name="商品条码", max_length=255)
     price                       = models.FloatField(db_column="price", null=True, blank=True, verbose_name="商品售价")
     current_price               = models.FloatField(db_column='current_price', null=True, blank=True, verbose_name="批发价")
     original_price              = models.FloatField(db_column='original_price', null=True, blank=True, verbose_name="参考价")
@@ -93,7 +93,7 @@ class Items(models.Model):
     create_time                 = models.IntegerField(db_column="create_time", verbose_name="创建时间", default=int(time.time()))
     update_person               = models.CharField(db_column="update_person", null=True, blank=True, verbose_name="更新人", max_length=255)
     update_time                 = models.IntegerField(db_column="update_time", verbose_name="更新时间", default=int(time.time()))
-    stock_count                 = models.IntegerField(db_column="stock_count", verbose_name="库存", default=0)
+    stock_count                 = models.IntegerField(db_column="stock_count", verbose_name="库存", default=0, null=True, blank=True)
     status                      = models.CharField(db_column="status", verbose_name="状态", default="normal", max_length=255)
     photo_id                    = models.CharField(db_column="photo_id", verbose_name="图片名", max_length=255, null=True, blank=True)
     
@@ -119,10 +119,12 @@ class Items(models.Model):
 
     @classmethod
     def get_item_id_by_item_name(cls, item_name):
-        try:
-            return cls.objects.get(item_name__icontains = item_name).item_id
-        except cls.DoesNotExist:
-            return None
+        l = cls.objects.filter(item_name__icontains = item_name).values_list('item_id')
+        if l:
+            l = [i[0] for i in l]
+            return l
+        else:
+            return []
     
     @classmethod
     def get_items_list_for_api(cls, current_page):
@@ -156,26 +158,24 @@ class Items(models.Model):
     
     @classmethod
     def get_item_name_by_barcode(cls, item_barcode):
-        try:
-            return cls.objects.get(item_barcode=item_barcode).item_name
-        except cls.DoesNotExist:
+        obj = cls.objects.filter(item_barcode=item_barcode).first()
+        if obj:
+            return obj.item_name
+        else:
             return None
     
     @classmethod
     def get_item_obj_by_barcode(cls, item_barcode):
-        try:
-            return cls.objects.filter(item_barcode=item_barcode)
-        except cls.DoesNotExist:
-            return None
-    
+        return cls.objects.filter(item_barcode=item_barcode)
+
     @classmethod
     def get_item_dict_by_item_barcode(cls, item_barcode):
-        try:
-            model = cls.objects.get(item_barcode=item_barcode)
+        model = cls.objects.filter(item_barcode=item_barcode).first()
+        if model:
             return model_to_dict(model)
-        except cls.DoesNotExist:
-            return None
-    
+        else:
+            return {}
+
     @classmethod
     def get_item_dict_by_barcode_api(cls, item_barcode):
         data_dict = dict()
@@ -185,32 +185,29 @@ class Items(models.Model):
         model = model_to_dict(model)
         data_dict['item_name'] = model.get('item_name')
         data_dict['specifications_type'] = model.get('capacity') if model.get('capacity') else '无规格信息'
-        data_dict['thumbicon'] = common.build_photo_url(model.get('photo_id'))
+        data_dict['thumbicon'] = common.build_photo_url(model.get('photo_id'), cdn=True)
         data_dict['item_barcode'] = model.get('item_barcode')
         return data_dict
-        
-    
+
     @classmethod
     def has_exist_item_code(cls, item_code, item_id):
-        try:
-            obj = cls.objects.get(item_code=item_code)
-            if item_id != obj.item_id:
-                return True
-        except cls.DoesNotExist:
+        obj = cls.objects.filter(item_code=item_code).first()
+        if obj and item_id != obj.item_id:
+            return True
+        else:
             return False
     @classmethod
     def has_exist_item_barcode(cls, item_barcode, item_id):
-        try:
-            obj = cls.objects.get(item_barcode=item_barcode)
-            if item_id != obj.item_id:
-                return True
-        except cls.DoesNotExist:
+        obj = cls.objects.filter(item_barcode=item_barcode).first()
+        if obj and item_id != obj.item_id:
+            return True
+        else:
             return False
 
 
     class Meta:
         db_table = "items"
-    
+
 
 class ItemImages(models.Model):
     '''
@@ -240,7 +237,6 @@ class ItemImages(models.Model):
         image_obj = cls.objects.filter(item_id=item_id, status = "normal", image_type=1).values().first()
         return image_obj
         
-
     @classmethod
     def create_item_image(cls, datas):
         cls.objects.create(**datas)
