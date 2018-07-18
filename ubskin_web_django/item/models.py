@@ -119,10 +119,12 @@ class Items(models.Model):
 
     @classmethod
     def get_item_id_by_item_name(cls, item_name):
-        try:
-            return cls.objects.get(item_name__icontains = item_name).item_id
-        except cls.DoesNotExist:
-            return None
+        l = cls.objects.filter(item_name__icontains = item_name).values_list('item_id')
+        if l:
+            l = [i[0] for i in l]
+            return l
+        else:
+            return []
     
     @classmethod
     def get_items_list_for_api(cls, current_page):
@@ -156,26 +158,20 @@ class Items(models.Model):
     
     @classmethod
     def get_item_name_by_barcode(cls, item_barcode):
-        try:
-            return cls.objects.get(item_barcode=item_barcode).item_name
-        except cls.DoesNotExist:
-            return None
+        return cls.objects.filter(item_barcode=item_barcode).first().item_name
     
     @classmethod
     def get_item_obj_by_barcode(cls, item_barcode):
-        try:
-            return cls.objects.filter(item_barcode=item_barcode)
-        except cls.DoesNotExist:
-            return None
+        return cls.objects.filter(item_barcode=item_barcode)
+        
     
     @classmethod
     def get_item_dict_by_item_barcode(cls, item_barcode):
-        try:
-            model = cls.objects.get(item_barcode=item_barcode)
+        model = cls.objects.filter(item_barcode=item_barcode).first()
+        if model:
             return model_to_dict(model)
-        except cls.DoesNotExist:
-            return None
-    
+        else:
+            return {}
     @classmethod
     def get_item_dict_by_barcode_api(cls, item_barcode):
         data_dict = dict()

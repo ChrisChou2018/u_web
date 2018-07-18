@@ -527,7 +527,7 @@ def item_comment_manage(request):
             item_id = item_models.Items.get_item_id_by_item_name(value)
             search_value = None
             if item_id:
-                search_value = {'item_id': item_id}
+                search_value = {'item_id__in': item_id}
             item_comments_list = item_models.ItemComments. \
                 get_item_comments_list(current_page, search_value)
             count = item_models.ItemComments. \
