@@ -1,6 +1,7 @@
 {% extends '../a_layout.html' %}
 {% load ui_method %}
 {% block css %}
+<link rel="stylesheet" href="/static/css/myadmin/daterangepicker.css">
 <style>
     table{
     table-layout:auto;
@@ -30,24 +31,29 @@
 <div class="row">
     <div class="col-md-8">
         <div "row">
-            <div class="col-md-8">
-                <form action="" method="GET" class="search_input">
+            <div class="col-md-5">
+            <form action="" method="GET" class="search_input">
                 <div class="input-group">
-                    <input type="text" class="form-control" placeholder="搜索订单号" name="search_value" value="{{ search_value }}">
+                    <input type="datetime" class="form-control datetime" name="datetime">
                     <span class="input-group-btn">
-                        <button class="btn btn-default search_input_btn" type="submit">搜索</button>
+                        <button class="btn btn-default" type="submit">过滤</button>
                     </span>
-                  </div><!-- /input-group -->
-                </form>
+                </div>
+            </form>
             </div>
-            <div class="col-md-4">
-
-            </div>
+            
         </div>
     </div>
-    <!-- <div class="col-md-4">
-        <a type="button" class="btn btn-info add_member_btn" type="button" href="{% url 'stock_batch' %}" >开始扫码出库 <span class="glyphicon glyphicon-plus"></span></a>
-    </div> -->
+    <div class="col-md-4">     
+        <form action="" method="GET" class="search_input">
+        <div class="input-group">
+            <input type="text" class="form-control" placeholder="搜索订单号" name="search_value" value="{{ search_value }}">
+            <span class="input-group-btn">
+                <button class="btn btn-default search_input_btn" type="submit">搜索</button>
+            </span>
+            </div><!-- /input-group -->
+        </form>   
+    </div>
 </div>
 {% endblock %}
 
@@ -121,6 +127,7 @@
 {% endblock %}
 
 {% block js %}
+    <script src="/static/js/myadmin/daterangepicker.js"></script>
     <script>
         $(function(){
             $('.user_order_manage').addClass('active')
@@ -131,12 +138,22 @@
                     if (status == "error") {
                         $('#id_modal_body').html('<p>加载数据时出错, 请稍后再试</p>');
                         return;
-                    }
+                    };
                 });
-            });  
+            });
+            $('.datetime').daterangepicker({
+                locale : {  
+                        applyLabel : '确定',  
+                        cancelLabel : '取消',  
+                        fromLabel : '起始时间',  
+                        toLabel : '结束时间',  
+                        customRangeLabel : '自定义',  
+                        daysOfWeek : [ '日', '一', '二', '三', '四', '五', '六' ],  
+                        monthNames : [ '一月', '二月', '三月', '四月', '五月', '六月',  
+                                    '七月', '八月', '九月', '十月', '十一月', '十二月' ],  
+                        firstDay : 1  
+                },
+            });
         })
-        
- 
-
     </script>
 {% endblock %}

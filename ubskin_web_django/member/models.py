@@ -239,6 +239,7 @@ class UserOrder(models.Model):
     recv_addr_id            = models.BigIntegerField(db_column="recv_addr", verbose_name="到货地址ID", null=True, blank=True)
     member_message          = models.CharField(db_column="member_message", verbose_name="用户留言", max_length=1000, null=True, blank=True)
     create_time             = models.IntegerField(db_column="create_time", verbose_name="创建时间", default=int(time.time()))
+    pay_time                = models.IntegerField(db_column="pay_time", verbose_name="支付时间", null=True, blank=True)
     status                  = models.CharField(db_column="status", verbose_name="状态", default="normal", max_length=255)
 
 

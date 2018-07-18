@@ -181,7 +181,7 @@ class Items(models.Model):
         model = model_to_dict(model)
         data_dict['item_name'] = model.get('item_name')
         data_dict['specifications_type'] = model.get('capacity') if model.get('capacity') else '无规格信息'
-        data_dict['thumbicon'] = common.build_photo_url(model.get('photo_id'))
+        data_dict['thumbicon'] = common.build_photo_url(model.get('photo_id'), cdn=True)
         data_dict['item_barcode'] = model.get('item_barcode')
         return data_dict
         
