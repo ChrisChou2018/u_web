@@ -92,37 +92,49 @@
     <div class="col-md-12" role="main" >
         
     <div class="bs-docs-section">
-        <div class="table-responsive">
-            <table class="table table-bordered table-striped">
-                <colgroup>
-                <col class="col-xs-1">
-                <col class="col-xs-1">
-                <col class="col-xs-1">
-                <col class="col-xs-1">
-                <col class="col-xs-1">
-                </colgroup>
-                <thead>
-                <tr>
-                    <th>订单号</th>
-                    <th>用户ID</th>
-                    <th>订单状态</th>
-                    <th>创建时间</th>
-                    <th>操作</th>
-                </tr>
-                </thead>
-                <tbody>
-                {% for data in data_list %}
-                <tr>
-                    <th scope="row">{{ data.order_num }}</th>
-                    <td>{{ data.member_id }}</td>
-                    <td>{{ data.order_status }}</td>
-                    <td>{% parse_timestamps data.create_time %}</td>
-                    <td><a href="#modalItemCodes" data-toggle="modal" data-target="#modalItemCodes" data-ordernum="{{ data.order_num }}">详情</a></td>
-                </tr>
-                {% endfor %}
-                </tbody>
-            </table>
+        {% for i in data_list %}
+        <div class="panel panel-success categories_list">
+            <div class="panel-heading"><input type="checkbox" class="item_checkbox" item-id={{i.categorie_id}}>订单号:{{i.order_num}}  <span style="padding-left: 30px">下单时间:{{i.create_time}}</span><span style="padding-left: 30px">客户:{{i.member_id}}</span></div>
+            <div class="panel-body">
+                <div class="media-left">
+                    <!-- <a href="#">
+                        <img class="media-object" src="{% build_photo_url i.photo_id %}" style="width: 100px; height: 100px;">
+                    </a> -->
+                </div>
+                <div class="media-body">
+                    <div class="row">
+                        <div class="col-md-1"></div>
+                        <div class="col-md-5">
+                            包裹信息
+                            <br>
+                            {% for j in i.goods %}
+                                <div style="">
+                                </div>
+                                <div class="row">
+                                    {{j.item_name}}
+                                </div>
+                                <div class="row">
+                                    <span style="color: darkgray;font-size: 12px">数量：{{j.item_count}} 单价：{{j.price}}</span>
+                                </div>
+                                
+                            {% endfor %}
+                        </div>
+                        <div class="col-md-2">
+                            {{i.all_price}}
+                        </div>
+                        <div class="col-md-2">
+                            <br>
+                            {{ i.order_status }}
+                        </div>
+                        <div class="col-md-2">
+                            <a  href="{% url 'editor_categorie' %}?categorie_id={{i.categorie_id}}&back_url={{request.get_full_path}}" style='cursor:pointer;text-decoration:none;'><span class="glyphicon glyphicon-pencil"></span> 编辑</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
+        {% endfor %}
+        
     </div>
 
     <div id="modalItemCodes" class="modal fade" tabindex="-1" role="dialog">

@@ -188,7 +188,7 @@ def user_order_manage(request):
             if len(filter_args) == 1:
                 filter_args = None
         if search_value:
-            data_list = member_models.UserOrder.get_user_order_data_list(
+            data_list = member_models.UserOrder.get_user_order_list(
                 current_page,
                 search_value
             )
@@ -196,13 +196,12 @@ def user_order_manage(request):
                 get_user_order_count(search_value)
         else:
             data_list = member_models.UserOrder. \
-                get_user_order_data_list(current_page)
+                get_user_order_list(current_page)
             data_count = member_models.UserOrder.get_user_order_count()
         order_status = member_models.UserOrder.status_choices
         for i in data_list:
             member = member_models.Member.get_member_by_id(i['member_id'])
             i['member_id'] = member.member_name if member else '无此用户'
-            i['order_status'] = dict(order_status)[i['order_status']]
         return my_render(
             request,
             'member/a_user_order_manage.html',

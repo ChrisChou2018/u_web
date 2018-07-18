@@ -291,6 +291,47 @@ class UserOrder(models.Model):
         return data_list
 
     @classmethod
+    def get_user_order_list(cls, current_page, search_value=None):
+        data_list =  get_data_list(cls, current_page, search_value=search_value)
+        data_list = data_list.values('order_num').annotate(c = Count('order_num'))
+        my_list = list()
+        for i in data_list:
+            order_num = i['order_num']
+            obj = cls.objects.filter(order_num=order_num, status = "normal").values()
+            if obj:
+                recv_addr = get_model_dict_by_pk(
+                        RecvAddr,
+                        obj.first()['recv_addr_id']
+                )
+                data_dict = {
+                    'member_id': obj.first()['member_id'],
+                    'order_num': i['order_num'],
+                    'recv_addr': recv_addr,
+                    'member_message': obj.first()['member_message'],
+                    'all_price': 0,
+                    'create_time': common.parse_timestamps(obj.first()['create_time']),
+                    'order_status': dict(cls.status_choices)[obj.first()['order_status']],
+                    'goods': list()
+                }
+                for j in obj:
+                    item = item_models.Items.get_item_by_id(j['item_id'])
+                    photo_id = item.photo_id if item else None
+                    image_path = common.build_photo_url(photo_id, cdn=True)
+                    data_dict['goods'].append({
+                        'image_path': image_path,
+                        'item_name': j['item_name'],
+                        'item_count': j['item_count'],
+                        'price': j['price'],
+                    })
+                    data_dict['all_price'] += float(j['price']) * int(j['item_count'])
+                my_list.append(data_dict)
+            else:
+                return list()
+        return my_list
+        
+
+
+    @classmethod
     def get_user_order_by_order_num(cls, order_num, order_status=None):
         if order_status is not None:
             obj = cls.objects.filter(
