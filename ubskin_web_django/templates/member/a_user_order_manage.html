@@ -38,7 +38,7 @@
                         <option value="">按支付时间</option>
                     </select>
                 </div>
-                <div class="col-md-5" style="padding-left: 0">
+                <div class="col-md-6" style="padding-left: 0">
                     <div class="input-group">
                         <input type="datetime" class="form-control datetime" name="datetime">
                         <span class="input-group-btn">
@@ -63,14 +63,19 @@
 <div "row">
     <!-- 更多过滤条件 -->
     <br>
+    <br>
     <div class="col-md-6">
         <div class="row">
-            <form action="">
+            <form action="" class="filter_select">
                 <div class="col-md-4" style="padding-right: 0">
                     <select name="order_status" class="form-control">
                         <option value="">订单状态</option>
                         {% for i in order_status %}
-                        <option value="{{ i.0 }}">{{ i.1 }}</option>
+                            {% if i.0 == from_data.order_status %}
+                                <option value="{{ i.0 }}" selected>{{ i.1 }}</option>
+                            {% else %}
+                                <option value="{{ i.0 }}">{{ i.1 }}</option>
+                            {% endif %}
                         {% endfor %}
                     </select>
                 </div>
@@ -183,12 +188,17 @@
                         firstDay : 1  
                 },
             });
-            if($('.datetime').val()){
-                let datevalue = '{{ from_data.datetime }}'
+            var datevalue = '{{from_data.datetime}}'
+            if(datevalue){ 
                 datevalue = datevalue.split(' - ')
                 $('.datetime').data('daterangepicker').setStartDate(datevalue[0])
                 $('.datetime').data('daterangepicker').setEndDate(datevalue[1])
             }
+            $('.filter_select select').change(
+                function(){
+                    $('.filter_select').submit()
+                }
+            )
         })
     </script>
 {% endblock %}

@@ -165,18 +165,16 @@ def user_order_manage(request):
     # '07/18/2018', '07/18/2018
     if request.method == 'GET':
         GET = request.GET.get
-        filter_args_list = [
-            'search_value', 'datetime',
-        ]
         filter_args_dict = {
             'search_value': 'order_num__icontains',
-            'datetime': 'create_time__range'
+            'datetime': 'create_time__range',
+            'order_status': 'order_status',
         }
         current_page = GET('page', 1)
         filter_args = '&'
         search_value = dict()
         from_data = dict()
-        for i in filter_args_list:
+        for i in filter_args_dict:
             value = GET(i)
             if value:
                 if i == 'datetime':
@@ -204,10 +202,15 @@ def user_order_manage(request):
             data_list = member_models.UserOrder. \
                 get_user_order_data_list(current_page)
             data_count = member_models.UserOrder.get_user_order_count()
+        order_status = member_models.UserOrder.status_choices
+        for i in data_list:
+            member = member_models.Member.get_member_by_id(i['member_id'])
+            i['member_id'] = member.member_name if member else '无此用户'
+            i['order_status'] = dict(order_status)[i['order_status']]
         return my_render(
             request,
             'member/a_user_order_manage.html',
-            order_status = member_models.UserOrder.status_choices,
+            order_status = order_status,
             current_page = current_page,
             filter_args = filter_args,
             data_list = data_list,
