@@ -173,21 +173,17 @@ def user_order_manage(request):
         current_page = GET('page', 1)
         filter_args = '&'
         search_value = dict()
-        from_data = dict()
         for i in filter_args_dict:
             value = GET(i)
             if value:
                 if i == 'datetime':
                     start_time, end_time = value.split(' - ')
-                    start_time = time.strptime(start_time, r'%m/%d/%Y')
-                    start_time = time.mktime(start_time)
-                    end_time = time.strptime(end_time, r'%m/%d/%Y')
-                    end_time = time.mktime(end_time)
+                    start_time = time.mktime(time.strptime(start_time, r'%m/%d/%Y'))
+                    end_time = time.mktime(time.strptime(end_time, r'%m/%d/%Y'))
                     search_value.update({filter_args_dict[i]: (start_time, end_time)})
                 else:
                     search_value.update({filter_args_dict[i]: value})
                 filter_args += "{}={}".format(i, value)
-                from_data.update({i: value})
         else:
             if len(filter_args) == 1:
                 filter_args = None
@@ -215,7 +211,7 @@ def user_order_manage(request):
             filter_args = filter_args,
             data_list = data_list,
             data_count = data_count,
-            from_data = from_data,
+            from_data = request.GET,
         )
 
 def out_order_manage(request):

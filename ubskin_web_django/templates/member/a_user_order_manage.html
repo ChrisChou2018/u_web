@@ -28,8 +28,8 @@
 
 {% block content_title %}
 
-<div class="row">
-    <form action="" method="GET" class="search_input">
+<form action="" method="GET" class="filter_form">
+    <div class="row">
         <div class="col-md-8">
             <div "row">
                 <div class="col-md-3" style="padding-right: 0">
@@ -48,27 +48,23 @@
                 </div>
             </div>
         </div>
-    </form>
-    <div class="col-md-4">     
-        <form action="" method="GET" class="search_input">
+        <div class="col-md-4">     
         <div class="input-group">
             <input type="text" class="form-control" placeholder="搜索订单号" name="search_value" value="{{ from_data.search_value }}">
             <span class="input-group-btn">
                 <button class="btn btn-default search_input_btn" type="submit">搜索</button>
             </span>
-            </div><!-- /input-group -->
-        </form>   
+        </div><!-- /input-group -->
+        </div>
     </div>
-</div>
-<div "row">
-    <!-- 更多过滤条件 -->
-    <br>
-    <br>
-    <div class="col-md-6">
-        <div class="row">
-            <form action="" class="filter_select">
+    <div "row">
+        <!-- 更多过滤条件 -->
+        <br>
+        <br>
+        <div class="col-md-6">
+            <div class="row">
                 <div class="col-md-4" style="padding-right: 0">
-                    <select name="order_status" class="form-control">
+                    <select name="order_status" class="form-control filter_select">
                         <option value="">订单状态</option>
                         {% for i in order_status %}
                             {% if i.0 == from_data.order_status %}
@@ -79,16 +75,15 @@
                         {% endfor %}
                     </select>
                 </div>
-            </form>
-            <!-- <div class="col-md-4" style="padding-right: 0">
-                <select name="order_status" class="form-control">
-                    <option value="new">支付状态</option>
-                </select>
-            </div> -->
+                <!-- <div class="col-md-4" style="padding-right: 0">
+                    <select name="order_status" class="form-control">
+                        <option value="new">支付状态</option>
+                    </select>
+                </div> -->
+            </div>
         </div>
     </div>
-    
-</div>
+</form>
 {% endblock %}
 
 {% block content %}
@@ -194,9 +189,14 @@
                 $('.datetime').data('daterangepicker').setStartDate(datevalue[0])
                 $('.datetime').data('daterangepicker').setEndDate(datevalue[1])
             }
-            $('.filter_select select').change(
+            $('.filter_form .filter_select').change(
                 function(){
-                    $('.filter_select').submit()
+                    $('.filter_form').submit()
+                }
+            )
+            $('.filter_form .datetime').change(
+                function(){
+                    $('.filter_form').submit()
                 }
             )
         })
