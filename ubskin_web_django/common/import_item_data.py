@@ -27,7 +27,7 @@ def import_item_data(f_path=None):
         "invalid_date",
         "price",
         "specifications_type_id",
-        "categories_id",
+        "categorie_id",
         "origin",
         "brand_id",
         # "brand_name", "product_no", "name", "barcode", "type_name"
@@ -60,7 +60,7 @@ def import_item_data(f_path=None):
                             obj[key] = 0
                 else:
                     obj[key] = None
-            elif key == 'categories_id':
+            elif key == 'categorie_id':
                 if sh1.row(rx)[idx].value:
                     categories = item_model.Categories
                     v = sh1.row(rx)[idx].value
