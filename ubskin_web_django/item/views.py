@@ -74,7 +74,7 @@ class AddItemForm(forms.ModelForm):
             "foreign_price", "key_word", "origin",
             "shelf_life", "capacity", "specifications_type_id",
             "for_people", "weight", "brand_id",
-            "categories_id", 'stock_count'
+            "categorie_id", 'stock_count'
         )
     def save(self, commit=True, request=None):
         item = super(AddItemForm, self).save(commit=False)
@@ -131,7 +131,7 @@ class EditorItemForm(forms.Form):
     for_people = forms.CharField(required=False)
     weight = forms.IntegerField(required=False)
     brand_id = forms.IntegerField(required=False)
-    categories_id = forms.IntegerField(required=False)
+    categorie_id = forms.IntegerField(required=False)
     stock_count = forms.IntegerField(required=False)
 
 
