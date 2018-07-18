@@ -167,8 +167,7 @@ class Items(models.Model):
     @classmethod
     def get_item_obj_by_barcode(cls, item_barcode):
         return cls.objects.filter(item_barcode=item_barcode)
-        
-    
+
     @classmethod
     def get_item_dict_by_item_barcode(cls, item_barcode):
         model = cls.objects.filter(item_barcode=item_barcode).first()
@@ -176,6 +175,7 @@ class Items(models.Model):
             return model_to_dict(model)
         else:
             return {}
+
     @classmethod
     def get_item_dict_by_barcode_api(cls, item_barcode):
         data_dict = dict()
@@ -188,8 +188,7 @@ class Items(models.Model):
         data_dict['thumbicon'] = common.build_photo_url(model.get('photo_id'), cdn=True)
         data_dict['item_barcode'] = model.get('item_barcode')
         return data_dict
-        
-    
+
     @classmethod
     def has_exist_item_code(cls, item_code, item_id):
         obj = cls.objects.filter(item_code=item_code).first()
@@ -208,7 +207,7 @@ class Items(models.Model):
 
     class Meta:
         db_table = "items"
-    
+
 
 class ItemImages(models.Model):
     '''
@@ -238,7 +237,6 @@ class ItemImages(models.Model):
         image_obj = cls.objects.filter(item_id=item_id, status = "normal", image_type=1).values().first()
         return image_obj
         
-
     @classmethod
     def create_item_image(cls, datas):
         cls.objects.create(**datas)
