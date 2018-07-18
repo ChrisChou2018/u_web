@@ -158,7 +158,11 @@ class Items(models.Model):
     
     @classmethod
     def get_item_name_by_barcode(cls, item_barcode):
-        return cls.objects.filter(item_barcode=item_barcode).first().item_name
+        obj = cls.objects.filter(item_barcode=item_barcode).first()
+        if obj:
+            return obj.item_name
+        else:
+            return None
     
     @classmethod
     def get_item_obj_by_barcode(cls, item_barcode):
