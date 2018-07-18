@@ -3,7 +3,6 @@ import xlrd
 
 from django.conf import settings
 
-# import app.models.item_model as item_model
 from ubskin_web_django.item import models as item_model
 
 

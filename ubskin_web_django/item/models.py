@@ -93,7 +93,7 @@ class Items(models.Model):
     create_time                 = models.IntegerField(db_column="create_time", verbose_name="创建时间", default=int(time.time()))
     update_person               = models.CharField(db_column="update_person", null=True, blank=True, verbose_name="更新人", max_length=255)
     update_time                 = models.IntegerField(db_column="update_time", verbose_name="更新时间", default=int(time.time()))
-    stock_count                 = models.IntegerField(db_column="stock_count", verbose_name="库存", default=0)
+    stock_count                 = models.IntegerField(db_column="stock_count", verbose_name="库存", default=0, null=True, blank=True)
     status                      = models.CharField(db_column="status", verbose_name="状态", default="normal", max_length=255)
     photo_id                    = models.CharField(db_column="photo_id", verbose_name="图片名", max_length=255, null=True, blank=True)
     
@@ -193,7 +193,7 @@ class Items(models.Model):
     @classmethod
     def has_exist_item_code(cls, item_code, item_id):
         try:
-            obj = cls.objects.get(item_code=item_code)
+            obj = cls.objects.filter(item_code=item_code).first()
             if item_id != obj.item_id:
                 return True
         except cls.DoesNotExist:
@@ -201,7 +201,7 @@ class Items(models.Model):
     @classmethod
     def has_exist_item_barcode(cls, item_barcode, item_id):
         try:
-            obj = cls.objects.get(item_barcode=item_barcode)
+            obj = cls.objects.filter(item_barcode=item_barcode).first()
             if item_id != obj.item_id:
                 return True
         except cls.DoesNotExist:
