@@ -232,6 +232,7 @@ class UserOrder(models.Model):
         ('paid', '等待发货'),
         ('shipped', '等待收货'),
         ('received', '确认收货'),
+        ('close', '订单关闭'),
     )
     order_status            = models.CharField(db_column="order_status", verbose_name="订单状态", choices=status_choices, default="new", max_length=255)
     member_id               = models.BigIntegerField(db_column="member_id", verbose_name="用户ID")
@@ -330,6 +331,7 @@ class UserOrder(models.Model):
                     'price': i['price'],
                     'order_status': dict(cls.status_choices)[i['order_status']],
                 })
+                data_dict['all_price'] += float(i['price']) * int(i['item_count'])
         return data_dict
     
     @classmethod

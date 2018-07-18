@@ -29,25 +29,30 @@
 {% block content_title %}
 
 <div class="row">
-    <div class="col-md-8">
-        <div "row">
-            <div class="col-md-5">
-            <form action="" method="GET" class="search_input">
-                <div class="input-group">
-                    <input type="datetime" class="form-control datetime" name="datetime">
-                    <span class="input-group-btn">
-                        <button class="btn btn-default" type="submit">过滤</button>
-                    </span>
+    <form action="" method="GET" class="search_input">
+        <div class="col-md-8">
+            <div "row">
+                <div class="col-md-3" style="padding-right: 0">
+                    <select name="datetime_typpe" id="" class="form-control">
+                        <option value="">按创建时间</option>
+                        <option value="">按支付时间</option>
+                    </select>
                 </div>
-            </form>
+                <div class="col-md-5" style="padding-left: 0">
+                    <div class="input-group">
+                        <input type="datetime" class="form-control datetime" name="datetime">
+                        <span class="input-group-btn">
+                            <button class="btn btn-default" type="submit">过滤</button>
+                        </span>
+                    </div>
+                </div>
             </div>
-            
         </div>
-    </div>
+    </form>
     <div class="col-md-4">     
         <form action="" method="GET" class="search_input">
         <div class="input-group">
-            <input type="text" class="form-control" placeholder="搜索订单号" name="search_value" value="{{ search_value }}">
+            <input type="text" class="form-control" placeholder="搜索订单号" name="search_value" value="{{ from_data.search_value }}">
             <span class="input-group-btn">
                 <button class="btn btn-default search_input_btn" type="submit">搜索</button>
             </span>
@@ -55,13 +60,37 @@
         </form>   
     </div>
 </div>
+<div "row">
+    <!-- 更多过滤条件 -->
+    <br>
+    <div class="col-md-6">
+        <div class="row">
+            <form action="">
+                <div class="col-md-4" style="padding-right: 0">
+                    <select name="order_status" class="form-control">
+                        <option value="">订单状态</option>
+                        {% for i in order_status %}
+                        <option value="{{ i.0 }}">{{ i.1 }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </form>
+            <!-- <div class="col-md-4" style="padding-right: 0">
+                <select name="order_status" class="form-control">
+                    <option value="new">支付状态</option>
+                </select>
+            </div> -->
+        </div>
+    </div>
+    
+</div>
 {% endblock %}
 
 {% block content %}
 
     <div class="row" style="padding: 15px">
     <div class="col-md-12" role="main" >
-    
+        
     <div class="bs-docs-section">
         <div class="table-responsive">
             <table class="table table-bordered table-striped">
@@ -154,6 +183,12 @@
                         firstDay : 1  
                 },
             });
+            if($('.datetime').val()){
+                let datevalue = '{{ from_data.datetime }}'
+                datevalue = datevalue.split(' - ')
+                $('.datetime').data('daterangepicker').setStartDate(datevalue[0])
+                $('.datetime').data('daterangepicker').setEndDate(datevalue[1])
+            }
         })
     </script>
 {% endblock %}

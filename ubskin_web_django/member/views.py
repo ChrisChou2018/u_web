@@ -1,4 +1,5 @@
 import os
+import time
 
 from django.shortcuts import render
 from django.http import HttpResponseRedirect as redirect
@@ -161,13 +162,38 @@ def recv_addr(request):
 
 @login_required(login_url='/myadmin/signin/')
 def user_order_manage(request):
+    # '07/18/2018', '07/18/2018
     if request.method == 'GET':
-        current_page = request.GET.get('page', 1)
-        value = request.GET.get('search_value', '')
-        filter_args = None
-        if value:
-            filter_args = '&search_value={0}'.format(value)
-            search_value = {"order_num__icontains" : value}
+        GET = request.GET.get
+        filter_args_list = [
+            'search_value', 'datetime',
+        ]
+        filter_args_dict = {
+            'search_value': 'order_num__icontains',
+            'datetime': 'create_time__range'
+        }
+        current_page = GET('page', 1)
+        filter_args = '&'
+        search_value = dict()
+        from_data = dict()
+        for i in filter_args_list:
+            value = GET(i)
+            if value:
+                if i == 'datetime':
+                    start_time, end_time = value.split(' - ')
+                    start_time = time.strptime(start_time, r'%m/%d/%Y')
+                    start_time = time.mktime(start_time)
+                    end_time = time.strptime(end_time, r'%m/%d/%Y')
+                    end_time = time.mktime(end_time)
+                    search_value.update({filter_args_dict[i]: (start_time, end_time)})
+                else:
+                    search_value.update({filter_args_dict[i]: value})
+                filter_args += "{}={}".format(i, value)
+                from_data.update({i: value})
+        else:
+            if len(filter_args) == 1:
+                filter_args = None
+        if search_value:
             data_list = member_models.UserOrder.get_user_order_data_list(
                 current_page,
                 search_value
@@ -181,11 +207,12 @@ def user_order_manage(request):
         return my_render(
             request,
             'member/a_user_order_manage.html',
+            order_status = member_models.UserOrder.status_choices,
             current_page = current_page,
             filter_args = filter_args,
             data_list = data_list,
             data_count = data_count,
-            search_value = value,
+            from_data = from_data,
         )
 
 def out_order_manage(request):
