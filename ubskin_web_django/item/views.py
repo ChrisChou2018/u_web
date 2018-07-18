@@ -74,7 +74,7 @@ class AddItemForm(forms.ModelForm):
             "foreign_price", "key_word", "origin",
             "shelf_life", "capacity", "specifications_type_id",
             "for_people", "weight", "brand_id",
-            "categories_id", 'stock_count'
+            "categorie_id", 'stock_count'
         )
     def save(self, commit=True, request=None):
         item = super(AddItemForm, self).save(commit=False)
@@ -131,7 +131,7 @@ class EditorItemForm(forms.Form):
     for_people = forms.CharField(required=False)
     weight = forms.IntegerField(required=False)
     brand_id = forms.IntegerField(required=False)
-    categories_id = forms.IntegerField(required=False)
+    categorie_id = forms.IntegerField(required=False)
     stock_count = forms.IntegerField(required=False)
 
 
@@ -411,7 +411,6 @@ def categorie_manage(request):
 
 class AddCategorieForm(forms.ModelForm):
     categorie_name = forms.CharField(error_messages={'required': '不可以为空'})
-    categorie_type = forms.IntegerField(error_messages={'required': '请选择一个所属分类'})
 
     class Meta:
         model = item_models.Categories
@@ -429,12 +428,12 @@ class AddCategorieForm(forms.ModelForm):
 
 @login_required(login_url='/myadmin/signin/')
 def add_categorie(request):
-    categorie_choices = dict(item_models.Categories.type_choices)
+    # categorie_choices = dict(item_models.Categories.type_choices)
     if request.method == 'GET':
         return my_render(
             request,
             'item/a_add_categorie.html',
-            categorie_choices = categorie_choices,
+            # categorie_choices = categorie_choices,
         )
     else:
         form = AddCategorieForm(request.POST)
@@ -443,7 +442,7 @@ def add_categorie(request):
                 request,
                 'item/a_add_categorie.html',
                 form_errors = form.errors,
-                categorie_choices = categorie_choices,
+                # categorie_choices = categorie_choices,
             )
         categorie = form.save()
         files = request.FILES

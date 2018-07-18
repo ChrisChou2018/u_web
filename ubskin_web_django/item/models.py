@@ -84,7 +84,7 @@ class Items(models.Model):
     )
     specifications_type_id      = models.SmallIntegerField(db_column="specifications_type_id", choices=specifications_type_choices, null=True, blank=True, verbose_name="单位类型")
     specifications_type         = models.CharField(db_column="specifications_type", null=True, blank=True, verbose_name="单位", max_length=255)
-    categories_id               = models.BigIntegerField(db_column="categories_id", null=True, blank=True, verbose_name="分类ID")
+    categorie_id               = models.BigIntegerField(db_column="categorie_id", null=True, blank=True, verbose_name="分类ID")
     brand_id                    = models.BigIntegerField(db_column="brand_id", null=True, blank=True, verbose_name="品牌ID")
     brand_name                  = models.CharField(db_column="brand_name", null=True, blank=True, verbose_name="品牌名", max_length=255)
     for_people                  = models.CharField(db_column="for_people", null=True, blank=True, verbose_name="适用人群", max_length=255)
@@ -143,7 +143,7 @@ class Items(models.Model):
     @classmethod
     def get_items_by_categorie_id(cls, categorie_id, current_page):
         item_obj = cls.objects. \
-            filter(categories_id = categorie_id, status = 'normal').order_by('-item_id')
+            filter(categorie_id = categorie_id, status = 'normal').order_by('-item_id')
         p = Paginator(item_obj, 15)
         items_list =  list(
             p.page(current_page).object_list.values(
@@ -275,7 +275,7 @@ class Categories(models.Model):
     '''
     商品分类表
     '''
-    categories_id    = models.AutoField(db_column="categories_id", verbose_name="分类ID", primary_key=True)
+    categorie_id   = models.AutoField(db_column="categorie_id", verbose_name="分类ID", primary_key=True)
     categorie_name  = models.CharField(db_column="categorie_name", verbose_name="分类名", max_length=255)
     categorie_type  = models.CharField(db_column="categorie_type", null=True, blank=True, verbose_name="类别", max_length=255)
     photo_id        = models.CharField(db_column="photo_id", null=True, blank=True, verbose_name="缩略图路径", max_length=255)
@@ -284,7 +284,7 @@ class Categories(models.Model):
 
     @classmethod
     def get_categoreis_dict_for_all(cls):
-        all_obj =  cls.objects.all().values_list("categories_id", "categorie_name")
+        all_obj =  cls.objects.all().values_list("categorie_id", "categorie_name")
         return dict(all_obj)
 
     @classmethod
