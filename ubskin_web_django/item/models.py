@@ -58,7 +58,7 @@ class Items(models.Model):
     item_name                   = models.CharField(db_column="item_name", verbose_name='商品名称', max_length=255)
     item_info                   = models.CharField(db_column="item_info", null=True, blank=True, verbose_name='商品信息', max_length=255)
     item_code                   = models.CharField(db_column="item_code", null=True, blank=True, verbose_name="商品编码", max_length=255)
-    item_barcode                = models.CharField(db_column="item_barcode", null=True, blank=True, verbose_name="商品条码", max_length=255, unique=True)
+    item_barcode                = models.CharField(db_column="item_barcode", null=True, blank=True, verbose_name="商品条码", max_length=255)
     price                       = models.FloatField(db_column="price", null=True, blank=True, verbose_name="商品售价")
     current_price               = models.FloatField(db_column='current_price', null=True, blank=True, verbose_name="批发价")
     original_price              = models.FloatField(db_column='original_price', null=True, blank=True, verbose_name="参考价")
@@ -192,19 +192,17 @@ class Items(models.Model):
     
     @classmethod
     def has_exist_item_code(cls, item_code, item_id):
-        try:
-            obj = cls.objects.filter(item_code=item_code).first()
-            if item_id != obj.item_id:
-                return True
-        except cls.DoesNotExist:
+        obj = cls.objects.filter(item_code=item_code).first()
+        if obj and item_id != obj.item_id:
+            return True
+        else:
             return False
     @classmethod
     def has_exist_item_barcode(cls, item_barcode, item_id):
-        try:
-            obj = cls.objects.filter(item_barcode=item_barcode).first()
-            if item_id != obj.item_id:
-                return True
-        except cls.DoesNotExist:
+        obj = cls.objects.filter(item_barcode=item_barcode).first()
+        if obj and item_id != obj.item_id:
+            return True
+        else:
             return False
 
 

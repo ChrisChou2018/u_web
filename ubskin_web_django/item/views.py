@@ -138,16 +138,18 @@ class EditorItemForm(forms.Form):
     def clean_item_code(self):
         item_code = self.cleaned_data['item_code']
         item_id = self.cleaned_data['item_id']
-        if item_models.Items.has_exist_item_code(item_code, item_id):
-            raise forms.ValidationError("当前商品编码已经存在")
-        return item_code
+        if item_code:
+            if item_models.Items.has_exist_item_code(item_code, item_id):
+                raise forms.ValidationError("当前商品编码已经存在")
+            return item_code
     
     def clean_item_barcode(self):
         item_barcode = self.cleaned_data['item_barcode']
         item_id = self.cleaned_data['item_id']
-        if item_models.Items.has_exist_item_barcode(item_barcode, item_id):
-            raise forms.ValidationError("当前商品条码已经存在")
-        return item_barcode
+        if item_barcode:
+            if item_models.Items.has_exist_item_barcode(item_barcode, item_id):
+                raise forms.ValidationError("当前商品条码已经存在")
+            return item_barcode
 
     def update(self, item_id, request=None):
         item = item_models.Items
