@@ -40,7 +40,7 @@
                 </div>
                 <div class="col-md-6" style="padding-left: 0">
                     <!-- <div class="input-group"> -->
-                        <input type="datetime" class="form-control datetime" name="datetime">
+                        <input type="datetime" class="form-control datetime" name="datetime" placeholder="点击选择时间">
                         <!-- <span class="input-group-btn">
                             <button class="btn btn-default" type="submit">过滤</button>
                         </span> -->
@@ -107,19 +107,24 @@
                         <div class="col-md-5">
                             包裹信息
                             <br>
+                            <br>
                             {% for j in i.goods %}
-                                <div style="">
-                                </div>
-                                <div class="row">
-                                    {{j.item_name}}
-                                </div>
-                                <div class="row">
-                                    <span style="color: darkgray;font-size: 12px">数量：{{j.item_count}} 单价：{{j.price}}</span>
+                                <a style="float: left;display: block;">
+                                    <img src="{% build_photo_url i.photo_id %}" alt="" style="width: 50px; height: 50px;">
+                                </a>
+                                <div >
+                                    <div class="row">
+                                           {{j.item_name}}
+                                        <div class="row">
+                                            <span style="color: darkgray;font-size: 12px;padding-left: 10px;">数量：{{j.item_count}} 单价：{{j.price}}</span>
+                                        </div>
+                                    </div>
                                 </div>
                                 
                             {% endfor %}
                         </div>
                         <div class="col-md-2">
+                            <br>
                             {{i.all_price}}
                         </div>
                         <div class="col-md-2">
@@ -127,7 +132,8 @@
                             {{ i.order_status }}
                         </div>
                         <div class="col-md-2">
-                            <a  href="{% url 'editor_categorie' %}?categorie_id={{i.categorie_id}}&back_url={{request.get_full_path}}" style='cursor:pointer;text-decoration:none;'><span class="glyphicon glyphicon-pencil"></span> 编辑</a>
+                            <br>
+                            <a href="#modalItemCodes" data-toggle="modal" data-target="#modalItemCodes" data-ordernum="{{ i.order_num }}">详情</a>
                         </div>
                     </div>
                 </div>
