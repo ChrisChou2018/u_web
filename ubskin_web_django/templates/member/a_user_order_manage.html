@@ -75,11 +75,14 @@
                         {% endfor %}
                     </select>
                 </div>
-                <!-- <div class="col-md-4" style="padding-right: 0">
-                    <select name="order_status" class="form-control">
-                        <option value="new">支付状态</option>
+                <div class="col-md-4" style="padding-right: 0;padding-left: 0;">
+                    <select name="pay_status" class="form-control filter_select">
+                        <option value="">支付状态</option>
+                        <option value="paid,shipped,received" {% if from_data.pay_status == 'paid,shipped,received' %}selected{% endif %}>已经支付</option>
+                        <option value="new" {% if from_data.pay_status == 'new' %}selected{% endif %}>未支付</option>
+                        <option value="close" {% if from_data.pay_status == 'close' %}selected{% endif %}>交易关闭</option>
                     </select>
-                </div> -->
+                </div>
             </div>
         </div>
     </div>

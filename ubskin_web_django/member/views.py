@@ -169,6 +169,7 @@ def user_order_manage(request):
             'search_value': 'order_num__icontains',
             'datetime': 'create_time__range',
             'order_status': 'order_status',
+            'pay_status': 'order_status__in'
         }
         current_page = GET('page', 1)
         filter_args = '&'
@@ -181,6 +182,9 @@ def user_order_manage(request):
                     start_time = time.mktime(time.strptime(start_time, r'%m/%d/%Y'))
                     end_time = time.mktime(time.strptime(end_time, r'%m/%d/%Y'))
                     search_value.update({filter_args_dict[i]: (start_time, end_time)})
+                elif i == 'pay_status':
+                    value_list = value.split(',')
+                    search_value.update({filter_args_dict[i]: value_list})
                 else:
                     search_value.update({filter_args_dict[i]: value})
                 filter_args += "{}={}".format(i, value)
