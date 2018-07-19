@@ -1,5 +1,6 @@
 import os
 import time
+import datetime
 
 from django.shortcuts import render
 from django.http import HttpResponseRedirect as redirect
@@ -169,6 +170,7 @@ def user_order_manage(request):
             'search_value': 'order_num__icontains',
             'datetime': 'create_time__range',
             'order_status': 'order_status',
+            'pay_status': 'order_status__in'
         }
         current_page = GET('page', 1)
         filter_args = '&'
@@ -179,8 +181,13 @@ def user_order_manage(request):
                 if i == 'datetime':
                     start_time, end_time = value.split(' - ')
                     start_time = time.mktime(time.strptime(start_time, r'%m/%d/%Y'))
-                    end_time = time.mktime(time.strptime(end_time, r'%m/%d/%Y'))
+                    d = datetime.datetime.strptime(end_time, r'%m/%d/%Y')
+                    d = d + datetime.timedelta(days=1)
+                    end_time = time.mktime(d.timetuple())
                     search_value.update({filter_args_dict[i]: (start_time, end_time)})
+                elif i == 'pay_status':
+                    value_list = value.split(',')
+                    search_value.update({filter_args_dict[i]: value_list})
                 else:
                     search_value.update({filter_args_dict[i]: value})
                 filter_args += "{}={}".format(i, value)

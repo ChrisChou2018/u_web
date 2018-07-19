@@ -68,3 +68,34 @@ python3 run_server.py
 ```
 确认nginx配置文件没有问题后再启动nginx
 
+`运行自动化任务`
+执行到期自动确认收货订单
+```
+python manage.py crontab add #将生成任务ID之后执行
+python manage.py crontab run ebb2a9c313b47207ced3f1c7ab8b4c47 #run后面跟随任务ID
+```
+
+
+`将数据库数据导出保存为json数据`
+执行命令
+```
+# 导出 item app下的models中所有的数据
+python manage.py dumpdata --format=json item > ubskin_web_django/item/fixtures/item_initial_data.json
+# 导入item app 数据
+python manage.py loaddata item_initial_data.json
+
+# 导出 member app下的models中所有的数据
+python manage.py dumpdata --format=json member > ubskin_web_django/member/fixtures/member_initial_data.json
+# 导入member app 数据
+python manage.py loaddata member_initial_data.json
+
+# 导出 order app下的models中所有的数据
+python manage.py dumpdata --format=json order > ubskin_web_django/order/fixtures/order_initial_data.json
+# 导入order app 数据
+python manage.py loaddata order_initial_data.json
+
+
+# 将数据库清空的命令
+python manage.py flush
+
+```

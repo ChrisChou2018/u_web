@@ -135,3 +135,29 @@ def jm_user_order_info(request):
         'member/a_jm_user_order_info.html',
         {'data_list': data_list},
     )
+
+def delete_user_order(request):
+    return_value = {
+        'status':'error',
+        'message':'',
+    }
+    order_num_list=request.POST.getlist('order_num_list[]')
+    member_models.UserOrder.delete_user_order(order_num_list)
+    return_value['status'] = 'success'
+    return JsonResponse(return_value)
+
+
+def change_order_status_js(request):
+    return_value = {
+        'status':'error',
+        'message':'',
+    }
+    if request.method == 'POST':
+        order_num = request.POST.get('order_num')
+        order_status = request.POST.get('order_status')
+        member_models.UserOrder.update_user_order_by_order_num(
+            order_num,
+            {'order_status': order_status}
+        )
+        return_value['status'] = 'success'
+        return return_value

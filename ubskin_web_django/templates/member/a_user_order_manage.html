@@ -40,7 +40,7 @@
                 </div>
                 <div class="col-md-6" style="padding-left: 0">
                     <!-- <div class="input-group"> -->
-                        <input type="datetime" class="form-control datetime" name="datetime">
+                        <input type="datetime" class="form-control datetime" name="datetime" placeholder="点击选择时间">
                         <!-- <span class="input-group-btn">
                             <button class="btn btn-default" type="submit">过滤</button>
                         </span> -->
@@ -49,7 +49,7 @@
             </div>
         </div>
         <div class="col-md-4">     
-        <div class="input-group">
+        <div class="input-group" style="padding-right: 12px;">
             <input type="text" class="form-control" placeholder="搜索订单号" name="search_value" value="{{ from_data.search_value }}">
             <span class="input-group-btn">
                 <button class="btn btn-default search_input_btn" type="submit">搜索</button>
@@ -57,6 +57,7 @@
         </div><!-- /input-group -->
         </div>
     </div>
+
     <div "row">
         <!-- 更多过滤条件 -->
         <br>
@@ -75,12 +76,21 @@
                         {% endfor %}
                     </select>
                 </div>
-                <!-- <div class="col-md-4" style="padding-right: 0">
-                    <select name="order_status" class="form-control">
-                        <option value="new">支付状态</option>
+                <div class="col-md-4" style="padding-right: 0;padding-left: 0;">
+                    <select name="pay_status" class="form-control filter_select">
+                        <option value="">支付状态</option>
+                        <option value="paid,shipped,received" {% if from_data.pay_status == 'paid,shipped,received' %}selected{% endif %}>已经支付</option>
+                        <option value="new" {% if from_data.pay_status == 'new' %}selected{% endif %}>未支付</option>
+                        <option value="close" {% if from_data.pay_status == 'close' %}selected{% endif %}>交易关闭</option>
                     </select>
-                </div> -->
+                </div>
             </div>
+        </div>
+        <div class="col-md-3">
+        </div>
+        <div class="col-md-3" >
+            <button type="button" class="btn btn-info choose_user_order" type="button">选择全部<span class="glyphicon glyphicon-saved"></span></button>
+            <button type="button" class="btn btn-danger delete_user_order" type="button">删除<span class="glyphicon glyphicon-trash"></span></button>
         </div>
     </div>
 </form>
@@ -93,8 +103,8 @@
         
     <div class="bs-docs-section">
         {% for i in data_list %}
-        <div class="panel panel-success categories_list">
-            <div class="panel-heading"><input type="checkbox" class="item_checkbox" item-id={{i.categorie_id}}>订单号:{{i.order_num}}  <span style="padding-left: 30px">下单时间:{{i.create_time}}</span><span style="padding-left: 30px">客户:{{i.member_id}}</span></div>
+        <div class="panel panel-default user_order_list">
+            <div class="panel-heading"><input type="checkbox" class="item_checkbox" item-id={{i.order_num}}>订单号:{{i.order_num}}  <span style="padding-left: 30px">下单时间:{{i.create_time}}</span><span style="padding-left: 30px">客户:{{i.member_id}}</span></div>
             <div class="panel-body">
                 <div class="media-left">
                     <!-- <a href="#">
@@ -107,27 +117,52 @@
                         <div class="col-md-5">
                             包裹信息
                             <br>
+                            <br>
                             {% for j in i.goods %}
-                                <div style="">
-                                </div>
-                                <div class="row">
-                                    {{j.item_name}}
-                                </div>
-                                <div class="row">
-                                    <span style="color: darkgray;font-size: 12px">数量：{{j.item_count}} 单价：{{j.price}}</span>
+                                <a style="float: left;display: block;">
+                                    <img src="{% build_photo_url i.photo_id %}" alt="" style="width: 40px; height: 40px;">
+                                </a>
+                                <div >
+                                    <div class="row">
+                                        <span style="padding-left: 10px">
+                                            {{j.item_name}}
+                                        </span>
+                                        <div class="row">
+                                            <span style="color: darkgray;font-size: 12px;padding-left: 15px;">数量：{{j.item_count}} 单价：{{j.price}}</span>
+                                        </div>
+                                    </div>
                                 </div>
                                 
                             {% endfor %}
                         </div>
                         <div class="col-md-2">
+                            <br>
                             {{i.all_price}}
                         </div>
                         <div class="col-md-2">
                             <br>
-                            {{ i.order_status }}
+                            <div class="order_status_div" style="display: block">
+                                {{ i.order_status }}
+                            </div>
+                            <select name="order_status" class="form-control order_status_selcet" style="display: none">
+                                <option value="">订单状态</option>
+                                {% for j in order_status %}
+                                    {% if j.1 == i.order_status %}
+                                        <option value="{{ j.0 }}" selected>{{ j.1 }}</option>
+                                    {% else %}
+                                        <option value="{{ j.0 }}">{{ j.1 }}</option>
+                                    {% endif %}
+                                {% endfor %}
+                            </select>
                         </div>
                         <div class="col-md-2">
-                            <a  href="{% url 'editor_categorie' %}?categorie_id={{i.categorie_id}}&back_url={{request.get_full_path}}" style='cursor:pointer;text-decoration:none;'><span class="glyphicon glyphicon-pencil"></span> 编辑</a>
+                            <br>
+                            <div class="row">
+                                <a href="#modalItemCodes" data-toggle="modal" data-target="#modalItemCodes" data-ordernum="{{ i.order_num }}">详情</a>
+                            </div>
+                            <div class="row">
+                                <a style="cursor: pointer" class="editor_order_status" data-ordernum="{{i.order_num}}">编辑状态</a>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -211,6 +246,77 @@
                     $('.filter_form').submit()
                 }
             )
+            $('.choose_user_order').click(function(){
+                var text =  $(this).text()
+                var $categories_list = $('.user_order_list')
+                if(text == '选择全部'){
+                    $categories_list.each(function(index, item){
+                        var $f =  $(item).children().find('input[type="checkbox"]')
+                        $f.prop('checked', true)
+                    })
+                    $(this).html('取消全部<span class="glyphicon glyphicon-saved"></span>')
+                }else{
+                    $categories_list.each(function(index, item){
+                        var $f =  $(item).children().find('input[type="checkbox"]')
+                        $f.prop('checked', false)
+                    })
+                    $(this).html('选择全部<span class="glyphicon glyphicon-saved"></span>')
+                }
+                
+            })
+            $('.delete_user_order').click(delete_user_order)
+            $('.editor_order_status').unbind()
+            $('.editor_order_status').click(function(){
+                if($(this).text()=='编辑状态'){
+                    $(this).text('确认')
+                    $(this).parent().parent().prev().find('.order_status_selcet').css('display', 'block')
+                    $(this).parent().parent().prev().find('.order_status_div').css('display', 'none')
+                }else{
+                    $(this).text('编辑状态')
+                    $(this).parent().parent().prev().find('.order_status_selcet').css('display', 'none')
+                    $(this).parent().parent().prev().find('.order_status_div').css('display', 'block')
+                    $(this).parent().parent().prev().find('.order_status_div').text($(this).parent().parent().prev().find('.order_status_selcet').find('option:selected').text())
+                    let select_var = $(this).parent().parent().prev().find('.order_status_selcet').val()
+                    let order_num = $(this).data('ordernum')
+                    $.post(
+                        "{% url 'change_order_status'%}",
+                        {'order_num': order_num, 'order_status': select_var, 'csrfmiddlewaretoken': getCookie('csrftoken')},
+                        function(data){
+                            if(data.status=='success'){
+
+                            }else{
+                                
+                            }
+                        }
+                    )
+                    
+                }
+            })
         })
+        function delete_user_order(){
+            var $item_list = $('.user_order_list')
+            var order_num_list = []
+            $item_list.each(function(index, item){
+                var f =  $(item).children().find('input[type="checkbox"]')
+                var is_checked = $(f).prop('checked')
+                if(is_checked){
+                    order_num_list.push($(f).attr('item-id'))
+                }
+            })
+            if(order_num_list.length>0){
+                $.post(
+                    "{% url 'delete_user_order' %}",
+                    {'order_num_list': order_num_list, 'csrfmiddlewaretoken': getCookie('csrftoken')},
+                    function(value){
+                        if(value.status == 'success'){
+                            location.reload()
+                        }else{
+                            alert(value.message)
+                        }
+                    },
+                    'json'
+                )
+            }
+        }
     </script>
 {% endblock %}
