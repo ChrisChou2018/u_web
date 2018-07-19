@@ -245,6 +245,14 @@ class UserOrder(models.Model):
 
 
     @classmethod
+    def delete_user_order(cls, order_num_list):
+        cls.objects.filter(order_num__in=order_num_list).update(status='deleted')
+    
+    @classmethod
+    def update_user_order_by_order_num(cls, order_num, data):
+        cls.objects.filter(order_num=order_num).update(**data)
+
+    @classmethod
     def get_user_order_by_member_id(cls, member_id, current_page, order_status):
         order_num_list = cls.objects.filter(member_id=member_id, status='normal'). \
             values('order_num').annotate(c = Count('order_num')).order_by('-pk')
