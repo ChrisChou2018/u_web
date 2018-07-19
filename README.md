@@ -68,3 +68,9 @@ python3 run_server.py
 ```
 确认nginx配置文件没有问题后再启动nginx
 
+`运行自动化任务`
+执行到期自动确认收货订单
+```
+python manage.py crontab add #将生成任务ID之后执行
+python manage.py crontab run ebb2a9c313b47207ced3f1c7ab8b4c47 #run后面跟随任务ID
+```
