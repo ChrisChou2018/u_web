@@ -1,4 +1,6 @@
 import os
+import time
+import datetime
 
 from django.shortcuts import render
 from django.http import HttpResponseRedirect as redirect
@@ -161,14 +163,39 @@ def recv_addr(request):
 
 @login_required(login_url='/myadmin/signin/')
 def user_order_manage(request):
+    # '07/18/2018', '07/18/2018
     if request.method == 'GET':
-        current_page = request.GET.get('page', 1)
-        value = request.GET.get('search_value', '')
-        filter_args = None
-        if value:
-            filter_args = '&search_value={0}'.format(value)
-            search_value = {"order_num__icontains" : value}
-            data_list = member_models.UserOrder.get_user_order_data_list(
+        GET = request.GET.get
+        filter_args_dict = {
+            'search_value': 'order_num__icontains',
+            'datetime': 'create_time__range',
+            'order_status': 'order_status',
+            'pay_status': 'order_status__in'
+        }
+        current_page = GET('page', 1)
+        filter_args = '&'
+        search_value = dict()
+        for i in filter_args_dict:
+            value = GET(i)
+            if value:
+                if i == 'datetime':
+                    start_time, end_time = value.split(' - ')
+                    start_time = time.mktime(time.strptime(start_time, r'%m/%d/%Y'))
+                    d = datetime.datetime.strptime(end_time, r'%m/%d/%Y')
+                    d = d + datetime.timedelta(days=1)
+                    end_time = time.mktime(d.timetuple())
+                    search_value.update({filter_args_dict[i]: (start_time, end_time)})
+                elif i == 'pay_status':
+                    value_list = value.split(',')
+                    search_value.update({filter_args_dict[i]: value_list})
+                else:
+                    search_value.update({filter_args_dict[i]: value})
+                filter_args += "{}={}".format(i, value)
+        else:
+            if len(filter_args) == 1:
+                filter_args = None
+        if search_value:
+            data_list = member_models.UserOrder.get_user_order_list(
                 current_page,
                 search_value
             )
@@ -176,16 +203,21 @@ def user_order_manage(request):
                 get_user_order_count(search_value)
         else:
             data_list = member_models.UserOrder. \
-                get_user_order_data_list(current_page)
+                get_user_order_list(current_page)
             data_count = member_models.UserOrder.get_user_order_count()
+        order_status = member_models.UserOrder.status_choices
+        for i in data_list:
+            member = member_models.Member.get_member_by_id(i['member_id'])
+            i['member_id'] = member.member_name if member else '无此用户'
         return my_render(
             request,
             'member/a_user_order_manage.html',
+            order_status = order_status,
             current_page = current_page,
             filter_args = filter_args,
             data_list = data_list,
             data_count = data_count,
-            search_value = value,
+            from_data = request.GET,
         )
 
 def out_order_manage(request):

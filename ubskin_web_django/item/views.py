@@ -74,7 +74,7 @@ class AddItemForm(forms.ModelForm):
             "foreign_price", "key_word", "origin",
             "shelf_life", "capacity", "specifications_type_id",
             "for_people", "weight", "brand_id",
-            "categories_id", 'stock_count'
+            "categorie_id", 'stock_count'
         )
     def save(self, commit=True, request=None):
         item = super(AddItemForm, self).save(commit=False)
@@ -131,23 +131,25 @@ class EditorItemForm(forms.Form):
     for_people = forms.CharField(required=False)
     weight = forms.IntegerField(required=False)
     brand_id = forms.IntegerField(required=False)
-    categories_id = forms.IntegerField(required=False)
+    categorie_id = forms.IntegerField(required=False)
     stock_count = forms.IntegerField(required=False)
 
 
     def clean_item_code(self):
         item_code = self.cleaned_data['item_code']
         item_id = self.cleaned_data['item_id']
-        if item_models.Items.has_exist_item_code(item_code, item_id):
-            raise forms.ValidationError("当前商品编码已经存在")
-        return item_code
+        if item_code:
+            if item_models.Items.has_exist_item_code(item_code, item_id):
+                raise forms.ValidationError("当前商品编码已经存在")
+            return item_code
     
     def clean_item_barcode(self):
         item_barcode = self.cleaned_data['item_barcode']
         item_id = self.cleaned_data['item_id']
-        if item_models.Items.has_exist_item_barcode(item_barcode, item_id):
-            raise forms.ValidationError("当前商品条码已经存在")
-        return item_barcode
+        if item_barcode:
+            if item_models.Items.has_exist_item_barcode(item_barcode, item_id):
+                raise forms.ValidationError("当前商品条码已经存在")
+            return item_barcode
 
     def update(self, item_id, request=None):
         item = item_models.Items
@@ -378,7 +380,7 @@ def categorie_manage(request):
         current_page = request.GET.get('page', 1)
         value = request.GET.get('search_value', '')
         filter_args = None
-        categorie_choices = dict(item_models.Categories.type_choices)
+        # categorie_choices = dict(item_models.Categories.type_choices)
         if value:
             filter_args = '&search_value={0}'.format(value)
             search_value = {'categorie_name__icontains': value}
@@ -403,7 +405,7 @@ def categorie_manage(request):
             current_page = current_page,
             search_value = value,
             filter_args = filter_args,
-            categorie_choices = categorie_choices,
+            # categorie_choices = categorie_choices,
             categories_list = categories_list,
             categories_count = categories_count,
         )
@@ -411,7 +413,6 @@ def categorie_manage(request):
 
 class AddCategorieForm(forms.ModelForm):
     categorie_name = forms.CharField(error_messages={'required': '不可以为空'})
-    categorie_type = forms.IntegerField(error_messages={'required': '请选择一个所属分类'})
 
     class Meta:
         model = item_models.Categories
@@ -429,12 +430,12 @@ class AddCategorieForm(forms.ModelForm):
 
 @login_required(login_url='/myadmin/signin/')
 def add_categorie(request):
-    categorie_choices = dict(item_models.Categories.type_choices)
+    # categorie_choices = dict(item_models.Categories.type_choices)
     if request.method == 'GET':
         return my_render(
             request,
             'item/a_add_categorie.html',
-            categorie_choices = categorie_choices,
+            # categorie_choices = categorie_choices,
         )
     else:
         form = AddCategorieForm(request.POST)
@@ -443,7 +444,7 @@ def add_categorie(request):
                 request,
                 'item/a_add_categorie.html',
                 form_errors = form.errors,
-                categorie_choices = categorie_choices,
+                # categorie_choices = categorie_choices,
             )
         categorie = form.save()
         files = request.FILES
@@ -463,14 +464,12 @@ def add_categorie(request):
 
 class EditorCategorieForm(forms.ModelForm):
     categorie_name = forms.CharField(error_messages={'required': '不可以为空'})
-    categorie_type = forms.IntegerField(error_messages={'required': '请选择一个所属分类'})
 
     class Meta:
         model = item_models.Categories
         fields = (
             'categorie_name', 'categorie_type',
         )
-
 
     def update(self, categorie_id):
         categorie = self._meta.model
@@ -483,13 +482,13 @@ def editor_categorie(request):
     categorie_id = request.GET.get('categorie_id')
     categorie = item_models.Categories.get_categorie_by_id(categorie_id)
     form_data = model_to_dict(categorie)
-    categorie_choices = dict(item_models.Categories.type_choices)
+    # categorie_choices = dict(item_models.Categories.type_choices)
     if request.method == 'GET':
         return my_render(
             request,
             'item/a_add_categorie.html',
             form_data = form_data,
-            categorie_choices = categorie_choices,
+            # categorie_choices = categorie_choices,
         )
     else:
         form = EditorCategorieForm(request.POST)
@@ -497,8 +496,9 @@ def editor_categorie(request):
             return my_render(
                 request,
                 'item/a_add_categorie.html',
+                form_data = form_data,
                 form_errors = form.errors,
-                categorie_choices = categorie_choices,
+                # categorie_choices = categorie_choices,
             )
         form.update(categorie_id)
         files = request.FILES
@@ -527,7 +527,7 @@ def item_comment_manage(request):
             item_id = item_models.Items.get_item_id_by_item_name(value)
             search_value = None
             if item_id:
-                search_value = {'item_id': item_id}
+                search_value = {'item_id__in': item_id}
             item_comments_list = item_models.ItemComments. \
                 get_item_comments_list(current_page, search_value)
             count = item_models.ItemComments. \

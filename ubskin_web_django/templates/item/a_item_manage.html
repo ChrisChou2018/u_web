@@ -20,12 +20,12 @@
         <div "row">
             <div class="col-md-8">
                 <form action="" method="GET" class="search_input">
-                <div class="input-group">
-                    <input type="text" class="form-control" placeholder="搜索商品名称" name="search_value" value="{{ search_value }}">
-                    <span class="input-group-btn">
-                        <button class="btn btn-default search_input_btn" type="submit">搜索</button>
-                    </span>
-                  </div><!-- /input-group -->
+                    <div class="input-group">
+                        <input type="text" class="form-control" placeholder="搜索商品名称" name="search_value" value="{{ search_value }}">
+                        <span class="input-group-btn">
+                            <button class="btn btn-default search_input_btn" type="submit">搜索</button>
+                        </span>
+                    </div><!-- /input-group -->
                 </form>
             </div>
             <div class="col-md-4">
@@ -77,10 +77,10 @@
                             适用人群{% if i.for_people is not None %}{{ i.for_people }}{% endif %}
                         </div>
                         <div class="row">
-                            所属品牌：{% if i.brand_id %}{% get_value_by_key brand_dict i.brand_id %}{% endif %}
+                            所属品牌：{% if i.brand_id is not None %}{% get_value_by_key brand_dict i.brand_id %}{% endif %}
                         </div>
                         <div class="row">
-                            所属分类：{% if i.categories_id %}{% get_value_by_key categories_dict i.categories_id %}{% endif %}
+                            所属分类：{% if i.categorie_id %}{% get_value_by_key categories_dict i.categorie_id %}{% endif %}
                         </div>
                     </div>
                     <div class="col-md-2">
