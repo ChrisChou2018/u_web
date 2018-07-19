@@ -1,8 +1,15 @@
 <div id="">
-    <p><strong>订单单号:{{ data_list.order_num }}</strong></p>
-    <p>收货地址: {{ data_list.recv_addr.address }}</p>
-    <p>下单时间: {{ data_list.create_time }}</p>
-    <p>支付时间: {{ data_list.pay_time }}</p>
+        <p><strong>订单单号:{{ data_list.order_num }}</strong></p>
+        <div class="row">
+            <div class="col-md-6">
+                <p>收货地址: {{ data_list.recv_addr.address }}</p>
+                <p>下单时间: {{ data_list.create_time }}</p>
+            </div>
+            <div class="col-md-6">
+                <p>支付时间: {{ data_list.pay_time }}</p>
+                <p>订单状态: {{ data_list.order_status }}</p>
+            </div>
+        </div>
     <p></p>
     <hr>
     <p></p>
@@ -12,14 +19,12 @@
                 <th>商品名</th>
                 <th>价格</th>
                 <th>数量</th>
-                <th>订单状态</th>
             </tr>
             {% for i in data_list.goods %}
             <tr>
                 <td>{% if i.item_name %}{{ i.item_name }}{% else %}未查询到商品信息{% endif %}</td>
                 <td>{{ i.price }}</td>
                 <td>{{ i.item_count }}</td>
-                <td>{{ i.order_status }}</td>
             </tr>
             {% endfor %}
         </tbody>

@@ -349,6 +349,7 @@ class UserOrder(models.Model):
             'order_num': order_num,
             'member_message': obj.first()['member_message'],
             'create_time': common.parse_timestamps(obj.first()['create_time']),
+            'order_status': dict(cls.status_choices)[obj.first()['order_status']],
             'recv_addr': recv_addr,
             'goods': list()
         }
