@@ -1,6 +1,8 @@
 <div id="">
     <p><strong>订单单号:{{ data_list.order_num }}</strong></p>
     <p>收货地址: {{ data_list.recv_addr.address }}</p>
+    <p>下单时间: {{ data_list.create_time }}</p>
+    <p>支付时间: {{ data_list.pay_time }}</p>
     <p></p>
     <hr>
     <p></p>
@@ -25,6 +27,7 @@
     <p></p>
     <hr>
     <p></p>
+    <p>买家备注:{{ data_list.member_message }}</p>
     <p>共计: {{ data_list.all_price }}</p>
 </div>
     
