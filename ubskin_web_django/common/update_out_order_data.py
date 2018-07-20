@@ -31,7 +31,7 @@ ORDER_LIST_BASE_URL = "http://www.weimob.com/vshop/Order/OrderList?PageId=19"
 
 def update_orders(limit_days=30):
     """直接抓取（更新）最近 30 天订单记录"""
-    member_model.OutOrder.objects.all().delete()
+    # member_model.OutOrder.objects.all().delete()
     page_num = 1
     while True:
         order_params = {
@@ -120,7 +120,7 @@ def update_orders(limit_days=30):
                 print("Found one !!!")
             
             print(order_obj)
-            member_model.create_model_data(
+            member_model.update_or_create_model_data(
                 member_model.OutOrder,
                 order_obj
             )
