@@ -346,7 +346,6 @@ def create_user_order(request):
         order_info = data.get('order_info')
         member_message = data.get('member_message')
         order_num = None
-        print(data)
         while True:
             order_num = ''.join(
                 random.choice(string.digits) \

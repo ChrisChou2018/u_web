@@ -160,4 +160,4 @@ def change_order_status_js(request):
             {'order_status': order_status}
         )
         return_value['status'] = 'success'
-        return return_value
+        return JsonResponse(return_value)

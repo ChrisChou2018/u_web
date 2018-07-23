@@ -38,6 +38,7 @@ urlpatterns += [
     path('api/filter_items/', views_api.filter_items),
     path('api/get_item_comment/', views_api.get_item_comment),
     path('api/create_item_comment/', views_api.create_item_comment),
+    path('api/upload_commemt_image/', views_api.upload_cmmment_image),
     path('api/get_item_info_by_code/', views_api.get_item_info_by_code),
     path('api/shopping_cart/', views_api.shopping_cart),
     path('api/get_item_info/<int:item_id>/', views_api.get_item_info),

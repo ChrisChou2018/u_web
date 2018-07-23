@@ -354,6 +354,7 @@ class ItemComments(models.Model):
         (5, '5星'),
     ) 
     stars           = models.SmallIntegerField(db_column="stars", choices=start_choices, verbose_name="星级", default=5, blank=True)
+    is_hide         = models.BooleanField(db_column="is_hide", verbose_name="是否匿名", default=False)
     status          = models.CharField(db_column="status", verbose_name="状态", default="normal", max_length=255)
 
     @classmethod
@@ -389,19 +390,16 @@ class ItemComments(models.Model):
 
     @classmethod
     def get_item_comment_by_item_id(cls, item_id, current_page):
-        try:
-            item_comments_list = cls.objects.filter(
-                item_id = item_id, status = 'normal'
-                ).order_by('-comment_id')
-            p = Paginator(item_comments_list, 15)
-            data = p.page(current_page).object_list.values()
-            data = list(data)
-            for i in data:
-                image_list = CommentImages.get_comment_image_obj_by_id(i['comment_id'], True)
-                i['image_list'] = image_list
-            return data
-        except cls.DoesNotExist:
-            return None
+        item_comments_list = cls.objects.filter(
+            item_id = item_id, status = 'normal'
+            ).order_by('-pk')
+        p = Paginator(item_comments_list, 15)
+        data = p.page(current_page).object_list.values()
+        data = list(data)
+        for i in data:
+            image_list = CommentImages.get_comment_image_obj_by_id(i['comment_id'], True)
+            i['image_list'] = image_list
+        return data
     
     @classmethod
     def get_item_comment_by_id(cls, comment_id):
@@ -435,6 +433,7 @@ class CommentImages(models.Model):
     @classmethod
     def get_comment_image_obj_by_id(cls, comment_id, for_api=False):
         image_list = list(cls.objects.filter(comment_id = comment_id, status = 'normal').values())
+        image_list = list(image_list)
         if for_api:
             for i in image_list:
                 i['image_path'] = common.build_photo_url(i['photo_id'], pic_version='title', cdn=True)

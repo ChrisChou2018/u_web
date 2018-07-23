@@ -518,6 +518,9 @@ def get_data_count(model, search_value=None, search_value_type='dict'):
 def create_model_data(model, data):
     return model.objects.create(**data)
 
+def update_or_create_model_data(model, data):
+    return model.objects.update_or_create(**data)
+
 def update_model_data_by_pk(model, pk, data):
     model.objects.filter(pk=pk).update(**data)
 
