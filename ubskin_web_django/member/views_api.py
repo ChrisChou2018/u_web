@@ -310,6 +310,7 @@ def get_user_order(request):
         openid = request.COOKIES.get('openid')
         current_page = request.GET.get('page', 1)
         member = member_models.Member.get_member_by_wx_openid(openid)
+        print(request.GET)
         data_dict = member_models.UserOrder.get_user_order_by_member_id(
             member.member_id, current_page, order_status
         )
