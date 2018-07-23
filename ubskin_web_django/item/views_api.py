@@ -43,7 +43,6 @@ def get_item_info(request, item_id):
         )
         if item_obj:
             item_dict = model_to_dict(item_obj)
-            print(item_dict)
             item_image = list(
                 item_models. \
                     ItemImages.get_item_images_by_itemid(item_dict['item_id'])
@@ -175,11 +174,8 @@ def upload_cmmment_image(request):
         'data': '',
     }
     if request.method == "POST":
-        print(request.POST)
         comment_id = request.POST.get('comment_id')
-        print(comment_id, 'comment_id..')
         files = request.FILES
-        print(files, 'files.....')
         comment_image_list = []
         if files:
             for i in files:
