@@ -21,8 +21,8 @@
         
             {% for i in comment_image_list %}
                 <div class="col-xs-6 col-md-3 image_item" image-id='{{i.image_id}}'>
-                    <a class="thumbnail" style="width: 400px;height: 400px;">
-                    <img src="{{i.image_path}}" alt="..." >
+                    <a class="thumbnail" style="width: 220px;height: 220px;">
+                    <img src="{{i.image_path}}" alt="..."   width="200px", height="200px">
                     </a>
                 </div>
             {% endfor %}
@@ -53,38 +53,38 @@
             }  
         });
 
-        // 添加图片事件
-        $('.add_image').click(function(){
-            $('input[name=add_new_image]').trigger('click')
-            $('input[name=add_new_image]').unbind()
-            var image_type = $(this).parent().next().attr('image-type')
-            $('input[name=add_new_image]').change(function(){
-                var file =  $(this)[0].files
-                var formData = new FormData();
-                for(var i=0;i<file.length;i++){
-                    formData.append(file[i].name,file[i])
-                }
-                formData.append('image_type', image_type)
-                formData.append('item_id', $(this).attr('item-id'))
-                formData.append('_xsrf', getCookie("_xsrf"))
-                $.ajax({
-                    type:'post',
-                    url:"",
-                    data:formData,
-                    dataType:'json',
-                    contentType:false,
-                    processData:false,
-                    success:function(data){
-                        if(data.result == 'success'){
-                            location.reload()
-                        }else{
-                            alert(data.message)
-                        }
-                    }
-                })
-            })
+        // // 添加图片事件
+        // $('.add_image').click(function(){
+        //     $('input[name=add_new_image]').trigger('click')
+        //     $('input[name=add_new_image]').unbind()
+        //     var image_type = $(this).parent().next().attr('image-type')
+        //     $('input[name=add_new_image]').change(function(){
+        //         var file =  $(this)[0].files
+        //         var formData = new FormData();
+        //         for(var i=0;i<file.length;i++){
+        //             formData.append(file[i].name,file[i])
+        //         }
+        //         formData.append('image_type', image_type)
+        //         formData.append('item_id', $(this).attr('item-id'))
+        //         formData.append('_xsrf', getCookie("_xsrf"))
+        //         $.ajax({
+        //             type:'post',
+        //             url:"",
+        //             data:formData,
+        //             dataType:'json',
+        //             contentType:false,
+        //             processData:false,
+        //             success:function(data){
+        //                 if(data.result == 'success'){
+        //                     location.reload()
+        //                 }else{
+        //                     alert(data.message)
+        //                 }
+        //             }
+        //         })
+        //     })
 
-        })
+        // })
         
 
         //删除图片事件

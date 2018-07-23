@@ -120,7 +120,7 @@
     <nav aria-label="Page navigation">
         <ul class="pagination page_box">
             {% Pagingfunc current_page data_count filter_args request.uri as page %}
-            {{ page | safe }}
+            {{ page | safe }}<p>当前页{{ data_list|length }}/共{{ data_count }}条数据</p>
         </ul>
     </nav>
 </div>

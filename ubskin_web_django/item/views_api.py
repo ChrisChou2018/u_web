@@ -140,34 +140,47 @@ def get_item_comment(request):
         return JsonResponse(return_value)
 
 
-class CreateCommentForm(forms.ModelForm):
-    class Meta:
-        model = item_models.ItemComments
-        fields = ('member_id', 'item_id', 'comment_content',)
-
-    def save(self, commit=True):
-        # Save the provided password in hashed format
-        user = super(CreateCommentForm, self).save(commit=False)
-        if commit:
-            user.save()
-        return user
-
-
 @csrf_exempt
+@decorators.wx_api_authenticated
 def create_item_comment(request):
     return_value = {
         'status': 'error',
         'message': '',
         'data': '',
     }
+    request_args = [
+        'item_id', 'stars', 'comment_content', 'is_hide'
+    ]
     if request.method == 'POST':
-        form = CreateCommentForm(request.POST)
-        if not form.is_valid():
-            return_value['message'] = list(form.errors.values())[0]
-            return JsonResponse(return_value)
-        obj = form.save()
-        comment_image_list = []
+        json_data = request.body
+        json_data = json.loads(json_data)
+        data = {  i: json_data.get(i) for i in request_args }
+        openid = request.COOKIES.get('openid')
+        member = member_models.Member.get_member_by_wx_openid(openid)
+        data.update({'member_id': member.member_id})
+        obj = item_models.create_model_data(
+            item_models.ItemComments,
+            data
+        )
+        return_value['status'] = 'success'
+        return_value['data'] = {'comment_id': obj.comment_id}
+        return JsonResponse(return_value)
+
+@csrf_exempt
+@decorators.wx_api_authenticated
+def upload_cmmment_image(request):
+    return_value = {
+        'status': 'error',
+        'message': '',
+        'data': '',
+    }
+    if request.method == "POST":
+        print(request.POST)
+        comment_id = request.POST.get('comment_id')
+        print(comment_id, 'comment_id..')
         files = request.FILES
+        print(files, 'files.....')
+        comment_image_list = []
         if files:
             for i in files:
                 file_obj = files[i]
@@ -178,13 +191,13 @@ def create_item_comment(request):
                     settings.MEDIA_ROOT,
                 )
                 if data:
-                    data['comment_id'] = obj.comment_id
+                    data['comment_id'] = comment_id
                     comment_image_list.append(data)
             else:
                 item_models.CommentImages. \
                 create_many_comment_image(comment_image_list)
-        return_value['status'] = 'success'
-        return JsonResponse(return_value)
+                return_value['status'] = 'success'
+                return JsonResponse(return_value)
 
 def get_item_info_by_code(request):
     return_value = {
@@ -238,7 +251,6 @@ def shopping_cart(request):
     
     else:
         data = json.loads(request.body)
-        print(data)
         shopping_cart_info = data.get('shopping_cart_info')
         post_type = data.get('post_type')
         if not shopping_cart_info:
