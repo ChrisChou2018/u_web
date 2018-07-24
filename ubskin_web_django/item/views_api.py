@@ -17,7 +17,7 @@ from ubskin_web_django.common import lib_data
 from ubskin_web_django.common import common
 
 
-@decorators.wx_api_authenticated
+# @decorators.wx_api_authenticated
 def get_item_list(request):
     return_value  = {
         'status': 'error',
