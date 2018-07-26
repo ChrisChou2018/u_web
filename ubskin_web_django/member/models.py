@@ -459,6 +459,7 @@ class UserCollectionItem(models.Model):
             return item_id_list
         else:
             return list()
+    
 
     class Meta:
         db_table = 'user_collection_item'
@@ -544,6 +545,9 @@ def get_data_count(model, search_value=None, search_value_type='dict'):
 
 def create_model_data(model, data):
     return model.objects.create(**data)
+
+def get_or_create_model_data(model, data):
+    return model.objects.get_or_create(**data)
 
 def update_or_create_model_data(model, data):
     return model.objects.update_or_create(**data)
