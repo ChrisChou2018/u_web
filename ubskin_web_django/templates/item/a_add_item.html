@@ -99,7 +99,7 @@
         </div>
         <div class="form-group">
             <label class="control-label">选择分类:</label>
-            <select name="categories_id" class="form-control">
+            <select name="categorie_id" class="form-control">
                 <option value="" selected>--选择--</option>
                 {% for i in categories_dict %}
                     {% if form_data and form_data.categories_id is not None and i == form_data.categories_id %}

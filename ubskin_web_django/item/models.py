@@ -27,7 +27,7 @@ class Brands(models.Model):
 
     @classmethod
     def get_brands_dict_for_all(cls):
-        all_data = cls.objects.all().values_list('brand_id','cn_name')
+        all_data = cls.objects.filter(status='normal').values_list('brand_id','cn_name')
         return dict(all_data)
 
     @classmethod
@@ -84,7 +84,7 @@ class Items(models.Model):
     )
     specifications_type_id      = models.SmallIntegerField(db_column="specifications_type_id", choices=specifications_type_choices, null=True, blank=True, verbose_name="单位类型")
     specifications_type         = models.CharField(db_column="specifications_type", null=True, blank=True, verbose_name="单位", max_length=255)
-    categorie_id               = models.BigIntegerField(db_column="categorie_id", null=True, blank=True, verbose_name="分类ID")
+    categorie_id                = models.BigIntegerField(db_column="categorie_id", null=True, blank=True, verbose_name="分类ID")
     brand_id                    = models.BigIntegerField(db_column="brand_id", null=True, blank=True, verbose_name="品牌ID")
     brand_name                  = models.CharField(db_column="brand_name", null=True, blank=True, verbose_name="品牌名", max_length=255)
     for_people                  = models.CharField(db_column="for_people", null=True, blank=True, verbose_name="适用人群", max_length=255)
@@ -280,7 +280,7 @@ class Categories(models.Model):
 
     @classmethod
     def get_categoreis_dict_for_all(cls):
-        all_obj =  cls.objects.all().values_list("categorie_id", "categorie_name")
+        all_obj =  cls.objects.filter(status='normal').values_list("categorie_id", "categorie_name")
         return dict(all_obj)
 
     @classmethod
@@ -305,7 +305,7 @@ class Categories(models.Model):
     @classmethod
     def get_categorie_by_id(cls, categorie_id):
         try:
-            return cls.objects.get(pk=categorie_id)
+            return cls.objects.get(pk=categorie_id, status='normal')
         except cls.DoesNotExist:
             return None
 

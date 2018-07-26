@@ -438,6 +438,32 @@ class UserOrder(models.Model):
     class Meta:
         db_table = "user_order"
 
+
+class UserCollectionItem(models.Model):
+    user_collection_id = models.AutoField(db_column="user_collection_id", verbose_name="用户收藏商品id", primary_key=True)
+    member_id = models.BigIntegerField(db_column="member_id", verbose_name="用户ID")
+    item_id = models.BigIntegerField(db_column="item_id", verbose_name="商品ID", null=True, blank=True)
+    create_time = models.IntegerField(db_column="create_time", verbose_name="创建时间", default=int(time.time()))
+    status = models.CharField(db_column="status", verbose_name="状态", default="normal", max_length=255)
+
+
+    @classmethod
+    def user_has_collection_item(cls, member_id, item_id):
+        return True if cls.objects.filter(member_id=member_id, item_id=item_id, status='normal') else False
+
+    @classmethod
+    def get_user_collection_item(cls, member_id):
+        objs = cls.objects.filter(member_id=member_id, status='normal').values_list('item_id').order_by('-pk')
+        if objs:
+            item_id_list = [i[0] for i in objs]
+            return item_id_list
+        else:
+            return list()
+
+    class Meta:
+        db_table = 'user_collection_item'
+
+
 class OutOrder(models.Model):
     out_order_id = models.AutoField(db_column="out_order_id", verbose_name="外部订单表ID", primary_key=True)
     member_nickname = models.CharField(db_column='member_nickname', verbose_name='用户昵称', max_length=255, null=True, blank=True)
@@ -490,6 +516,7 @@ class OutOrder(models.Model):
     class Meta:
         db_table = "out_order"
 
+
 def get_data_list(model, current_page, search_value=None, order_by="-pk", search_value_type='dict'):
     if search_value:
         if search_value_type == 'dict':
@@ -528,3 +555,4 @@ def get_model_dict_by_pk(model, pk):
     obj = model.objects.filter(pk=pk).first()
     obj = model_to_dict(obj) if obj else None
     return obj
+

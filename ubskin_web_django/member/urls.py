@@ -39,4 +39,5 @@ urlpatterns += [
     path('api/create_user_order/', views_api.create_user_order),
     path('api/get_user_order/', views_api.get_user_order),
     path('api/get_user_orer_info/<str:order_num>/', views_api.get_user_order_info),
+    path('api/user_collection_item/', views_api.user_collection_item),
 ]

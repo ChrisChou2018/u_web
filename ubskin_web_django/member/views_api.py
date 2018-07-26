@@ -391,3 +391,29 @@ def change_order_status(request):
         return_value['status'] = 'success'
         return JsonResponse(return_value)
 
+@csrf_exempt
+@decorators.wx_api_authenticated
+def user_collection_item(request):
+    return_value = {
+        'status': 'error',
+        'message': ''
+    }
+    openid = request.COOKIES.get('openid')
+    member = member_models.Member.get_member_by_wx_openid(openid)
+    if request.method == 'POST':
+        data = request.body
+        data = json.loads(data)
+        item_id_list = data.get('item_id_list')
+        for i in item_id_list:
+            member_models.create_model_data(
+                member_models.UserCollectionItem,
+                {'item_id': i, 'member_id': member.member_id}
+            )
+        return_value['status'] = 'success'
+        return JsonResponse(return_value)
+    else:
+        item_id_list = member_models.UserCollectionItem.get_user_collection_item(member.member_id)
+        return_value['status'] = 'success'
+        return_value['data'] = item_id_list
+        return JsonResponse(return_value)
+
