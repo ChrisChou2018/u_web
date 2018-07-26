@@ -447,6 +447,19 @@ class UserCollectionItem(models.Model):
     status = models.CharField(db_column="status", verbose_name="状态", default="normal", max_length=255)
 
 
+    @classmethod
+    def user_has_collection_item(cls, member_id, item_id):
+        return True if cls.objects.filter(member_id=member_id, item_id=item_id, status='normal') else False
+
+    @classmethod
+    def get_user_collection_item(cls, member_id):
+        objs = cls.objects.filter(member_id=member_id, status='normal').values_list('item_id').order_by('-pk')
+        if objs:
+            item_id_list = [i[0] for i in objs]
+            return item_id_list
+        else:
+            return list()
+
     class Meta:
         db_table = 'user_collection_item'
 

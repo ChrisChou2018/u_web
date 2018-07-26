@@ -36,6 +36,8 @@ def get_item_info(request, item_id):
         'status': 'error',
         'message': ''
     }
+    openid = request.COOKIES.get('openid')
+    member = member_models.Member.get_member_by_wx_openid(openid) if openid is not None else None
     if  request.method == 'GET':
         item_obj = item_models.get_model_obj_by_pk(
             item_models.Items,
@@ -85,6 +87,12 @@ def get_item_info(request, item_id):
             item_dict['specifications_type'] = dict(
                 item_models.Items.specifications_type_choices
             )[item_dict['specifications_type_id']] if item_dict['specifications_type_id'] else ''
+            if member:
+                b = member_models.UserCollectionItem. \
+                    user_has_collection_item(member.member_id, item_dict['item_id'])
+                item_dict['has_collection'] = b
+            else:
+                item_dict['has_collection'] = False
             return_value['status'] = 'success'
             return_value['data'] = item_dict
             return JsonResponse(return_value)
