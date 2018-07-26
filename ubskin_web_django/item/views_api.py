@@ -58,6 +58,12 @@ def get_item_info(request, item_id):
                         cdn=True
                     )
                 item_dict['item_image'] = item_image
+            else:
+                item_dict['item_image'] = [common.build_photo_url(
+                        None,
+                        pic_version="title",
+                        cdn=True
+                    ),]
             
             if item_info_image:
                 item_info_image['image_path'] = common.build_photo_url(
@@ -66,6 +72,19 @@ def get_item_info(request, item_id):
                     cdn=True
                 )
                 item_dict['item_info_image'] = item_info_image
+            else:
+                item_dict['item_info_image'] = common.build_photo_url(
+                    None,
+                    pic_version="item",
+                    cdn=True
+                )
+            categories = item_models.Categories.get_categorie_by_id(item_dict['categorie_id'])
+            item_dict['categorie_name'] = categories.categorie_name if categories else ''
+            brand = item_models.Brands.get_brand_by_id(item_dict['brand_id'])
+            item_dict['brand_name'] = brand.cn_name if brand else ''
+            item_dict['specifications_type'] = dict(
+                item_models.Items.specifications_type_choices
+            )[item_dict['specifications_type_id']] if item_dict['specifications_type_id'] else ''
             return_value['status'] = 'success'
             return_value['data'] = item_dict
             return JsonResponse(return_value)
@@ -90,6 +109,8 @@ def get_item_info_list(request):
             )
             if item_obj:
                 item_dict = model_to_dict(item_obj)
+                item_dict['item_name'] = item_dict['item_name'] \
+                    if item_dict['status'] == 'normal' else item_dict['item_name'] + '(该商品已经下架)'
                 item_dict['image_path'] = common.build_photo_url(item_dict['photo_id'], cdn=True)
                 data_list.append(item_dict)
         return_value['status'] = 'success'
