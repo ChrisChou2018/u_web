@@ -405,10 +405,17 @@ def user_collection_item(request):
         data = json.loads(data)
         item_id_list = data.get('item_id_list')
         for i in item_id_list:
-            member_models.create_model_data(
+            obj, has_new = member_models.get_or_create_model_data(
                 member_models.UserCollectionItem,
                 {'item_id': i, 'member_id': member.member_id}
             )
+            if not has_new:
+                if obj.status != 'normal':
+                    obj.status = 'normal'
+                    obj.save()
+                else:
+                    obj.status = 'deleted'
+                    obj.save()
         return_value['status'] = 'success'
         return JsonResponse(return_value)
     else:
