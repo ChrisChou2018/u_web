@@ -73,6 +73,7 @@ python3 run_server.py
 ```
 python manage.py crontab add #将生成任务ID之后执行
 python manage.py crontab run ebb2a9c313b47207ced3f1c7ab8b4c47 #run后面跟随任务ID
+python manage.py crontab remove #清除所有的计划任务
 ```
 
 
