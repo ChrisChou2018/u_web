@@ -106,6 +106,10 @@ def get_reve_addr(request):
     }
     if request.method == 'GET':
         recv_code = request.GET.get('recv_code')
+        stock_batch_id = request.GET.get('stock_batch_id')
+        if order_models.StockBatch.check_has_stock_batch_id(stock_batch_id):
+            return_value['message'] = '该出库单号已经存在'
+            return JsonResponse(return_value)
         recv_addr = order_models.Recv.get_recv_addr_by_recv_code(recv_code)
         if recv_addr:
             return_value['status'] = 'success'
@@ -154,9 +158,6 @@ def create_stock_bach(request):
         recv_code = request.POST.get('recv_code')
         item_codes_dict = json.loads(request.POST.get('item_codes_dict'))
         has_qr_code_list = list()
-        if order_models.StockBatch.check_has_stock_batch_id(stock_batch_id):
-            return_value['message'] = "提交的出库单号已经存在，请检查"
-            return JsonResponse(return_value)
         if item_codes_dict:
             for key, item in item_codes_dict.items():
                 for i in item:

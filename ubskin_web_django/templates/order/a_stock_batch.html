@@ -197,7 +197,7 @@ $(function() {
         // check if in monitor codes and load brand names
         $.get(
             "{% url 'get_recv_addr' %}",
-            {recv_code: recv_code},
+            {recv_code: recv_code, stock_batch_id: stock_batch_id},
             (r) => {
                 if (r.status == "success") {
                     recv_addr = r.data.recv_addr;
