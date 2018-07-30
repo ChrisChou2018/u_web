@@ -153,6 +153,19 @@ def create_stock_bach(request):
         stock_batch_id = request.POST.get('stock_batch_id')
         recv_code = request.POST.get('recv_code')
         item_codes_dict = json.loads(request.POST.get('item_codes_dict'))
+        has_qr_code_list = list()
+        if order_models.StockBatch.check_has_stock_batch_id(stock_batch_id):
+            return_value['message'] = "提交的出库单号已经存在，请检查"
+            return JsonResponse(return_value)
+        if item_codes_dict:
+            for key, item in item_codes_dict.items():
+                for i in item:
+                    if order_models.ItemQRCode.check_has_item_qr_code(i):
+                        has_qr_code_list.append(i)
+        if has_qr_code_list:
+            l = ','.join(has_qr_code_list)
+            return_value['message'] = "这些录入的二维码已经存在{}".format(l)
+            return JsonResponse(return_value)
         nums_dict = json.loads(request.POST.get('nums_dict'))
         create_user_id = request.user.member_id
         if not recv_code or not stock_batch_id or not (item_codes_dict or  nums_dict):

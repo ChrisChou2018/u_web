@@ -22,7 +22,7 @@
 </style>
 {% endblock %}
 {% block title %}
-<button class="btn btn-default back_btn" onclick="history.back()">🔙</button> 商品出库扫码            
+<button class="btn btn-default back_btn" onclick="history.back()">🔙</button> 商品出库扫码       
 {% endblock %}
 {% block page_header %}
 <ol class="breadcrumb">
@@ -102,6 +102,7 @@
             </div>
             <div>
                 <button id="id_btn_submit" type="button" class="btn btn-primary">出库商品扫描完毕</button>
+                <button type="button" class="btn btn-primary" onclick="location.reload()">重新录入</button>
             </div>
         </div>
         </form>
