@@ -5,6 +5,7 @@ from django.core.paginator import Paginator
 from django.forms import model_to_dict
 from django.conf import settings
 from django.db.models import Q
+from django.db.models import Count
 
 from ubskin_web_django.member import models as member_models
 from ubskin_web_django.common import common
@@ -23,6 +24,7 @@ class Brands(models.Model):
     key_word                    = models.CharField(db_column="key_word", null=True, blank=True, verbose_name="搜索关键字", max_length=255)
     brand_about                 = models.CharField(db_column="brand_about", null=True, blank=True, verbose_name="品牌简介", max_length=255)
     photo_id                    = models.CharField(db_column="photo_id", null=True, blank=True, verbose_name='图片名', max_length=255)
+    is_hot                      = models.BooleanField(db_column="is_hot", verbose_name='是否热门品牌', default=False)
     is_watch                    = models.BooleanField(db_column='is_watch', verbose_name='重点关注', default=False)
     status                      = models.CharField(db_column="status", verbose_name="状态", default="normal", max_length=255)
 
@@ -30,6 +32,14 @@ class Brands(models.Model):
     def get_brands_dict_for_all(cls):
         all_data = cls.objects.filter(status='normal').values_list('brand_id','cn_name')
         return dict(all_data)
+
+    @classmethod
+    def get_all_brand_dict_for_api(cls):
+        all_data = cls.objects.filter(status='normal', is_hot=True).values('brand_id', 'cn_name', 'photo_id')
+        all_data = list(all_data)
+        for i in all_data:
+            i['image'] = common.build_photo_url(i['photo_id'], pic_version="thumbicon", cdn=True)
+        return all_data
 
     @classmethod
     def get_brand_by_id(cls, brand_id):
@@ -144,9 +154,13 @@ class Items(models.Model):
         return items_list
     
     @classmethod
-    def get_items_by_categorie_id(cls, categorie_id, current_page):
-        item_obj = cls.objects. \
-            filter(categorie_id = categorie_id, status = 'normal').order_by('-item_id')
+    def get_items_by_categorie_id(cls, data_id, filter_type, order_by, current_page):
+        if filter_type == 'categorie_id':
+            item_obj = cls.objects. \
+                filter(categorie_id = data_id, status = 'normal').order_by(order_by)
+        else:
+            item_obj = cls.objects. \
+                filter(brand_id = data_id, status = 'normal').order_by(order_by)
         p = Paginator(item_obj, 15)
         items_list =  list(
             p.page(current_page).object_list.values(
@@ -154,9 +168,9 @@ class Items(models.Model):
             )
         )
         for i in items_list:
-            i['item_thumbicon'] = common.build_photo_url(i['photo_id'], cdn=True)
+            i['image'] = common.build_photo_url(i['photo_id'], pic_version='thumbicon', cdn=True)
         return items_list
-    
+
     @classmethod
     def get_item_name_by_barcode(cls, item_barcode):
         obj = cls.objects.filter(item_barcode=item_barcode).first()
@@ -276,6 +290,7 @@ class Categories(models.Model):
     categorie_name  = models.CharField(db_column="categorie_name", verbose_name="分类名", max_length=255)
     categorie_type  = models.CharField(db_column="categorie_type", null=True, blank=True, verbose_name="类别", max_length=255)
     photo_id        = models.CharField(db_column="photo_id", null=True, blank=True, verbose_name="缩略图路径", max_length=255)
+    is_hot          = models.BooleanField(db_column="is_hot", verbose_name='是否热门品牌', default=False)
     status          = models.CharField(db_column="status", verbose_name="状态", default="normal", max_length=255)
 
 
@@ -321,16 +336,20 @@ class Categories(models.Model):
     @classmethod
     def get_categoreis_for_api(cls):
         data_dict = dict()
-        for i in cls.type_choices:
-            temp = cls.objects.filter(categorie_type = i[0]).values('categorie_id', 'categorie_name', 'photo_id')
+        categorie_type = cls.objects.filter(~Q(categorie_type=None), status='normal').values('categorie_type').annotate(c=Count('categorie_type'))
+        for i in categorie_type:
+            temp = cls.objects.filter(categorie_type = i['categorie_type']).values('categorie_id', 'categorie_name', 'photo_id')
             temp = list(temp)
             for j in temp:
                 j['image_path'] = common.build_photo_url(j['photo_id'], pic_version='thumbicon', cdn=True)
-            data_dict[i[1]] = temp
-        # brands = Brands.objects.filter(status='normal').values('brand_id', 'cn_name', 'photo_id')
-        # for i in brands:
-        #     i['image_path'] = common.build_photo_url(i['photo_id'], pic_version='thumbicon', cdn=True)
-        # data_dict['热门品牌'] = list(brands)
+            data_dict[i['categorie_type']] = temp
+        obj = cls.objects.filter(is_hot=True, status='normal').values('categorie_id', 'categorie_name', 'photo_id')
+        if obj:
+            obj = list(obj)
+            for j in obj:
+                j['image_path'] = common.build_photo_url(j['photo_id'], pic_version='thumbicon', cdn=True)
+            data_dict['热门分类'] = obj
+        data_dict['热门品牌'] = Brands.get_all_brand_dict_for_api()
         return data_dict
 
 

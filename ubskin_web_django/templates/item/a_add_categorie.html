@@ -24,17 +24,15 @@
         <div class="form-group">
           <label for="cn_name_abridge">类别</label>
           <input type="text" class="form-control" id="exampleInputEmail1" name="categorie_type" value="{% if form_data.categorie_type %}{{ form_data.categorie_type }}{% endif %}">
-          <!-- <select name="categorie_type" id="" class="form-control">
-                <option value="">--选择类别--</option>
-                {% for key in categorie_choices %}
-                    {% if form_data and form_data.categorie_type is not None and form_data.categorie_type == key %}
-                        <option value="{{ key }}" selected>{% get_value_by_key categorie_choices key %}</option>
-                    {% else %}
-                        <option value="{{ key }}">{% get_value_by_key categorie_choices key %}</option>
-                    {% endif %}
-                {% endfor %}
-          </select> -->
           <span style="color: red">{% if form_errors.categorie_type %}{{ form_errors.categorie_type }}{% endif %}</span>
+        </div>
+        <div class="form-group">
+            <label for="" class="control-label">是否为热门分类</label>
+            {% if form_data.is_hot %}
+            <input type="checkbox"  id="recipient-name" name="is_hot" checked>
+            {% else %}
+            <input type="checkbox"  id="recipient-name" name="is_hot">
+            {% endif %}
         </div>
         <div class="form-group">
             <label for="from_country">品牌图片</label>
