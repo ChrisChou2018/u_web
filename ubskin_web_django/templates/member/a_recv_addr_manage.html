@@ -17,11 +17,15 @@
 </style>
 {% endblock %}
 {% block title %}
-用户地址管理            
+<ul class="nav nav-tabs">
+    <li role="presentation"><a href="{% url 'member_manage' %}">用户表</a></li>
+    <li role="presentation" class="active"><a href="{% url 'recv_addr_manage' %}">用户收货地址</a></li>
+</ul>              
 {% endblock %}
 {% block page_header %}
 <ol class="breadcrumb">
-    <li><a href="#"><i class="fa fa-dashboard"></i>用户地址管理</a></li>
+    <li><a href="#"><i class="fa fa-dashboard"></i> 用户管理</a></li>
+    <li><a href="#"><i class="fa fa-dashboard"></i>用户收获地址</a></li>
 </ol>
 {% endblock %}
 
@@ -118,7 +122,7 @@
 {% block js %}
     <script>
     $(function(){
-        $('.recv_addr_manage').addClass('active')
+        $('.member_manage').addClass('active')
         $('#modalItemCodes').on('show.bs.modal', (e) => {
             let btn = $(e.relatedTarget);
             let data_id = btn.data('dataid');

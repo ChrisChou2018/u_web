@@ -278,7 +278,8 @@ class AddBrandForm(forms.ModelForm):
         model = item_models.Brands
         fields = (
             'cn_name', 'cn_name_abridge', 'en_name',
-            'form_country', 'key_word', 'brand_about'
+            'form_country', 'key_word', 'brand_about',
+            'is_hot'
         )
 
 
@@ -327,7 +328,8 @@ class EditorBrandForm(forms.ModelForm):
         model = item_models.Brands
         fields = (
             'cn_name', 'cn_name_abridge', 'en_name',
-            'form_country', 'key_word', 'brand_about'
+            'form_country', 'key_word', 'brand_about',
+            'is_hot',
         )
 
 
@@ -417,7 +419,7 @@ class AddCategorieForm(forms.ModelForm):
     class Meta:
         model = item_models.Categories
         fields = (
-            'categorie_name', 'categorie_type',
+            'categorie_name', 'categorie_type', 'is_hot'
         )
 
 
@@ -468,7 +470,7 @@ class EditorCategorieForm(forms.ModelForm):
     class Meta:
         model = item_models.Categories
         fields = (
-            'categorie_name', 'categorie_type',
+            'categorie_name', 'categorie_type', 'is_hot'
         )
 
     def update(self, categorie_id):
