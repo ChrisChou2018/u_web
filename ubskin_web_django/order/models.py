@@ -60,6 +60,13 @@ class StockBatch(models.Model):
             return obj[0]
         else:
             return None
+    
+    @classmethod
+    def check_has_stock_batch_id(cls, stock_batch_id):
+        flag = False
+        obj = cls.objects.filter(stock_batch_id=stock_batch_id).first()
+        flag = True if obj else False
+        return flag
 
 
     class Meta:
@@ -91,6 +98,7 @@ class StockBatchCount(models.Model):
     @classmethod
     def get_stock_batch_count_by_stock_batch_id(cls, stock_batch_id):
         return cls.objects.filter(stock_batch_id=stock_batch_id).values()
+    
 
 class ItemQRCode(models.Model):
     qr_code_id = models.AutoField(db_column='qr_code_id', primary_key=True, verbose_name='qr_code_id')
@@ -126,6 +134,13 @@ class ItemQRCode(models.Model):
                 i['item_name'] = item_model.Items.get_item_name_by_barcode(i['item_barcode'])
         data_dict['all_count'] = StockBatchCount.get_item_count_by_stock_batch_id(stock_batch_id)
         return data_dict
+
+    @classmethod
+    def check_has_item_qr_code(cls, item_qr_code):
+        flag = False
+        obj = cls.objects.filter(qr_code=item_qr_code).first()
+        flag = True if obj else False
+        return flag
 
 
     class Meta:

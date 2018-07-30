@@ -106,6 +106,10 @@ def get_reve_addr(request):
     }
     if request.method == 'GET':
         recv_code = request.GET.get('recv_code')
+        stock_batch_id = request.GET.get('stock_batch_id')
+        if order_models.StockBatch.check_has_stock_batch_id(stock_batch_id):
+            return_value['message'] = '该出库单号已经存在'
+            return JsonResponse(return_value)
         recv_addr = order_models.Recv.get_recv_addr_by_recv_code(recv_code)
         if recv_addr:
             return_value['status'] = 'success'
@@ -127,13 +131,18 @@ def get_item_info_by_code(request):
             return_value['message'] = '无效的商品码'
             return JsonResponse(return_value)
         item_dict = item_models.Items.get_item_dict_by_item_barcode(item_barcode)
+        brand_id = item_dict.get('brand_id')
+        brand = None
+        if brand_id:
+            brand = item_models.get_model_obj_by_pk(item_models.Brands, brand_id)
         if item_dict is None:
             return_value['message'] = '没有找到相关的商品'
             return JsonResponse(return_value)
-        
         recv = order_models.Recv.get_recv_obj_by_recv_code(recv_code)
         if recv:
             return_value['in_monitor'] = True if recv.is_watch else False
+            if brand_id and brand:
+                return_value['in_monitor'] = True if recv.is_watch and brand.is_watch else False
         item_dict.pop("item_id")
         return_value['status'] = 'success'
         return_value['data'] = item_dict
@@ -148,6 +157,16 @@ def create_stock_bach(request):
         stock_batch_id = request.POST.get('stock_batch_id')
         recv_code = request.POST.get('recv_code')
         item_codes_dict = json.loads(request.POST.get('item_codes_dict'))
+        has_qr_code_list = list()
+        if item_codes_dict:
+            for key, item in item_codes_dict.items():
+                for i in item:
+                    if order_models.ItemQRCode.check_has_item_qr_code(i):
+                        has_qr_code_list.append(i)
+        if has_qr_code_list:
+            l = ','.join(has_qr_code_list)
+            return_value['message'] = "这些录入的二维码已经存在{}".format(l)
+            return JsonResponse(return_value)
         nums_dict = json.loads(request.POST.get('nums_dict'))
         create_user_id = request.user.member_id
         if not recv_code or not stock_batch_id or not (item_codes_dict or  nums_dict):
