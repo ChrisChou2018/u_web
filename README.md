@@ -11,6 +11,26 @@ python3 manage.py createsuperuser
 python3 run_migrate.py
 ```
 
+`初始化数据`
+```
+#执行命令类的
+
+#倒入商品
+python manage.py import_item
+# 倒入外部订单数据表
+python manage.py update_out_order
+
+#请求url快捷倒入数据类的
+
+
+#快速导入收货方地址URL
+/create_recv
+#快速导入品牌
+/create_brand
+
+```
+
+
 配置文件相关
 ==========
 配置文件（本机配置相关，都在这里设置，不要直接修改 youproject/settings.py）：
@@ -54,19 +74,13 @@ include /Users/matt/Projects/ubskin_web/conf/vhost_dev.conf;
 ```
 
 项目启动说明
-------
-`本地启动项目`
-直接命令运行
-```
-python3 run_server_local.py
-```
-
-`线上启动`
+确认nginx配置文件没有问题后启动nginx
+`动态路由交给uwsgi`
 执行
 ```
-python3 run_server.py
+uwsgi --socket 127.0.0.1:9001 --file ubskin_web_django/wsgi.py  # 具体IP和端口需要和nginx配置文件上保持一致
 ```
-确认nginx配置文件没有问题后再启动nginx
+
 
 `运行自动化任务`
 执行到期自动确认收货订单
@@ -100,3 +114,5 @@ python manage.py loaddata order_initial_data.json
 python manage.py flush
 
 ```
+
+
