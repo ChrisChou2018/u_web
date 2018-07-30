@@ -81,3 +81,23 @@ def delete_item_comments(request):
         comment_ids_list = request.POST.getlist('comment_ids_list[]')
         item_models.ItemComments.delete_comment_by_id_list(comment_ids_list)
         return JsonResponse({'status': 'success'})
+
+@decorators.js_authenticated
+def set_brand_watch(request):
+    return_value = {
+        'status': 'error',
+        'message': '',
+    }
+    if request.method == 'POST':
+        brand_id = request.POST.get('cid')
+        brand_obj = item_models.get_model_obj_by_pk(item_models.Brands, brand_id)
+        is_watch = True
+        if brand_obj:
+            is_watch = brand_obj.is_watch
+        if is_watch:
+            is_watch = False
+        else:
+            is_watch = True
+        item_models.update_models_by_pk(item_models.Brands, brand_id, {'is_watch': is_watch})
+        return_value['status'] = 'success'
+        return JsonResponse(return_value)

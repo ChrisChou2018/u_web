@@ -30,6 +30,7 @@ urlpatterns += [
     path('js/delete_brands/',  views_js.delete_brands, name='delete_brands'),
     path('js/delete_categories/', views_js.delete_categories, name='delete_categories'),
     path('js/delete_item_comments/', views_js.delete_item_comments, name='delete_item_comments'),
+    path('js/set_brand_watch/', views_js.set_brand_watch, name='set_brand_watch')
 ]
 
 urlpatterns += [

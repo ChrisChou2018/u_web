@@ -71,6 +71,10 @@
                         </div>
                         <div class="col-md-2">
                             <div class="row">
+                                <a id="id_set_watch" onclick="javascript:set_brand_watch('{{ i.brand_id }}');" href="javascript:;">
+                                {% if i.is_watch %}取消重点关注{% else %}加重点关注{% endif %}</a>
+                            </div>
+                            <div class="row">
                                 <a  href="{% url 'editor_brand' %}?brand_id={{i.brand_id}}&back_url={{request.get_full_path}}" style='cursor:pointer;text-decoration:none;'><span class="glyphicon glyphicon-pencil"></span> 编辑</a>
                             </div>
                         </div>
@@ -141,6 +145,14 @@
             }
         })
     })
+    function set_brand_watch(cid) {
+        $.post(
+            "{% url 'set_brand_watch' %}",
+            {'cid': cid, 'csrfmiddlewaretoken':getCookie('csrftoken') },
+            function(r) {
+                location.href = location.href;
+        });
+    }
 </script>
    
 {% endblock %}

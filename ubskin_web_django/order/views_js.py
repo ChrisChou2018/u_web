@@ -127,13 +127,18 @@ def get_item_info_by_code(request):
             return_value['message'] = '无效的商品码'
             return JsonResponse(return_value)
         item_dict = item_models.Items.get_item_dict_by_item_barcode(item_barcode)
+        brand_id = item_dict.get('brand_id')
+        brand = None
+        if brand_id:
+            brand = item_models.get_model_obj_by_pk(item_models.Brands, brand_id)
         if item_dict is None:
             return_value['message'] = '没有找到相关的商品'
             return JsonResponse(return_value)
-        
         recv = order_models.Recv.get_recv_obj_by_recv_code(recv_code)
         if recv:
             return_value['in_monitor'] = True if recv.is_watch else False
+            if brand_id and brand:
+                return_value['in_monitor'] = True if recv.is_watch or brand.is_watch else False
         item_dict.pop("item_id")
         return_value['status'] = 'success'
         return_value['data'] = item_dict
