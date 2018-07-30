@@ -138,7 +138,7 @@ def get_item_info_by_code(request):
         if recv:
             return_value['in_monitor'] = True if recv.is_watch else False
             if brand_id and brand:
-                return_value['in_monitor'] = True if recv.is_watch or brand.is_watch else False
+                return_value['in_monitor'] = True if recv.is_watch and brand.is_watch else False
         item_dict.pop("item_id")
         return_value['status'] = 'success'
         return_value['data'] = item_dict
