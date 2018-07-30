@@ -17,7 +17,11 @@
 </style>
 {% endblock %}
 {% block title %}
-收获方管理            
+<ul class="nav nav-tabs">
+    <li role="presentation"><a href="{% url 'order_manage' %}">商品出库表</a></li>
+    <li role="presentation"><a href="{% url 'item_qr_Code_manage' %}">物码查询</a></li>
+    <li role="presentation" class="active"><a href="{% url 'recv_manage' %}">收获方管理</a></li>
+</ul>         
 {% endblock %}
 {% block page_header %}
 <ol class="breadcrumb">
@@ -137,7 +141,7 @@
 {% block js %}
     <script>
     $(function(){
-        $('.recv_manage').addClass('active')
+        $('.order_manage').addClass('active')
         $('.add_recv_btn').click(function(){
             $('.modal-title').text('创建收货方')
             $('.submit_btn').unbind()
@@ -259,7 +263,8 @@
         )
         
     }
-       
+    
+    
 
     </script>
 {% endblock %}

@@ -17,7 +17,11 @@
 </style>
 {% endblock %}
 {% block title %}
-物码管理表            
+<ul class="nav nav-tabs">
+    <li role="presentation" ><a href="{% url 'order_manage' %}">商品出库表</a></li>
+    <li role="presentation" class="active"><a href="{% url 'item_qr_Code_manage' %}">物码查询</a></li>
+    <li role="presentation"><a href="{% url 'recv_manage' %}">收获方管理</a></li>
+</ul>            
 {% endblock %}
 {% block page_header %}
 <ol class="breadcrumb">
@@ -131,7 +135,7 @@
 {% block js %}
 <script> 
 $(function() {
-    $('.item_qr_code_manage').addClass('active')
+    $('.order_manage').addClass('active')
     $('#modalItemCodes').on('show.bs.modal', (e) => {
         let btn = $(e.relatedTarget);
         let batchId = btn.data('batchid');

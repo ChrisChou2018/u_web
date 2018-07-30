@@ -80,6 +80,11 @@ def get_item_info(request, item_id):
                     pic_version="item",
                     cdn=True
                 )
+            item_dict['item_thumbicon'] = common.build_photo_url(
+                item_dict.get('photo_id'),
+                pic_version="thumbicon",
+                cdn=True
+            )
             categories = item_models.Categories.get_categorie_by_id(item_dict['categorie_id'])
             item_dict['categorie_name'] = categories.categorie_name if categories else ''
             brand = item_models.Brands.get_brand_by_id(item_dict['brand_id'])
@@ -121,6 +126,7 @@ def get_item_info_list(request):
                     if item_dict['status'] == 'normal' else item_dict['item_name'] + '(该商品已经下架)'
                 item_dict['image_path'] = common.build_photo_url(item_dict['photo_id'], cdn=True)
                 data_list.append(item_dict)
+        
         return_value['status'] = 'success'
         return_value['data'] = data_list
         return JsonResponse(return_value)
@@ -137,6 +143,18 @@ def api_get_categories(request):
         return_value['data'] = data_list
         return JsonResponse(return_value)
 
+def api_get_hot_brands(request):
+    return_value  = {
+        'status': 'error',
+        'message': '',
+        'data': '',
+    }
+    if request.method == 'GET':
+        data_list = item_models.Brands.get_all_brand_dict_for_api()
+        return_value['status'] = 'success'
+        return_value['data'] = data_list
+        return JsonResponse(return_value)
+
 def filter_items(request):
     return_value  = {
         'status': 'error',
@@ -144,10 +162,12 @@ def filter_items(request):
         'data': '',
     }
     if request.method == 'GET':
-        categorie_id = request.GET.get('categorie_id')
+        filter_type = request.GET.get('filter_type')
+        data_id = request.GET.get('data_id')
         current_page = request.GET.get('page', 1)
+        order_by = request.GET.get('order_by', 'pk')
         datas = item_models.Items. \
-            get_items_by_categorie_id(categorie_id, current_page)
+            get_items_by_categorie_id(data_id, filter_type, order_by, current_page)
         return_value['status'] = 'success'
         return_value['data'] = datas
         return JsonResponse(return_value)
