@@ -23,6 +23,7 @@ class Brands(models.Model):
     key_word                    = models.CharField(db_column="key_word", null=True, blank=True, verbose_name="搜索关键字", max_length=255)
     brand_about                 = models.CharField(db_column="brand_about", null=True, blank=True, verbose_name="品牌简介", max_length=255)
     photo_id                    = models.CharField(db_column="photo_id", null=True, blank=True, verbose_name='图片名', max_length=255)
+    is_watch                    = models.BooleanField(db_column='is_watch', verbose_name='重点关注', default=False)
     status                      = models.CharField(db_column="status", verbose_name="状态", default="normal", max_length=255)
 
     @classmethod
@@ -503,3 +504,6 @@ def get_model_obj_by_pk(model, pk):
          return model.objects.get(pk=pk)
     except model.DoesNotExist:
         return None
+
+def update_models_by_pk(model, pk, data):
+    model.objects.filter(pk=pk).update(**data)
