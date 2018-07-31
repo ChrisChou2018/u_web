@@ -65,13 +65,17 @@ def import_item_data(f_path=None):
                     v = sh1.row(rx)[idx].value
                     if '_' in v:
                         categorie_type, categorie_name = v.split('_')
+                    elif v == '0':
+                        categorie_type = '其他'
+                        categorie_name = '其他'
                     else:
-                        categorie_type = None
+                        categorie_type = '其他'
                         categorie_name = v
-                    model_obj, has = categories.objects.get_or_create(
-                        categorie_type=categorie_type, categorie_name=categorie_name
-                    )
-                    obj[key] = model_obj.pk
+                    if categorie_name and categorie_type:
+                        model_obj, has = categories.objects.get_or_create(
+                            categorie_type=categorie_type, categorie_name=categorie_name
+                        )
+                        obj[key] = model_obj.pk
                 else:
                     obj[key] = None
             elif key == 'brand_id':

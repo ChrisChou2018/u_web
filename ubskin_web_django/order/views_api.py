@@ -48,7 +48,7 @@ def create_stock_batch_api(request):
                 break
         data = json.loads(request.body)
         recv_code = data.get('shop_id')
-        item_codes_dict = data.get('item_codes_dict')
+        item_codes_dict = data.get('item_codes_dict')        
         openid = request.COOKIES.get('openid')
         member = member_models.Member.get_member_by_wx_openid(openid)
         if not member and not member.is_staff:
@@ -105,6 +105,7 @@ def item_code(request, qr_code):
     if not qr_code_obj:
         return_value['message'] = '没有记录'
         return JsonResponse(return_value)
+        
     stock_batch_count_id = qr_code_obj.stock_batch_count_id
     obj = order_models.get_model_obj_by_pk(
         order_models.StockBatchCount,

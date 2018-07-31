@@ -379,13 +379,23 @@ def editor_brand(request):
 @login_required(login_url='/myadmin/signin/')
 def categorie_manage(request):
     if request.method == 'GET':
+        search_dict = {
+            'search_value': 'categorie_name__icontains',
+            'categorie_type': 'categorie_type',
+        }
+        search_value = dict()
         current_page = request.GET.get('page', 1)
-        value = request.GET.get('search_value', '')
-        filter_args = None
-        # categorie_choices = dict(item_models.Categories.type_choices)
-        if value:
-            filter_args = '&search_value={0}'.format(value)
-            search_value = {'categorie_name__icontains': value}
+        categorie_types = item_models.Categories.get_all_categorie_type()
+        filter_args = '&'
+        for i in search_dict:
+            value = request.GET.get(i)
+            if value is not None:
+                search_value[search_dict[i]] = value
+                filter_args += "{}={}".format(i, value)
+        else:
+            if len(filter_args) == 1:
+                filter_args = None
+        if search_value:
             categories_list = item_models.Categories. \
                 get_list_categories(current_page, search_value)
             categories_list = item_models.get_data_list(
@@ -405,11 +415,12 @@ def categorie_manage(request):
             request,
             'item/a_categorie_manage.html',
             current_page = current_page,
-            search_value = value,
+            form_data = request.GET,
             filter_args = filter_args,
             # categorie_choices = categorie_choices,
             categories_list = categories_list,
             categories_count = categories_count,
+            categorie_types = categorie_types,
         )
 
 
@@ -515,8 +526,7 @@ def editor_categorie(request):
             if data:
                 categorie.photo_id = data['photo_id']
                 categorie.save()
-        back_url = request.GET.get('back_url')
-        return redirect(back_url)
+        return redirect(request.get_full_path().split('back_url=')[1])
 
 @login_required(login_url='/myadmin/signin/')
 def item_comment_manage(request):
