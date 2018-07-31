@@ -89,7 +89,7 @@ def add_item(request):
         item_models.Items.specifications_type_choices
     )
     brands_dict = item_models.Brands.get_brands_dict_for_all()
-    categories_dict = item_models.Categories.get_categoreis_dict_for_all()
+    categories_dict = item_models.Categories.get_categoreis_select_for_all()
     if request.method == 'GET':
         return my_render(
             request,
@@ -167,7 +167,7 @@ def editor_item(request):
         item_models.Items.specifications_type_choices
     )
     brands_dict = item_models.Brands.get_brands_dict_for_all()
-    categories_dict = item_models.Categories.get_categoreis_dict_for_all()
+    categories_dict = item_models.Categories.get_categoreis_select_for_all()
     item_id = request.GET.get('item_id')
     item_obj = item_models.Items.get_item_by_id(item_id)
     form_data = model_to_dict(item_obj)

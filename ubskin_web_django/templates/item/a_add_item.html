@@ -102,10 +102,10 @@
             <select name="categorie_id" class="form-control">
                 <option value="" selected>--选择--</option>
                 {% for i in categories_dict %}
-                    {% if form_data and form_data.categories_id is not None and i == form_data.categories_id %}
-                        <option value="{{ i }}" selected>{% get_value_by_key categories_dict i %}</option>
+                    {% if form_data and form_data.categorie_id is not None and i.categorie_id == form_data.categorie_id %}
+                        <option value="{{ i.categorie_id }}" selected>{{ i.categorie_name }}</option>
                     {% else %}
-                        <option value="{{ i }}">{% get_value_by_key categories_dict i %}</option>
+                        <option value="{{ i.categorie_id }}">{{ i.categorie_name }}</option>
                     {% endif %}
                 {% endfor %}
             </select>
