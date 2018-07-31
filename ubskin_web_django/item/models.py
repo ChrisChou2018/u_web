@@ -295,6 +295,18 @@ class Categories(models.Model):
 
 
     @classmethod
+    def get_categoreis_select_for_all(cls):
+        data_list = list()
+        data = cls.objects.values('categorie_type').annotate(c=Count('categorie_type'))
+        for i in data:
+            o = cls.objects.filter(categorie_type=i['categorie_type']).values("categorie_id", "categorie_name")
+            for j in o:
+                j['categorie_name'] = i['categorie_type'] + '__' + j['categorie_name']
+            data_list.extend(o)
+        # all_obj =  cls.objects.filter(status='normal').values_list("categorie_id", "categorie_name")
+        return data_list
+    
+    @classmethod
     def get_categoreis_dict_for_all(cls):
         all_obj =  cls.objects.filter(status='normal').values_list("categorie_id", "categorie_name")
         return dict(all_obj)
