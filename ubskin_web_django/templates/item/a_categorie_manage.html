@@ -20,7 +20,7 @@
             <div class="col-md-8">
                 <form action="" method="GET" class="search_input">
                 <div class="input-group">
-                    <input type="text" class="form-control" placeholder="搜索分类名称" name="search_value" value="{{ search_value }}">
+                    <input type="text" class="form-control" placeholder="搜索分类名称" name="search_value" value="{{ form_data.search_value }}">
                     <span class="input-group-btn">
                         <button class="btn btn-default search_input_btn" type="submit">搜索</button>
                     </span>
@@ -41,43 +41,51 @@
 {% endblock %}
 
 {% block content %}
-
-<div style="padding: 15px;overflow: auto;">
-    {% for i in categories_list %}
-        <div class="panel panel-success categories_list">
-            <div class="panel-heading"><input type="checkbox" class="item_checkbox" item-id={{i.categorie_id}}>分类名：{{i.categorie_name}}</div>
-            <div class="panel-body">
-                <div class="media-left">
-                    <a href="#">
-                        <img class="media-object" src="{% build_photo_url i.photo_id %}" style="width: 100px; height: 100px;">
+<div class="row" style="padding: 15px;overflow: auto;">
+    <div class="col-md-3">
+        <div class="list-group">
+            <!-- <a href="#" class="list-group-item active">
+                Cras justo odio
+            </a> -->
+            {% for i in categorie_types %}
+                {% if form_data.categorie_type == i.categorie_type %}
+                    <a href="{% url 'categorie_manage' %}?page={{ current_page }}&categorie_type={{ i.categorie_type }}" class="list-group-item active">
+                            <span class="badge">{{ i.c }}</span>
+                            {{ i.categorie_type }}
                     </a>
-                </div>
-                <div class="media-body">
-                    <div class="row">
-                        <div class="col-md-2"></div>
-                        <div class="col-md-8">
-                            <br>
-                            类别：{{ i.categorie_type }}
-                        </div>
-                        <div class="col-md-2">
-                            <a  href="{% url 'editor_categorie' %}?categorie_id={{i.categorie_id}}&back_url={{request.get_full_path}}" style='cursor:pointer;text-decoration:none;'><span class="glyphicon glyphicon-pencil"></span> 编辑</a>
-                        </div>
-                    </div>
-                </div>
-            </div>
+                {% else %}
+                    <a href="{% url 'categorie_manage' %}?page={{ current_page }}&categorie_type={{ i.categorie_type }}" class="list-group-item">
+                            <span class="badge">{{ i.c }}</span>
+                            {{ i.categorie_type }}
+                    </a>
+                {% endif %}
+            {% endfor %}
         </div>
-    {% endfor %}
+    </div>
+    <div class="col-md-9">
+        <div class="row" style="text-align: center">
+                {% for i in categories_list %}
+                    <dir class="col-md-3 categories_list">
+                        <img class="media-object" src="{% build_photo_url i.photo_id %}" style="width: 70px; height: 70px;margin: 0 auto;">
+                        <span> <input type="checkbox" class="item_checkbox" item-id={{i.categorie_id}}> <a  href="{% url 'editor_categorie' %}?categorie_id={{i.categorie_id}}&back_url={{request.get_full_path}}" style='cursor:pointer;text-decoration:none;'>{{i.categorie_name}}</a></span>
+                    </dir>
+                {% endfor %}
+        </div>
+        
+        <div>
+            <nav aria-label="Page navigation">
+                <ul class="pagination page_box">
+                    {% Pagingfunc current_page categories_count filter_args request.path as page %}
+                    {{ page | safe }}<p>当前页{{ categories_list|length }}/共{{ categories_count }}条数据</p>
+                </ul>
+            </nav>
+        </div>
+
+    </div>
+
 </div>
 
 
-<div>
-    <nav aria-label="Page navigation">
-        <ul class="pagination page_box">
-            {% Pagingfunc current_page categories_count filter_args request.path as page %}
-            {{ page | safe }}<p>当前页{{ categories_list|length }}/共{{ categories_count }}条数据</p>
-        </ul>
-    </nav>
-</div>
 
 
 {% endblock %}

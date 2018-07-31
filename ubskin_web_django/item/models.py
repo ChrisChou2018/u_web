@@ -288,7 +288,7 @@ class Categories(models.Model):
     '''
     categorie_id   = models.AutoField(db_column="categorie_id", verbose_name="分类ID", primary_key=True)
     categorie_name  = models.CharField(db_column="categorie_name", verbose_name="分类名", max_length=255)
-    categorie_type  = models.CharField(db_column="categorie_type", null=True, blank=True, verbose_name="类别", max_length=255)
+    categorie_type  = models.CharField(db_column="categorie_type", default='其他', verbose_name="类别", max_length=255)
     photo_id        = models.CharField(db_column="photo_id", null=True, blank=True, verbose_name="缩略图路径", max_length=255)
     is_hot          = models.BooleanField(db_column="is_hot", verbose_name='是否热门品牌', default=False)
     status          = models.CharField(db_column="status", verbose_name="状态", default="normal", max_length=255)
@@ -298,6 +298,11 @@ class Categories(models.Model):
     def get_categoreis_dict_for_all(cls):
         all_obj =  cls.objects.filter(status='normal').values_list("categorie_id", "categorie_name")
         return dict(all_obj)
+    
+    @classmethod
+    def get_all_categorie_type(cls):
+        data = cls.objects.values('categorie_type').annotate(c=Count('categorie_type'))
+        return data
 
     @classmethod
     def get_list_categories(cls, current_page, search_value=None):
