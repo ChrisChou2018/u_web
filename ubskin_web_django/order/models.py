@@ -59,8 +59,8 @@ class StockBatch(models.Model):
         if obj:
             return obj[0]
         else:
-            return None
-    
+            return None 
+           
     @classmethod
     def check_has_stock_batch_id(cls, stock_batch_id):
         flag = False
