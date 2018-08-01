@@ -382,6 +382,7 @@ def categorie_manage(request):
         search_dict = {
             'search_value': 'categorie_name__icontains',
             'categorie_type': 'categorie_type',
+            'is_hot': 'is_hot',
         }
         search_value = dict()
         current_page = request.GET.get('page', 1)

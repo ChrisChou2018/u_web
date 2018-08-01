@@ -179,14 +179,17 @@ def get_item_comment(request):
         'data': '',
     }
     if request.method == 'GET':
-        item_id = request.GET.get('item_id', 1)
+        item_id = request.GET.get('item_id')
         current_page = request.GET.get('page', 1)
-        item_comment_data = item_models.ItemComments. \
-            get_item_comment_by_item_id(item_id, current_page)
-        return_value['status'] = 'success'
-        return_value['data'] = item_comment_data
+        if item_id:
+            item_comment_data = item_models.ItemComments. \
+                get_item_comment_by_item_id(item_id, current_page)
+            return_value['status'] = 'success'
+            return_value['data'] = item_comment_data
+        else:
+            return_value['status'] = 'success'
+            return_value['data'] = list()
         return JsonResponse(return_value)
-
 
 @csrf_exempt
 @decorators.wx_api_authenticated
