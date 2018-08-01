@@ -314,6 +314,9 @@ class Categories(models.Model):
     @classmethod
     def get_all_categorie_type(cls):
         data = cls.objects.values('categorie_type').annotate(c=Count('categorie_type'))
+        hot_count = cls.objects.filter(is_hot=True, status='normal').count()
+        data = list(data)
+        data.append({'is_hot': True, 'c': hot_count})
         return data
 
     @classmethod
@@ -407,8 +410,9 @@ class ItemComments(models.Model):
         for i in data:
             member_id = i['member_id']
             item_id = i['item_id']
+            i['create_time'] = common.parse_timestamps(i['create_time'])
             member_obj = member_models.Member.get_member_by_id(member_id)
-            i['member_name'] = member_obj.member_name if member_obj else '已经注销用户'
+            i['member_name'] = member_obj.member_name if member_obj and member_obj.status=='normal' else '已注销用户'
             item_obj = Items.get_item_by_id(item_id)
             i['item_name'] = item_obj.item_name if item_obj else '商品已经下架'
         return data
@@ -434,8 +438,16 @@ class ItemComments(models.Model):
         data = p.page(current_page).object_list.values()
         data = list(data)
         for i in data:
+            member_obj = member_models.Member.get_member_by_id(i['member_id'])
+            if member_obj and member_obj.status=='normal':
+                i['member_name'] = member_obj.member_name if not member_obj.is_hide else '**匿名用户**'
+            else:
+                i['member_name'] = '已注销用户'
             image_list = CommentImages.get_comment_image_obj_by_id(i['comment_id'], True)
-            i['image_list'] = image_list
+            if image_list:
+                i['image_list'] = image_list
+            else:
+                i['image_list'] = list()
         return data
     
     @classmethod
@@ -469,15 +481,20 @@ class CommentImages(models.Model):
 
     @classmethod
     def get_comment_image_obj_by_id(cls, comment_id, for_api=False):
-        image_list = list(cls.objects.filter(comment_id = comment_id, status = 'normal').values())
-        image_list = list(image_list)
-        if for_api:
-            for i in image_list:
-                i['image_path'] = common.build_photo_url(i['photo_id'], pic_version='title', cdn=True)
-        for i in image_list:
-                i['image_path'] = common.build_photo_url(i['photo_id'], pic_version='title')
-        return image_list
-    
+        image_list = cls.objects.filter(comment_id = comment_id, status = 'normal').values()
+        if image_list:
+            image_list = list(image_list)
+            if for_api:
+                for i in image_list:
+                    i['image_path'] = common.build_photo_url(i['photo_id'], pic_version='title', cdn=True)
+            else:
+                for i in image_list:
+                        i['image_path'] = common.build_photo_url(i['photo_id'], pic_version='title')
+            return image_list
+        else:
+            return None
+
+
     @classmethod
     def create_many_comment_image(cls, data_list):
         for i in data_list:
