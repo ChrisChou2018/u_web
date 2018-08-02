@@ -424,3 +424,16 @@ def user_collection_item(request):
         return_value['data'] = item_id_list
         return JsonResponse(return_value)
 
+@decorators.wx_api_authenticated
+def get_user_order_status_count(request):
+    return_value = {
+        'status': 'error',
+        'message': ''
+    }
+    if request.method == "GET":
+        openid = request.COOKIES.get('openid')
+        member = member_models.Member.get_member_by_wx_openid(openid)
+        data_list = member_models.UserOrder.get_user_order_all_status_count(member.member_id)
+        return_value['status'] = 'success'
+        return_value['data'] = data_list
+        return JsonResponse(return_value)
