@@ -291,6 +291,7 @@ class UserOrder(models.Model):
                         'image_path': image_path,
                         'item_name': j['item_name'],
                         'item_count': j['item_count'],
+                        'item_id': j['item_id'],
                         'price': j['price'],
                     })
                     data_dict['all_price'] += float(j['price']) * int(j['item_count'])
@@ -371,6 +372,7 @@ class UserOrder(models.Model):
                     'image_path': image_path,
                     'item_name': i['item_name'],
                     'item_count': i['item_count'],
+                    'item_id': i['item_id'],
                     'price': i['price'],
                     'order_status': dict(cls.status_choices)[i['order_status']],
                 })
