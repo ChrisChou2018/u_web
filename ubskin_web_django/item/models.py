@@ -384,6 +384,7 @@ class ItemComments(models.Model):
     comment_id      = models.AutoField(db_column="comment_id", verbose_name="评论ID", primary_key=True)
     member_id       = models.BigIntegerField(db_column="member_id", verbose_name="评论用户ID")
     item_id         = models.BigIntegerField(db_column="item_id", verbose_name="所属商品ID")
+    order_num       = models.CharField(db_column="order_num", verbose_name="订单号", null=True, blank=True, max_length=255)
     comment_content = models.CharField(max_length=255, db_column="comment_content", verbose_name="评论内容")
     create_time     = models.IntegerField(db_column="create_time", verbose_name="创建时间", default=int(time.time()))
     start_choices   = (
@@ -392,7 +393,7 @@ class ItemComments(models.Model):
         (3, '3星'),
         (4, '4星'),
         (5, '5星'),
-    ) 
+    )
     stars           = models.SmallIntegerField(db_column="stars", choices=start_choices, verbose_name="星级", default=5, blank=True)
     is_hide         = models.BooleanField(db_column="is_hide", verbose_name="是否匿名", default=False)
     status          = models.CharField(db_column="status", verbose_name="状态", default="normal", max_length=255)

@@ -200,7 +200,8 @@ def create_item_comment(request):
         'data': '',
     }
     request_args = [
-        'item_id', 'stars', 'comment_content', 'is_hide'
+        'item_id', 'stars', 'comment_content',
+        'is_hide' , 'order_num'
     ]
     if request.method == 'POST':
         json_data = request.body
@@ -213,6 +214,11 @@ def create_item_comment(request):
             item_models.ItemComments,
             data
         )
+        order_num = obj.order_num
+        user_order_obj = member_models.UserOrder.get_user_order_obj_by_order_num(order_num)
+        if user_order_obj:
+            user_order_obj.is_comment = True
+            user_order_obj.save()
         return_value['status'] = 'success'
         return_value['data'] = {'comment_id': obj.comment_id}
         return JsonResponse(return_value)
