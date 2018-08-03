@@ -222,7 +222,6 @@ def create_recv_addr(request):
         return JsonResponse(return_value)
 
 @decorators.wx_api_authenticated
-
 def get_recv_addr(request):
     return_value = {
         'status': 'error',
