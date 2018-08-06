@@ -21,7 +21,8 @@ urlpatterns += [
     path('js/get_recv_addr/', views_js.get_reve_addr, name='get_recv_addr'),
     path('js/get_item_info_by_code/', views_js.get_item_info_by_code, name='get_item_info_by_code'),
     path('js/create_stock_bach/', views_js.create_stock_bach, name="create_stock_bach"),
-    path('js/a_jm_stock_batch_info/', views_js.jm_stock_batch_info, name='a_jm_stock_batch_info')
+    path('js/a_jm_stock_batch_info/', views_js.jm_stock_batch_info, name='a_jm_stock_batch_info'),
+    path('js/check_has_item_qr_code/', views_js.check_has_item_qr_code, name='check_has_item_qr_code'),
 ]
 
 urlpatterns += [

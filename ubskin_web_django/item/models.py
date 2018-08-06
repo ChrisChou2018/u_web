@@ -162,6 +162,8 @@ class Items(models.Model):
             item_obj = cls.objects. \
                 filter(brand_id = data_id, status = 'normal').order_by(order_by)
         p = Paginator(item_obj, 15)
+        if int(current_page) > p.num_pages:
+            return list()
         items_list =  list(
             p.page(current_page).object_list.values(
                 'item_id', "item_name", "price", "stock_count", "photo_id"
@@ -413,7 +415,8 @@ class ItemComments(models.Model):
             item_id = i['item_id']
             i['create_time'] = common.parse_timestamps(i['create_time'])
             member_obj = member_models.Member.get_member_by_id(member_id)
-            i['member_name'] = member_obj.member_name if member_obj and member_obj.status=='normal' else '已注销用户'
+            i['member_name'] = member_obj.member_name if member_obj.status=='normal' else '已注销用户'
+            i['avatar'] = member_obj.avatar
             item_obj = Items.get_item_by_id(item_id)
             i['item_name'] = item_obj.item_name if item_obj else '商品已经下架'
         return data
@@ -431,17 +434,39 @@ class ItemComments(models.Model):
         cls.objects.filter(pk__in=id_list).update(status='deleted')
 
     @classmethod
-    def get_item_comment_by_item_id(cls, item_id, current_page):
-        item_comments_list = cls.objects.filter(
-            item_id = item_id, status = 'normal'
+    def get_item_comment_by_item_id(cls, item_id, current_page, filter_value):
+        item_comments_list = None
+        if filter_value == 'good':
+            item_comments_list = cls.objects.filter(
+                (Q(stars = 4) | Q(stars = 5)),
+                item_id = item_id,
+                status = 'normal',
+            ).order_by('-pk')
+        elif filter_value == 'not_bad':
+            item_comments_list = cls.objects.filter(
+                item_id = item_id, status = 'normal', stars = 3
+            ).order_by('-pk')
+        elif filter_value == 'bad':
+            item_comments_list = cls.objects.filter(
+                (Q(stars = 1) | Q(stars = 2)),
+                item_id = item_id,
+                status = 'normal',
+            ).order_by('-pk')
+        else:
+            item_comments_list = cls.objects.filter(
+                item_id = item_id,
+                status = 'normal',
             ).order_by('-pk')
         p = Paginator(item_comments_list, 15)
+        if int(current_page) > p.num_pages:
+            return list()
         data = p.page(current_page).object_list.values()
         data = list(data)
         for i in data:
             member_obj = member_models.Member.get_member_by_id(i['member_id'])
             if member_obj and member_obj.status=='normal':
-                i['member_name'] = member_obj.member_name if not member_obj.is_hide else '**匿名用户**'
+                i['member_name'] = member_obj.member_name if not i['is_hide'] else '**匿名用户**'
+                i['avatar'] = member_obj.avatar if not i['is_hide'] else ''
             else:
                 i['member_name'] = '已注销用户'
             image_list = CommentImages.get_comment_image_obj_by_id(i['comment_id'], True)
@@ -462,6 +487,18 @@ class ItemComments(models.Model):
     @classmethod
     def update_item_comment_by_id(cls, comment_id, data):
         cls.objects.filter(pk=comment_id).update(**data)
+    
+    @classmethod
+    def get_item_comment_status_count(cls, item_id):
+        data_dict = dict()
+        bad = cls.objects.filter(Q(stars=1) | Q(stars=2)).count()
+        not_bad = cls.objects.filter(stars=3).count()
+        good = cls.objects.filter(Q(stars=4) | Q(stars=5)).count()
+        data_dict['好评'] = good
+        data_dict['中评'] = not_bad
+        data_dict['差评'] = bad
+        return data_dict
+
 
     class Meta:
         db_table = "item_comments"

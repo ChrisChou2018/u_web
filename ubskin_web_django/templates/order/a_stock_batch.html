@@ -253,9 +253,17 @@ $(function() {
                     return obj != barcode;
                 });
             });
-            codes_dict[curr_item_barcode].push(barcode);
-
-            build_info_div();
+            $.get(
+                '{% url "check_has_item_qr_code" %}?item_qr_code=' + barcode,
+                function(value){
+                    if(value.status=='success'){
+                        codes_dict[curr_item_barcode].push(barcode);
+                        build_info_div();
+                    }else{
+                        alert('当前二维码已经录入')
+                    }
+                }
+            )
         }
         else {
             curr_item_barcode = barcode;

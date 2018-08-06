@@ -41,4 +41,4 @@ urlpatterns += [
     path('api/get_user_orer_info/<str:order_num>/', views_api.get_user_order_info),
     path('api/user_collection_item/', views_api.user_collection_item),
     path('api/get_user_order_status_count/', views_api.get_user_order_status_count),
-]
+] 
