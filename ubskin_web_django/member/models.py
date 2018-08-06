@@ -67,7 +67,7 @@ class Member(AbstractBaseUser, PermissionsMixin):
     REQUIRED_FIELDS = ['member_name']
 
     def __str__(self):  # __unicode__ on Python 2
-        return self.member_name
+        return self.member_name if self.member_name else str(self)
     
     def get_full_name(self):
         return self.member_name
@@ -258,6 +258,8 @@ class UserOrder(models.Model):
         order_num_list = cls.objects.filter(member_id=member_id, status='normal'). \
             values('order_num').annotate(c = Count('order_num')).order_by('-pk')
         p = Paginator(order_num_list, 10)
+        if int(current_page) > p.num_pages:
+            return list()
         order_num_list = p.page(current_page).object_list
         data_list = list()
         for i in order_num_list:

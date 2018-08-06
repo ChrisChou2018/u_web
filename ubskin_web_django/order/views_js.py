@@ -157,16 +157,6 @@ def create_stock_bach(request):
         stock_batch_id = request.POST.get('stock_batch_id')
         recv_code = request.POST.get('recv_code')
         item_codes_dict = json.loads(request.POST.get('item_codes_dict'))
-        has_qr_code_list = list()
-        if item_codes_dict:
-            for key, item in item_codes_dict.items():
-                for i in item:
-                    if order_models.ItemQRCode.check_has_item_qr_code(i):
-                        has_qr_code_list.append(i)
-        if has_qr_code_list:
-            l = ','.join(has_qr_code_list)
-            return_value['message'] = "这些录入的二维码已经存在{}".format(l)
-            return JsonResponse(return_value)
         nums_dict = json.loads(request.POST.get('nums_dict'))
         create_user_id = request.user.member_id
         if not recv_code or not stock_batch_id or not (item_codes_dict or  nums_dict):
@@ -232,3 +222,17 @@ def jm_stock_batch_info(request):
             'order/a_jm_stock_batch_info.html',
             code_data = code_data
         )
+
+def check_has_item_qr_code(request):
+    return_value = {
+        'status': 'error',
+        'message': '',
+    }
+    if request.method == 'GET':
+        item_qr_code = request.GET.get('item_qr_code')
+        has = order_models.ItemQRCode.check_has_item_qr_code(item_qr_code)
+        if has:
+            return JsonResponse(return_value)
+        else:
+            return_value['status'] = 'success'
+            return JsonResponse(return_value)

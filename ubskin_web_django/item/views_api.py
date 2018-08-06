@@ -181,9 +181,10 @@ def get_item_comment(request):
     if request.method == 'GET':
         item_id = request.GET.get('item_id')
         current_page = request.GET.get('page', 1)
+        filter_value = request.GET.get('filter_value', 'all')
         if item_id:
             item_comment_data = item_models.ItemComments. \
-                get_item_comment_by_item_id(item_id, current_page)
+                get_item_comment_by_item_id(item_id, current_page, filter_value)
             return_value['status'] = 'success'
             return_value['data'] = item_comment_data
         else:
@@ -219,6 +220,14 @@ def create_item_comment(request):
         if user_order_obj:
             user_order_obj.is_comment = True
             user_order_obj.save()
+        item_id = data.get('item_id')
+        if item_id:
+            item_obj = item_models.get_model_obj_by_pk(
+                item_models.Items,
+                item_id
+            )
+            item_obj.comment_count += 1
+            item_obj.save()
         return_value['status'] = 'success'
         return_value['data'] = {'comment_id': obj.comment_id}
         return JsonResponse(return_value)
@@ -350,4 +359,13 @@ def shopping_cart(request):
                 return_value['status'] = 'success'
                 return JsonResponse(return_value)
 
-            
+def get_item_comment_status_count(request, item_id):
+    return_value = {
+        'status': 'error',
+        'message': '',
+    }
+    if request.method == 'GET':
+        data = item_models.ItemComments.get_item_comment_status_count(item_id)
+        return_value['status'] = 'success'
+        return_value['data'] = data
+        return JsonResponse(return_value)
