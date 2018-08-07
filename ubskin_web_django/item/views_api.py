@@ -51,7 +51,6 @@ def get_item_info(request, item_id):
             )
             item_info_image = item_models.ItemImages. \
                 get_item_info_images_by_itemid(item_dict['item_id'])
-            
             if item_image:
                 for i in item_image:
                     i['image_path'] = common.build_photo_url(
@@ -98,6 +97,9 @@ def get_item_info(request, item_id):
                 item_dict['has_collection'] = b
             else:
                 item_dict['has_collection'] = False
+            item_comment_list = item_models.ItemComments. \
+                get_item_comment_by_item_id(item_dict['item_id'], 1, 'all')
+            item_dict['item_comment_list'] = item_comment_list[0:3]
             return_value['status'] = 'success'
             return_value['data'] = item_dict
             return JsonResponse(return_value)

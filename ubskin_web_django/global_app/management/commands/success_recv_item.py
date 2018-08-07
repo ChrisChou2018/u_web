@@ -25,10 +25,10 @@ class Command(BaseCommand):
     #     parser.add_argument('poll_id', nargs='+', type=int)
     def handle(self, *args, **options):
         user_order = member_models.UserOrder
-        time_delta = datetime.timedelta(days=7)
+        time_delta = datetime.timedelta(days=10)
         today = datetime.datetime.now()
         expire_date = today-time_delta
         time_time = time.mktime(expire_date.timetuple())
-        user_order.objects.filter(create_time__lt=int(time_time)).update(
+        user_order.objects.filter(create_time__lt=int(time_time), order_status='shipped').update(
             order_status = 'received'
         )
