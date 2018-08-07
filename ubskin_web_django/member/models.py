@@ -67,7 +67,7 @@ class Member(AbstractBaseUser, PermissionsMixin):
     REQUIRED_FIELDS = ['member_name']
 
     def __str__(self):  # __unicode__ on Python 2
-        return self.member_name
+        return self.member_name if self.member_name else str(self)
     
     def get_full_name(self):
         return self.member_name
@@ -237,6 +237,7 @@ class UserOrder(models.Model):
     order_status            = models.CharField(db_column="order_status", verbose_name="订单状态", choices=status_choices, default="new", max_length=255)
     member_id               = models.BigIntegerField(db_column="member_id", verbose_name="用户ID")
     is_shopping_cart        = models.BooleanField(db_column="is_shupping_cart", verbose_name="是否来自购物车", default=False)
+    is_comment              = models.BooleanField(db_column="is_comment", verbose_name="是否评价", default=False)
     recv_addr_id            = models.BigIntegerField(db_column="recv_addr", verbose_name="到货地址ID", null=True, blank=True)
     member_message          = models.CharField(db_column="member_message", verbose_name="用户留言", max_length=1000, null=True, blank=True)
     create_time             = models.IntegerField(db_column="create_time", verbose_name="创建时间", default=int(time.time()))
@@ -257,6 +258,8 @@ class UserOrder(models.Model):
         order_num_list = cls.objects.filter(member_id=member_id, status='normal'). \
             values('order_num').annotate(c = Count('order_num')).order_by('-pk')
         p = Paginator(order_num_list, 10)
+        if int(current_page) > p.num_pages:
+            return list()
         order_num_list = p.page(current_page).object_list
         data_list = list()
         for i in order_num_list:
@@ -290,6 +293,7 @@ class UserOrder(models.Model):
                         'image_path': image_path,
                         'item_name': j['item_name'],
                         'item_count': j['item_count'],
+                        'item_id': j['item_id'],
                         'price': j['price'],
                     })
                     data_dict['all_price'] += float(j['price']) * int(j['item_count'])
@@ -370,6 +374,7 @@ class UserOrder(models.Model):
                     'image_path': image_path,
                     'item_name': i['item_name'],
                     'item_count': i['item_count'],
+                    'item_id': i['item_id'],
                     'price': i['price'],
                     'order_status': dict(cls.status_choices)[i['order_status']],
                 })
@@ -433,6 +438,31 @@ class UserOrder(models.Model):
     @classmethod
     def get_user_order_obj_by_order_num(cls, order_num):
         return cls.objects.filter(order_num=order_num).first()
+    
+    @classmethod
+    def get_user_order_all_status_count(cls, member_id):
+        order_status_help = {
+            'new': '待支付',
+            'paid': '待发货',
+            'shipped': '待收货',
+        }
+        data_list = list()
+        data = cls.objects.filter(member_id=member_id, status='normal'). \
+            values_list('order_status').annotate(c=Count('order_status'))
+        data = dict(data)
+        for i in order_status_help:
+            data_list.append({
+                order_status_help[i]: data.get(i) if data.get(i) is not None else 0
+            })
+        data_list.append({
+            '待评价': cls.objects.filter(
+                         member_id=member_id,
+                         status='normal',
+                         is_comment=False,
+                         order_status='received'
+                     ).count()
+        })
+        return data_list
 
 
     class Meta:

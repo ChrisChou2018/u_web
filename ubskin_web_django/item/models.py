@@ -162,6 +162,8 @@ class Items(models.Model):
             item_obj = cls.objects. \
                 filter(brand_id = data_id, status = 'normal').order_by(order_by)
         p = Paginator(item_obj, 15)
+        if int(current_page) > p.num_pages:
+            return list()
         items_list =  list(
             p.page(current_page).object_list.values(
                 'item_id', "item_name", "price", "stock_count", "photo_id"
@@ -314,6 +316,9 @@ class Categories(models.Model):
     @classmethod
     def get_all_categorie_type(cls):
         data = cls.objects.values('categorie_type').annotate(c=Count('categorie_type'))
+        hot_count = cls.objects.filter(is_hot=True, status='normal').count()
+        data = list(data)
+        data.append({'is_hot': True, 'c': hot_count})
         return data
 
     @classmethod
@@ -381,6 +386,7 @@ class ItemComments(models.Model):
     comment_id      = models.AutoField(db_column="comment_id", verbose_name="评论ID", primary_key=True)
     member_id       = models.BigIntegerField(db_column="member_id", verbose_name="评论用户ID")
     item_id         = models.BigIntegerField(db_column="item_id", verbose_name="所属商品ID")
+    order_num       = models.CharField(db_column="order_num", verbose_name="订单号", null=True, blank=True, max_length=255)
     comment_content = models.CharField(max_length=255, db_column="comment_content", verbose_name="评论内容")
     create_time     = models.IntegerField(db_column="create_time", verbose_name="创建时间", default=int(time.time()))
     start_choices   = (
@@ -389,7 +395,7 @@ class ItemComments(models.Model):
         (3, '3星'),
         (4, '4星'),
         (5, '5星'),
-    ) 
+    )
     stars           = models.SmallIntegerField(db_column="stars", choices=start_choices, verbose_name="星级", default=5, blank=True)
     is_hide         = models.BooleanField(db_column="is_hide", verbose_name="是否匿名", default=False)
     status          = models.CharField(db_column="status", verbose_name="状态", default="normal", max_length=255)
@@ -407,8 +413,10 @@ class ItemComments(models.Model):
         for i in data:
             member_id = i['member_id']
             item_id = i['item_id']
+            i['create_time'] = common.parse_timestamps(i['create_time'])
             member_obj = member_models.Member.get_member_by_id(member_id)
-            i['member_name'] = member_obj.member_name if member_obj else '已经注销用户'
+            i['member_name'] = member_obj.member_name if member_obj.status=='normal' else '已注销用户'
+            i['avatar'] = member_obj.avatar
             item_obj = Items.get_item_by_id(item_id)
             i['item_name'] = item_obj.item_name if item_obj else '商品已经下架'
         return data
@@ -426,16 +434,46 @@ class ItemComments(models.Model):
         cls.objects.filter(pk__in=id_list).update(status='deleted')
 
     @classmethod
-    def get_item_comment_by_item_id(cls, item_id, current_page):
-        item_comments_list = cls.objects.filter(
-            item_id = item_id, status = 'normal'
+    def get_item_comment_by_item_id(cls, item_id, current_page, filter_value):
+        item_comments_list = None
+        if filter_value == 'good':
+            item_comments_list = cls.objects.filter(
+                (Q(stars = 4) | Q(stars = 5)),
+                item_id = item_id,
+                status = 'normal',
+            ).order_by('-pk')
+        elif filter_value == 'not_bad':
+            item_comments_list = cls.objects.filter(
+                item_id = item_id, status = 'normal', stars = 3
+            ).order_by('-pk')
+        elif filter_value == 'bad':
+            item_comments_list = cls.objects.filter(
+                (Q(stars = 1) | Q(stars = 2)),
+                item_id = item_id,
+                status = 'normal',
+            ).order_by('-pk')
+        else:
+            item_comments_list = cls.objects.filter(
+                item_id = item_id,
+                status = 'normal',
             ).order_by('-pk')
         p = Paginator(item_comments_list, 15)
+        if int(current_page) > p.num_pages:
+            return list()
         data = p.page(current_page).object_list.values()
         data = list(data)
         for i in data:
+            member_obj = member_models.Member.get_member_by_id(i['member_id'])
+            if member_obj and member_obj.status=='normal':
+                i['member_name'] = member_obj.member_name if not i['is_hide'] else '**匿名用户**'
+                i['avatar'] = member_obj.avatar if not i['is_hide'] else ''
+            else:
+                i['member_name'] = '已注销用户'
             image_list = CommentImages.get_comment_image_obj_by_id(i['comment_id'], True)
-            i['image_list'] = image_list
+            if image_list:
+                i['image_list'] = image_list
+            else:
+                i['image_list'] = list()
         return data
     
     @classmethod
@@ -449,6 +487,18 @@ class ItemComments(models.Model):
     @classmethod
     def update_item_comment_by_id(cls, comment_id, data):
         cls.objects.filter(pk=comment_id).update(**data)
+    
+    @classmethod
+    def get_item_comment_status_count(cls, item_id):
+        data_dict = dict()
+        bad = cls.objects.filter(Q(stars=1) | Q(stars=2)).count()
+        not_bad = cls.objects.filter(stars=3).count()
+        good = cls.objects.filter(Q(stars=4) | Q(stars=5)).count()
+        data_dict['好评'] = good
+        data_dict['中评'] = not_bad
+        data_dict['差评'] = bad
+        return data_dict
+
 
     class Meta:
         db_table = "item_comments"
@@ -469,15 +519,20 @@ class CommentImages(models.Model):
 
     @classmethod
     def get_comment_image_obj_by_id(cls, comment_id, for_api=False):
-        image_list = list(cls.objects.filter(comment_id = comment_id, status = 'normal').values())
-        image_list = list(image_list)
-        if for_api:
-            for i in image_list:
-                i['image_path'] = common.build_photo_url(i['photo_id'], pic_version='title', cdn=True)
-        for i in image_list:
-                i['image_path'] = common.build_photo_url(i['photo_id'], pic_version='title')
-        return image_list
-    
+        image_list = cls.objects.filter(comment_id = comment_id, status = 'normal').values()
+        if image_list:
+            image_list = list(image_list)
+            if for_api:
+                for i in image_list:
+                    i['image_path'] = common.build_photo_url(i['photo_id'], pic_version='title', cdn=True)
+            else:
+                for i in image_list:
+                        i['image_path'] = common.build_photo_url(i['photo_id'], pic_version='title')
+            return image_list
+        else:
+            return None
+
+
     @classmethod
     def create_many_comment_image(cls, data_list):
         for i in data_list:

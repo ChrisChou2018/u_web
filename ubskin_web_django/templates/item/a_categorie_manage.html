@@ -48,16 +48,32 @@
                 Cras justo odio
             </a> -->
             {% for i in categorie_types %}
-                {% if form_data.categorie_type == i.categorie_type %}
-                    <a href="{% url 'categorie_manage' %}?page={{ current_page }}&categorie_type={{ i.categorie_type }}" class="list-group-item active">
-                            <span class="badge">{{ i.c }}</span>
-                            {{ i.categorie_type }}
-                    </a>
+                {% if i.is_hot is not None %}
+                    {% if i.is_hot is not None and i.c %}
+                        {% if form_data.is_hot is not None %}
+                            <a href="{% url 'categorie_manage' %}?page={{ current_page }}&is_hot={{ i.is_hot }}" class="list-group-item active">
+                                    <span class="badge">{{ i.c }}</span>
+                                    热门分类
+                            </a>
+                        {% else %}
+                            <a href="{% url 'categorie_manage' %}?page={{ current_page }}&is_hot={{ i.is_hot }}" class="list-group-item">
+                                    <span class="badge">{{ i.c }}</span>
+                                    热门分类
+                            </a>
+                        {% endif %}
+                    {% endif %}
                 {% else %}
-                    <a href="{% url 'categorie_manage' %}?page={{ current_page }}&categorie_type={{ i.categorie_type }}" class="list-group-item">
-                            <span class="badge">{{ i.c }}</span>
-                            {{ i.categorie_type }}
-                    </a>
+                    {% if form_data.categorie_type == i.categorie_type %}
+                        <a href="{% url 'categorie_manage' %}?page={{ current_page }}&categorie_type={{ i.categorie_type }}" class="list-group-item active">
+                                <span class="badge">{{ i.c }}</span>
+                                {{ i.categorie_type }}
+                        </a>
+                    {% else %}
+                        <a href="{% url 'categorie_manage' %}?page={{ current_page }}&categorie_type={{ i.categorie_type }}" class="list-group-item">
+                                <span class="badge">{{ i.c }}</span>
+                                {{ i.categorie_type }}
+                        </a>
+                    {% endif %}
                 {% endif %}
             {% endfor %}
         </div>

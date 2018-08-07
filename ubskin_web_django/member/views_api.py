@@ -75,6 +75,8 @@ def wx_regist_member(return_value, openid, name, avatar, session_key=None):
     form  = UserCreationFormWX(user_data)
     if form.is_valid():
         member = form.save()
+        if name is None:
+            member.member_name = '用户{}'.format(member.member_id)
         return_value['status'] = 'success'
         return_value['data'] = [{'is_staff': member.is_staff, 'openid': openid},]
         return JsonResponse(return_value)
@@ -105,7 +107,7 @@ def wx_signin(request):
         if openid is not None:
             member = member_models.Member.get_member_by_wx_openid(openid)
             if member:
-                member.member_name = name
+                member.member_name = name if name else '用户{}'.format(member.member_id)
                 member.avatar = avatar
                 member.save()
                 return_value['status'] = 'success'
@@ -222,7 +224,6 @@ def create_recv_addr(request):
         return JsonResponse(return_value)
 
 @decorators.wx_api_authenticated
-
 def get_recv_addr(request):
     return_value = {
         'status': 'error',
@@ -424,3 +425,16 @@ def user_collection_item(request):
         return_value['data'] = item_id_list
         return JsonResponse(return_value)
 
+@decorators.wx_api_authenticated
+def get_user_order_status_count(request):
+    return_value = {
+        'status': 'error',
+        'message': ''
+    }
+    if request.method == "GET":
+        openid = request.COOKIES.get('openid')
+        member = member_models.Member.get_member_by_wx_openid(openid)
+        data_list = member_models.UserOrder.get_user_order_all_status_count(member.member_id)
+        return_value['status'] = 'success'
+        return_value['data'] = data_list
+        return JsonResponse(return_value)

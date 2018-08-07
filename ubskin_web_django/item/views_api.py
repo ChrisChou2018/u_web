@@ -51,7 +51,6 @@ def get_item_info(request, item_id):
             )
             item_info_image = item_models.ItemImages. \
                 get_item_info_images_by_itemid(item_dict['item_id'])
-            
             if item_image:
                 for i in item_image:
                     i['image_path'] = common.build_photo_url(
@@ -98,6 +97,9 @@ def get_item_info(request, item_id):
                 item_dict['has_collection'] = b
             else:
                 item_dict['has_collection'] = False
+            item_comment_list = item_models.ItemComments. \
+                get_item_comment_by_item_id(item_dict['item_id'], 1, 'all')
+            item_dict['item_comment_list'] = item_comment_list[0:3]
             return_value['status'] = 'success'
             return_value['data'] = item_dict
             return JsonResponse(return_value)
@@ -179,14 +181,18 @@ def get_item_comment(request):
         'data': '',
     }
     if request.method == 'GET':
-        item_id = request.GET.get('item_id', 1)
+        item_id = request.GET.get('item_id')
         current_page = request.GET.get('page', 1)
-        item_comment_data = item_models.ItemComments. \
-            get_item_comment_by_item_id(item_id, current_page)
-        return_value['status'] = 'success'
-        return_value['data'] = item_comment_data
+        filter_value = request.GET.get('filter_value', 'all')
+        if item_id:
+            item_comment_data = item_models.ItemComments. \
+                get_item_comment_by_item_id(item_id, current_page, filter_value)
+            return_value['status'] = 'success'
+            return_value['data'] = item_comment_data
+        else:
+            return_value['status'] = 'success'
+            return_value['data'] = list()
         return JsonResponse(return_value)
-
 
 @csrf_exempt
 @decorators.wx_api_authenticated
@@ -197,7 +203,8 @@ def create_item_comment(request):
         'data': '',
     }
     request_args = [
-        'item_id', 'stars', 'comment_content', 'is_hide'
+        'item_id', 'stars', 'comment_content',
+        'is_hide' , 'order_num'
     ]
     if request.method == 'POST':
         json_data = request.body
@@ -210,6 +217,19 @@ def create_item_comment(request):
             item_models.ItemComments,
             data
         )
+        order_num = obj.order_num
+        user_order_obj = member_models.UserOrder.get_user_order_obj_by_order_num(order_num)
+        if user_order_obj:
+            user_order_obj.is_comment = True
+            user_order_obj.save()
+        item_id = data.get('item_id')
+        if item_id:
+            item_obj = item_models.get_model_obj_by_pk(
+                item_models.Items,
+                item_id
+            )
+            item_obj.comment_count += 1
+            item_obj.save()
         return_value['status'] = 'success'
         return_value['data'] = {'comment_id': obj.comment_id}
         return JsonResponse(return_value)
@@ -341,4 +361,13 @@ def shopping_cart(request):
                 return_value['status'] = 'success'
                 return JsonResponse(return_value)
 
-            
+def get_item_comment_status_count(request, item_id):
+    return_value = {
+        'status': 'error',
+        'message': '',
+    }
+    if request.method == 'GET':
+        data = item_models.ItemComments.get_item_comment_status_count(item_id)
+        return_value['status'] = 'success'
+        return_value['data'] = data
+        return JsonResponse(return_value)

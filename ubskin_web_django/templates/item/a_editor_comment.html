@@ -26,8 +26,8 @@
           <span>{% if form_errors and form_errors.comment_content %}{{ form_errors.comment_content }}{% endif %}</span>
         </div>
         <div class="form-group">
-          <label for="cn_name_abridge">所属商品ID: </label>
-          <span style="font-size: 20px">{% if form_data and form_data.item_id %}{{ form_data.item_id }}{% endif %}</span>
+          <label for="cn_name_abridge">所属订单号: </label>
+          <span style="font-size: 20px">{% if form_data and form_data.order_num %}{{ form_data.order_num }}{% endif %}</span>
         </div>
       </div><!-- /.box-body -->
 
