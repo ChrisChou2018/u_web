@@ -16,7 +16,7 @@ class Campaigns(models.Model):
     start_time = models.IntegerField(db_column="start_time", verbose_name="活动开始时间")
     end_time = models.IntegerField(db_column="end_time", verbose_name="活动结束时间")
     intorduction = models.CharField(db_column="intorduction", verbose_name="活动介绍", max_length=1000, null=True, blank=True)
-    campaigns_photo_id = models.CharField(db_column="campaigns_photo_id", verbose_name="活动图片ID", max_length=255)
+    campaigns_photo_id = models.CharField(db_column="campaigns_photo_id", verbose_name="活动图片ID", max_length=255, null=True, blank=True)
     title_photo_id = models.CharField(db_column="title_photo_id", verbose_name="活动内顶部图片ID", max_length=255, null=True, blank=True)
     status = models.CharField(db_column="status", verbose_name="数据状态", default="normal", max_length=255)
     create_time = models.IntegerField(db_column="create_time", verbose_name="活动创建时间", default=int(time.time()))

@@ -1,4 +1,5 @@
 from django.shortcuts import render
+from django import forms
 
 from ubskin_web_django.ad import models as ad_models
 
@@ -50,8 +51,22 @@ def campaigns_manage(request):
         data_count = data_count,
     )
 
-def add_campaigns(request):
+class AddCampaignForm(forms.ModelForm):
+    class Meta:
+        model = ad_models.Campaigns
+        fields = (
+            # 'categorie_name', 'categorie_type', 'is_hot'
+        )
+
+
+    def save(self, commit=True, request=None):
+        model_obj = super(AddCampaignForm, self).save(commit=False)
+        if commit:
+            model_obj.save()
+        return model_obj
+
+def add_campaign(request):
     pass
 
-def editor_campaigns(request):
+def editor_campaign(request):
     pass
