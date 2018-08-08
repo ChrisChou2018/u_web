@@ -24,6 +24,13 @@ class Campaigns(models.Model):
 
     class Meta:
         db_table = "campaigns"
+    
+
+    @classmethod
+    def get_all_location_list(cls):
+        data = cls.objects.values('location').annotate(c=Count('location'))
+        data = list(data)
+        return data
 
 
 class CampaignItems(models.Model):

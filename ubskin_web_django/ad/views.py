@@ -1,7 +1,14 @@
+import time
+import datetime
+import os
+
 from django.shortcuts import render
+from django.shortcuts import redirect
 from django import forms
+from django.conf import settings
 
 from ubskin_web_django.ad import models as ad_models
+from ubskin_web_django.common import photo
 
 
 def my_render(request, templater_path, **kwargs):
@@ -10,6 +17,7 @@ def my_render(request, templater_path, **kwargs):
 def campaigns_manage(request):
     search_dict = {
         'search_value': 'campaign_name__icontains',
+        'location': 'location',
     }
     search_value = dict()
     current_page = request.GET.get('page', 1)
@@ -40,7 +48,7 @@ def campaigns_manage(request):
         data_count = ad_models.get_data_count(
             ad_models.Campaigns,
         )
-
+    location_list = ad_models.Campaigns.get_all_location_list()
     return my_render(
         request,
         'ad/a_campaigns_manage.html',
@@ -49,24 +57,95 @@ def campaigns_manage(request):
         filter_args = filter_args,
         data_list = data_list,
         data_count = data_count,
+        location_list = location_list,
     )
 
 class AddCampaignForm(forms.ModelForm):
+    datetime = forms.CharField(error_messages={'required': '至少这个不可以为空'})
+
     class Meta:
         model = ad_models.Campaigns
         fields = (
-            # 'categorie_name', 'categorie_type', 'is_hot'
+            'location', 'campaign_name', 'intorduction'
         )
 
-
-    def save(self, commit=True, request=None):
+    def save(self, commit=True):
         model_obj = super(AddCampaignForm, self).save(commit=False)
         if commit:
+            datetime = self.cleaned_data['datetime']
+            if datetime:
+                start_time, end_time = datetime.split(' - ')
+                start_time = time.mktime(time.strptime(start_time, r'%m/%d/%Y'))
+                end_time = time.mktime(time.strptime(end_time, r'%m/%d/%Y'))
+                model_obj.start_time = start_time
+                model_obj.end_time = end_time
+                model_obj.create_time = int(time.time())
             model_obj.save()
         return model_obj
 
 def add_campaign(request):
-    pass
+    if request.method == 'GET':
+        return my_render(
+            request,
+            'ad/a_add_campign.html',
+        )
+    else:
+        form = AddCampaignForm(request.POST)
+        if  not form.is_valid():
+            print(form.errors)
+            return my_render(
+                request,
+                'ad/a_add_campign.html',
+                form_errors = form.errors,
+                form_data = request.POST,
+            )
+        model_obj =  form.save()
+        files = request.FILES
+        if files:
+            for i in files:
+                file_obj = files[i]
+                if not os.path.exists(settings.MEDIA_ROOT,):
+                    os.makedirs(settings.MEDIA_ROOT,)
+                data = photo.save_upload_photo(
+                    file_obj,
+                    settings.MEDIA_ROOT,
+                )
+                if data:
+                    setattr(model_obj, i, data['photo_id'])
+                    model_obj.save()
+        return redirect('/myadmin/campaigns_manage/')
+
+
+class EditorCampaignForm(forms.ModelForm):
+
+
+    datetime = forms.CharField(error_messages={'required': '至少这个不可以为空'})
+
+
+    class Meta:
+        model = ad_models.Campaigns
+        fields = (
+            'location', 'campaign_name', 'intorduction'
+        )
+    
+
+    def update(self, data_id):
+        model = self._meta.model
+        data = self.cleaned_data
+        datetime = data.pop('datetime')
+        start_time, end_time = datetime.split(' - ')
+        start_time = time.mktime(time.strptime(start_time, r'%m/%d/%Y'))
+        end_time = time.mktime(time.strptime(end_time, r'%m/%d/%Y'))
+        data.update({'start_time': start_time, 'end_time': end_time})
+        ad_models.update_models_by_pk(
+            model,
+            data_id,
+            data,
+        )
+
 
 def editor_campaign(request):
-    pass
+    if request.method == "GET":
+        pass
+    else:
+        pass
