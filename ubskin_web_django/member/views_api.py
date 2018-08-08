@@ -112,6 +112,7 @@ def wx_signin(request):
                 member.save()
                 return_value['status'] = 'success'
                 return_value['data'] = [{'is_staff': member.is_staff, 'openid': member.wx_openid},]
+                print(return_value)
                 return JsonResponse(return_value)
             else:
                 return wx_regist_member(return_value, openid, name, avatar, session_key)

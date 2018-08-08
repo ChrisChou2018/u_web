@@ -69,7 +69,7 @@
                             参考价格：{% if i.original_price is not None %}{{ i.original_price }}{% endif %}
                         </div>
                         <div class="row">
-                            单位：{% if i.specifications_type is not None %}{{ i.specifications_type }}{% endif %}/规格：{% if i.capacity is not None %}{{ i.capacity }}{% endif %}
+                            单位：{% if i.specifications_type_id is not None %} {% get_value_by_key specifications_type_dict i.specifications_type_id %}{% endif %}/规格：{% if i.capacity is not None %}{{ i.capacity }}{% endif %}
                         </div>
                     </div>
                     <div class="col-md-2">
@@ -80,7 +80,7 @@
                             所属品牌：{% if i.brand_id is not None %}{% get_value_by_key brand_dict i.brand_id %}{% endif %}
                         </div>
                         <div class="row">
-                            所属分类：{% if i.categorie_id %}{% get_value_by_key categories_dict i.categorie_id %}{% endif %}
+                            所属分类：{% if i.categorie_id %}{% get_value_by_key categories_dict i.categorie_id %}{% else %}未设置{% endif %}
                         </div>
                     </div>
                     <div class="col-md-2">

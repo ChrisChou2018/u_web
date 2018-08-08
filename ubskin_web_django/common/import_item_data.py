@@ -22,8 +22,8 @@ def import_item_data(f_path=None):
         "item_barcode",
         "item_name",
         "capacity",
-        "batch_num",
-        "invalid_date",
+        # "batch_num",
+        # "invalid_date",
         "price",
         "specifications_type_id",
         "categorie_id",
@@ -58,7 +58,7 @@ def import_item_data(f_path=None):
                         if not has_flag:
                             obj[key] = 0
                 else:
-                    obj[key] = None
+                    obj[key] = 0
             elif key == 'categorie_id':
                 if sh1.row(rx)[idx].value:
                     categories = item_model.Categories
@@ -86,8 +86,8 @@ def import_item_data(f_path=None):
                 obj[key] = sh1.row(rx)[idx].value
         obj.pop('id')
         obj.pop('warehouse')
-        obj.pop('batch_num')
-        obj.pop('invalid_date')
+        # obj.pop('batch_num')
+        # obj.pop('invalid_date')
         db_obj = item_model.Items.get_item_obj_by_barcode(obj["item_barcode"])
         if db_obj:
             # print "Updating obj", obj["product_no"], "..."

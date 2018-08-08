@@ -123,3 +123,11 @@ def parse_timestamps(timestamps):
     t = time.localtime(timestamps)
     time_str = time.strftime(r'%Y-%m-%d %H:%M:%S', t)
     return time_str
+
+@register.simple_tag
+def str_step(s, stop):
+    if len(s) > stop:
+        stop = int(stop)
+        return s[:stop] + '...'
+    else:
+        return s
