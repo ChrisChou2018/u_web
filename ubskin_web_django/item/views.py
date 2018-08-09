@@ -387,14 +387,14 @@ def categorie_manage(request):
         search_value = dict()
         current_page = request.GET.get('page', 1)
         categorie_types = item_models.Categories.get_all_categorie_type()
-        filter_args = '&'
+        filter_args = ''
         for i in search_dict:
             value = request.GET.get(i)
             if value is not None:
                 search_value[search_dict[i]] = value
-                filter_args += "{}={}".format(i, value)
+                filter_args += "&{}={}".format(i, value)
         else:
-            if len(filter_args) == 1:
+            if not filter_args:
                 filter_args = None
         if search_value:
             categories_list = item_models.Categories. \

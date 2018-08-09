@@ -5,10 +5,8 @@
 {% endblock %}
 
 {% block title %}
-<ul class="nav nav-tabs">
-    <li role="presentation" class="active"><a href="{% url 'campaigns_manage' %}">活动管理</a></li>
-    <li role="presentation"><a href="">活动商品管理</a></li>
-</ul>  
+<h1>活动管理</h1>
+
 {% endblock %}
 {% block page_header %}
 <ol class="breadcrumb">
@@ -25,7 +23,7 @@
             <div class="col-md-8">
                 <form action="" method="GET" class="search_input">
                 <div class="input-group">
-                    <input type="text" class="form-control" placeholder="搜索活动" name="search_value" value="{{ search_value }}">
+                    <input type="text" class="form-control" placeholder="搜索活动" name="search_value" value="{{ form_data.search_value }}">
                     <span class="input-group-btn">
                         <button class="btn btn-default search_input_btn" type="submit">搜索</button>
                     </span>
@@ -40,7 +38,7 @@
     <div class="col-md-4">
         <a href="{% url 'add_campaign' %}" class="btn btn-info" >添加活动 <span class="glyphicon glyphicon-plus"></span></a>
         <button type="button" class="btn btn-default choose_datas">选择全部<span class="glyphicon glyphicon-saved"></span></button>
-        <button type="button" class="btn btn-danger delete_brands" >删除<span class="glyphicon glyphicon-trash"></span></button>
+        <button type="button" class="btn btn-danger delete_datas" >删除<span class="glyphicon glyphicon-trash"></span></button>
     </div>
 </div>
 {% endblock %}
@@ -73,10 +71,10 @@
             {% for i in data_list %}
                 <div class="col-md-4 data_list" >
                     <div class="thumbnail">
-                        <input type="checkbox">
+                        <input type="checkbox" item-id={{i.campaign_id}}>
                         <img src="{% build_photo_url i.campaigns_photo_id %}" alt="..." style="width: 150px;height: 150px;">
                         <div class="caption">
-                            <a href=""><strong>{% str_step i.campaign_name 13 %}</strong></a>
+                            <a href="{% url 'editor_campaign' %}?data_id={{i.campaign_id}}&back_url={{request.get_full_path}}"><strong>{% str_step i.campaign_name 13 %}</strong></a>
                             <p>开始：{% parse_timestamps i.start_time %}</p>
                             <p>结束：{% parse_timestamps i.end_time %}</p>
                             <p>活动位置：{{ i.location }}</p>
@@ -119,20 +117,20 @@
             }
             
         })
-        $('.delete_brands').click(function(){
+        $('.delete_datas').click(function(){
             var $item_list = $('.data_list')
-            var brand_ids_list = []
+            var data_id_list = []
             $item_list.each(function(index, item){
                 var f =  $(item).children().find('input[type="checkbox"]')
                 var is_checked = $(f).prop('checked')
                 if(is_checked){
-                    brand_ids_list.push($(f).attr('item-id'))
+                    data_id_list.push($(f).attr('item-id'))
                 }
             })
-            if(brand_ids_list.length>0){
+            if(data_id_list.length>0){
                 $.post(
-                    '{% url "delete_brands" %}',
-                    {'brand_ids_list': brand_ids_list, 'csrfmiddlewaretoken': getCookie('csrftoken')},
+                    '{% url "delete_campaigns" %}',
+                    {'data_id_list': data_id_list, 'csrfmiddlewaretoken': getCookie('csrftoken')},
                     function(value){
                         if(value.status == 'success'){
                             location.reload()
