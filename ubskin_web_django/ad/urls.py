@@ -12,7 +12,7 @@ urlpatterns = [
 ]
 
 urlpatterns += [
-    
+    path('js/delete_campaigns/', views_js.delete_campaigns, name='delete_campaigns')
 ]
 
 urlpatterns += [

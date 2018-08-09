@@ -28,7 +28,7 @@ class Campaigns(models.Model):
 
     @classmethod
     def get_all_location_list(cls):
-        data = cls.objects.values('location').annotate(c=Count('location'))
+        data = cls.objects.filter(status='normal').values('location').annotate(c=Count('location'))
         data = list(data)
         return data
 
