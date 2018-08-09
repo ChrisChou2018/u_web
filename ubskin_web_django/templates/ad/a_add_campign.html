@@ -3,6 +3,7 @@
 {% load ui_method %}
 {% block css %}
 <link rel="stylesheet" href="/static/css/myadmin/daterangepicker.css">
+<link rel="stylesheet" href="/static/css/myadmin/multi-select.css">
 {% endblock %}
 {% block title %}
 <a type="button" class="btn btn-default back_btn" onclick="history.back()" >🔙 后退</a>             
@@ -18,38 +19,51 @@
       <div class="box-body">
         <div class="form-group">
           <label for="exampleInputEmail1">活动名（主题）</label>
-          <input type="text" class="form-control" id="exampleInputEmail1" name="campaign_name" value="{% if form_data.campaign_name %}{{ form_data.campaign_name }}{% endif %}">
+          <input type="text" class="form-control" id="exampleInputEmail1" name="campaign_name" value="{% if form_data.campaign_name %}{{form_data.campaign_name}}{% endif %}">
           {% if form_errors and form_errors.campaign_name %}<span style="color: red">{{ form_errors.campaign_name }}</span>{% endif %}
         </div>
-        <div class="form-group">
-          <label for="cn_name_abridge">活动位置</label>
-          <input type="text" class="form-control" id="location" name="location" value="{% if form_data.location %}{{ form_data.location }} {% endif %}">
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="cn_name_abridge">活动位置</label>
+                    <input type="text" class="form-control" id="location" name="location" value="{% if form_data.location %}{{form_data.location}}{% endif %}">
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="en_name">活动开始时间和结束时间</label>
+                    <input type="datetime" class="form-control datetime" name="datetime" placeholder="点击选择时间">
+                    {% if form_errors and form_errors.datetime %}<span style="color: red">{{form_errors.datetime}}</span>{% endif %}
+                </div>
+            </div>
         </div>
-        <div class="form-group">
-            <label for="en_name">活动开始时间和结束时间</label>
-            <input type="datetime" class="form-control datetime" name="datetime" placeholder="点击选择时间">
-            {% if form_errors and form_errors.datetime %}<span style="color: red">{{ form_errors.datetime }}</span>{% endif %}
-        </div>
-        
         <div class="form-group">
             <label for="from_country">活动简介</label>
-            <textarea name="intorduction" id="" cols="100" rows="10" class="form-control"> {% if form_data.intorduction %}{{ form_data.intorduction }}{% endif %}</textarea>
+            <textarea name="intorduction" id="" cols="100" rows="10" class="form-control"> {% if form_data.intorduction %}{{form_data.intorduction}}{% endif %}</textarea>
         </div>
-        <div class="form-group">
-            <label for="from_country">活动推广图片</label>
-            <input type="file" class="form-control" name="campaigns_photo_id">
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="from_country">活动推广图片</label>
+                    <input type="file" class="form-control" name="campaigns_photo_id">
+                </div>
+                <div class="image-box">
+                    <img class="campaigns_photo_id" src="{%if form_data and form_data.campaigns_photo_id %}{% build_photo_url form_data.campaigns_photo_id %}{% endif %}" alt="图片预览" style="width: 300px;height: 300px;">
+                </div>
+                <br>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="from_country">活动页顶部图片</label>
+                    <input type="file" class="form-control" name="title_photo_id">
+                </div>
+                <div class="image-box">
+                    <img class="title_photo_id" src="{%if form_data and form_data.title_photo_id %}{% build_photo_url form_data.title_photo_id %}{% endif %}" alt="图片预览" style="width: 300px;height: 300px;">
+                </div>
+            </div>
         </div>
-        <div class="image-box">
-            <img class="campaigns_photo_id" src="{%if form_data and form_data.campaigns_photo_id %}{% build_photo_url form_data.campaigns_photo_id %}{% endif %}" alt="图片预览" style="width: 300px;height: 300px;">
-        </div>
-        <br>
-        <div class="form-group">
-            <label for="from_country">活动页顶部图片</label>
-            <input type="file" class="form-control" name="title_photo_id">
-        </div>
-        <div class="image-box">
-            <img class="title_photo_id" src="{%if form_data and form_data.title_photo_id %}{% build_photo_url form_data.title_photo_id %}{% endif %}" alt="图片预览" style="width: 300px;height: 300px;">
-        </div>
+        
+
       </div><!-- /.box-body -->
 
       <div class="box-footer">
@@ -61,6 +75,7 @@
 {% endblock %}
 {% block js %}
     <script src="/static/js/myadmin/daterangepicker.js"></script>
+    <script src="/static/js/myadmin/jquery.multi-select.js"></script>
     <script>
     $(function(){
         $('.datetime').daterangepicker({
@@ -76,6 +91,7 @@
                     firstDay : 1  
             },
         });
+        
         var datevalue = '{{form_data.datetime}}'
         if(datevalue){ 
             datevalue = datevalue.split(' - ')
@@ -108,6 +124,7 @@
             }
             $image_item.attr('src', url)
         });
+        
     })
     
     </script>

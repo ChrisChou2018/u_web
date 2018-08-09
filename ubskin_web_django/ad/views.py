@@ -9,6 +9,7 @@ from django.conf import settings
 from django.forms import model_to_dict
 
 from ubskin_web_django.ad import models as ad_models
+from ubskin_web_django.item import models as item_models
 from ubskin_web_django.common import photo
 
 
@@ -86,6 +87,7 @@ class AddCampaignForm(forms.ModelForm):
         return model_obj
 
 def add_campaign(request):
+    categories_dict = item_models.Categories.get_categoreis_select_for_all()
     if request.method == 'GET':
         return my_render(
             request,
@@ -100,6 +102,7 @@ def add_campaign(request):
                 'ad/a_add_campign.html',
                 form_errors = form.errors,
                 form_data = request.POST,
+                categories_dict = categories_dict,
             )
         model_obj =  form.save()
         files = request.FILES
@@ -149,9 +152,10 @@ class EditorCampaignForm(forms.ModelForm):
 def editor_campaign(request):
     data_id = request.GET.get('data_id')
     model_obj = ad_models.get_model_obj_by_pk(
-            ad_models.Campaigns,
-            data_id
-        )
+        ad_models.Campaigns,
+        data_id
+    )
+    categories_dict = item_models.Categories.get_categoreis_select_for_all()
     if request.method == "GET":
         if model_obj:
             form_data = model_to_dict(model_obj)
@@ -167,13 +171,13 @@ def editor_campaign(request):
                 request,
                 'ad/a_add_campign.html',
                 form_data = form_data,
+                categories_dict = categories_dict,
             )
         else:
             return redirect(request.get_full_path().split('back_url=')[1])
     else:
         form = EditorCampaignForm(request.POST)
         if  not form.is_valid():
-            print(form.errors)
             return my_render(
                 request,
                 'ad/a_add_campign.html',
