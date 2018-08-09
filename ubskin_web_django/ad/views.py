@@ -147,12 +147,12 @@ class EditorCampaignForm(forms.ModelForm):
 
 
 def editor_campaign(request):
-    if request.method == "GET":
-        data_id = request.GET.get('data_id')
-        model_obj = ad_models.get_model_obj_by_pk(
+    data_id = request.GET.get('data_id')
+    model_obj = ad_models.get_model_obj_by_pk(
             ad_models.Campaigns,
             data_id
         )
+    if request.method == "GET":
         if model_obj:
             form_data = model_to_dict(model_obj)
             start_time = form_data.pop('start_time')
@@ -168,5 +168,30 @@ def editor_campaign(request):
                 'ad/a_add_campign.html',
                 form_data = form_data,
             )
+        else:
+            return redirect(request.get_full_path().split('back_url=')[1])
     else:
-        pass
+        form = EditorCampaignForm(request.POST)
+        if  not form.is_valid():
+            print(form.errors)
+            return my_render(
+                request,
+                'ad/a_add_campign.html',
+                form_errors = form.errors,
+                form_data = request.POST,
+            )
+        form.update(data_id)
+        files = request.FILES
+        if files:
+            for i in files:
+                file_obj = files[i]
+                if not os.path.exists(settings.MEDIA_ROOT,):
+                    os.makedirs(settings.MEDIA_ROOT,)
+                data = photo.save_upload_photo(
+                    file_obj,
+                    settings.MEDIA_ROOT,
+                )
+                if data:
+                    setattr(model_obj, i, data['photo_id'])
+                    model_obj.save()
+        return redirect(request.get_full_path().split('back_url=')[1])
