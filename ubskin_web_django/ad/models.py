@@ -75,3 +75,9 @@ def get_data_count(model, search_value=None, search_value_type='dict'):
     else:
         count = model.objects.filter(status='normal').count()
     return count
+
+def get_model_obj_by_pk(model, pk):
+    try:
+        return model.objects.get(pk=pk)
+    except model.DoesNotExist:
+        return None

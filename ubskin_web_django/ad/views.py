@@ -6,6 +6,7 @@ from django.shortcuts import render
 from django.shortcuts import redirect
 from django import forms
 from django.conf import settings
+from django.forms import model_to_dict
 
 from ubskin_web_django.ad import models as ad_models
 from ubskin_web_django.common import photo
@@ -146,6 +147,25 @@ class EditorCampaignForm(forms.ModelForm):
 
 def editor_campaign(request):
     if request.method == "GET":
-        pass
+        data_id = request.GET.get('data_id')
+        model_obj = ad_models.get_model_obj_by_pk(
+            ad_models.Campaigns,
+            data_id
+        )
+        if model_obj:
+            form_data = model_to_dict(model_obj)
+            start_time = form_data.pop('start_time')
+            start_time = time.localtime(start_time)
+            start_time = time.strftime(r'%m/%d/%Y', start_time)
+            end_time = form_data.pop('end_time')
+            end_time = time.localtime(end_time)
+            end_time = time.strftime(r'%m/%d/%Y', end_time)
+            datetime = ' - '.join([start_time, end_time])
+            form_data.update({'datetime': datetime})
+            return my_render(
+                request,
+                'ad/a_add_campign.html',
+                form_data = form_data,
+            )
     else:
         pass

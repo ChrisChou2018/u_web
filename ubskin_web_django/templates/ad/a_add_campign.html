@@ -18,7 +18,7 @@
       <div class="box-body">
         <div class="form-group">
           <label for="exampleInputEmail1">活动名（主题）</label>
-          <input type="text" class="form-control" id="exampleInputEmail1" name="campaign_name" value="{% if form_data.cn_name %}{{ form_data.cn_name }}{% endif %}">
+          <input type="text" class="form-control" id="exampleInputEmail1" name="campaign_name" value="{% if form_data.campaign_name %}{{ form_data.campaign_name }}{% endif %}">
           {% if form_errors and form_errors.campaign_name %}<span style="color: red">{{ form_errors.campaign_name }}</span>{% endif %}
         </div>
         <div class="form-group">
@@ -33,7 +33,7 @@
         
         <div class="form-group">
             <label for="from_country">活动简介</label>
-            <textarea name="intorduction" id="" cols="100" rows="10" class="form-control"> {% if form_data.brand_about %}{{ form_data.brand_about }}{% endif %}</textarea>
+            <textarea name="intorduction" id="" cols="100" rows="10" class="form-control"> {% if form_data.intorduction %}{{ form_data.intorduction }}{% endif %}</textarea>
         </div>
         <div class="form-group">
             <label for="from_country">活动推广图片</label>
@@ -76,7 +76,7 @@
                     firstDay : 1  
             },
         });
-        var datevalue = '{{from_data.datetime}}'
+        var datevalue = '{{form_data.datetime}}'
         if(datevalue){ 
             datevalue = datevalue.split(' - ')
             $('.datetime').data('daterangepicker').setStartDate(datevalue[0])

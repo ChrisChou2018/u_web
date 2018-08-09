@@ -76,7 +76,7 @@
                         <input type="checkbox">
                         <img src="{% build_photo_url i.campaigns_photo_id %}" alt="..." style="width: 150px;height: 150px;">
                         <div class="caption">
-                            <a href=""><strong>{% str_step i.campaign_name 13 %}</strong></a>
+                            <a href="{% url 'editor_campaign' %}?data_id={{i.campaign_id}}&back_url={{request.get_full_path}}"><strong>{% str_step i.campaign_name 13 %}</strong></a>
                             <p>开始：{% parse_timestamps i.start_time %}</p>
                             <p>结束：{% parse_timestamps i.end_time %}</p>
                             <p>活动位置：{{ i.location }}</p>
