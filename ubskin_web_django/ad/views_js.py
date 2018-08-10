@@ -4,7 +4,6 @@ from django.http import JsonResponse
 from ubskin_web_django.ad import models as ad_models
 
 
-
 def delete_campaigns(request):
     return_value = {
         'status':'error',

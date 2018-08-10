@@ -100,6 +100,7 @@ class Items(models.Model):
     brand_name                  = models.CharField(db_column="brand_name", null=True, blank=True, verbose_name="品牌名", max_length=255)
     for_people                  = models.CharField(db_column="for_people", null=True, blank=True, verbose_name="适用人群", max_length=255)
     weight                      = models.CharField(db_column="weight", null=True, blank=True, verbose_name="重量", max_length=255)
+    campaign_id                 = models.IntegerField(db_column="campaign_id", null=True, blank=True, verbose_name="活动ID")
     create_person               = models.CharField(db_column="create_person", verbose_name="创建人", max_length=255)
     create_time                 = models.IntegerField(db_column="create_time", verbose_name="创建时间", default=int(time.time()))
     update_person               = models.CharField(db_column="update_person", null=True, blank=True, verbose_name="更新人", max_length=255)
@@ -220,8 +221,6 @@ class Items(models.Model):
             return True
         else:
             return False
-    
-    
 
 
     class Meta:

@@ -9,6 +9,7 @@ from django.contrib.auth.decorators import login_required
 from django.db.models import Count
 
 from ubskin_web_django.item import models as item_models
+from ubskin_web_django.ad import models as ad_models
 from ubskin_web_django.common import photo
 from ubskin_web_django.common import common
 from ubskin_web_django.common import lib_data
@@ -21,11 +22,23 @@ def my_render(request, templater_path, **kwargs):
 def items_manage(request):
     if request.method == 'GET':
         current_page = request.GET.get('page', 1)
-        value = request.GET.get('search_value', '')
-        filter_args = None
-        if value:
-            filter_args = '&search_value={0}'.format(value)
-            search_value = {"item_name__icontains" : value}
+        filter_args_dict = {
+            'search_value': 'item_name__icontains',
+            'categorie_id': 'categorie_id',
+            'campaign_id': 'campaign_id',
+        }
+        search_value = dict()
+        filter_args = ''
+        for i in filter_args_dict:
+            GET = request.GET.get
+            value = GET(i)
+            if value:
+                search_value.update({filter_args_dict[i]: value})
+                filter_args += "&{}={}".format(i, value)
+        else:
+            if not filter_args:
+                filter_args = None
+        if search_value:
             item_list = item_models.get_data_list(
                 item_models.Items,
                 current_page,
@@ -48,6 +61,9 @@ def items_manage(request):
             specifications_type_choices)
         brand_dict = item_models.Brands.get_brands_dict_for_all()
         categories_dict = item_models.Categories.get_categoreis_dict_for_all()
+        categories_select_dict = item_models.Categories.get_categoreis_select_for_all()
+        campaigns_select_dict = ad_models.Campaigns.get_campaigns_selecet_all()
+        print(request.GET)
         return my_render(
             request,
             'item/a_item_manage.html',
@@ -59,7 +75,9 @@ def items_manage(request):
             specifications_type_dict = specifications_type_dict,
             brand_dict = brand_dict,
             categories_dict = categories_dict,
-            search_value = value,
+            form_data = request.GET,
+            categories_select_dict = categories_select_dict,
+            campaigns_select_dict = campaigns_select_dict,
         )
 
 
@@ -74,7 +92,7 @@ class AddItemForm(forms.ModelForm):
             "foreign_price", "key_word", "origin",
             "shelf_life", "capacity", "specifications_type_id",
             "for_people", "weight", "brand_id",
-            "categorie_id", 'stock_count'
+            "categorie_id", 'stock_count', 'campaign_id'
         )
     def save(self, commit=True, request=None):
         item = super(AddItemForm, self).save(commit=False)
@@ -90,6 +108,7 @@ def add_item(request):
     )
     brands_dict = item_models.Brands.get_brands_dict_for_all()
     categories_dict = item_models.Categories.get_categoreis_select_for_all()
+    campaigns_dict = ad_models.Campaigns.get_campaigns_selecet_all()
     if request.method == 'GET':
         return my_render(
             request,
@@ -97,6 +116,7 @@ def add_item(request):
             specifications_type_dict = specifications_type_dict,
             brands_dict = brands_dict,
             categories_dict = categories_dict,
+            campaigns_dict = campaigns_dict,
         )
     else:
         form = AddItemForm(request.POST)
@@ -109,6 +129,7 @@ def add_item(request):
                 categories_dict = categories_dict,
                 form_errors = form.errors,
                 form_data = request.POST,
+                campaigns_dict = campaigns_dict,
             )
         form.save(request=request)
         return redirect('/myadmin/item_manage/')
@@ -133,6 +154,7 @@ class EditorItemForm(forms.Form):
     brand_id = forms.IntegerField(required=False)
     categorie_id = forms.IntegerField(required=False)
     stock_count = forms.IntegerField(required=False)
+    campaign_id = forms.IntegerField(required=False)
 
 
     def clean_item_code(self):
@@ -172,6 +194,7 @@ def editor_item(request):
     item_obj = item_models.Items.get_item_by_id(item_id)
     form_data = model_to_dict(item_obj)
     back_url = request.GET.get('back_url')
+    campaigns_dict = ad_models.Campaigns.get_campaigns_selecet_all()
     if request.method == 'GET':
         return my_render(
             request,
@@ -180,6 +203,7 @@ def editor_item(request):
             specifications_type_dict = specifications_type_dict,
             brands_dict = brands_dict,
             categories_dict = categories_dict,
+            campaigns_dict = campaigns_dict,
         )
     else:
         form = EditorItemForm(request.POST)
@@ -192,6 +216,7 @@ def editor_item(request):
                 brands_dict = brands_dict,
                 categories_dict = categories_dict,
                 form_errors = form.errors,
+                campaigns_dict = campaigns_dict,
             )
         form.update(item_id, request)
         return redirect(back_url)

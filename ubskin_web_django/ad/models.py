@@ -31,20 +31,17 @@ class Campaigns(models.Model):
         data = cls.objects.filter(status='normal').values('location').annotate(c=Count('location'))
         data = list(data)
         return data
-
-
-class CampaignItems(models.Model):
-    '''
-    活动相关商品表
-    '''
-    campaign_items_id = models.AutoField(db_column="campaign_items_id", primary_key=True, verbose_name="活动商品ID")
-    campaign_id = models.BigIntegerField(db_column="campaign_id", verbose_name="活动ID")
-    item_id = models.BigIntegerField(db_column="item_id", verbose_name="商品ID")
-    status = models.CharField(db_column="status", verbose_name="数据状态", default="normal", max_length=255)
-
-    class Meta:
-        db_table = "campaign_items"
-
+    
+    @classmethod
+    def get_campaigns_selecet_all(cls):
+        data_list = list()
+        data = cls.objects.values('location').annotate(c=Count('location'))
+        for i in data:
+            o = cls.objects.filter(location=i['location']).values("campaign_id", "campaign_name")
+            for j in o:
+                j['campaign_name'] = i['location'] + '__' + j['campaign_name']
+            data_list.extend(o)
+        return data_list
 
 def create_model_data(model, data):
     return model.objects.create(**data)
