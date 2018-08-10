@@ -8,6 +8,7 @@ from django.db.models import Q
 from django.db.models import Count
 
 from ubskin_web_django.member import models as member_models
+from ubskin_web_django.ad import models as ad_models
 from ubskin_web_django.common import common
 
 
@@ -100,6 +101,7 @@ class Items(models.Model):
     brand_name                  = models.CharField(db_column="brand_name", null=True, blank=True, verbose_name="品牌名", max_length=255)
     for_people                  = models.CharField(db_column="for_people", null=True, blank=True, verbose_name="适用人群", max_length=255)
     weight                      = models.CharField(db_column="weight", null=True, blank=True, verbose_name="重量", max_length=255)
+    campaign_id                 = models.IntegerField(db_column="campaign_id", null=True, blank=True, verbose_name="活动ID")
     create_person               = models.CharField(db_column="create_person", verbose_name="创建人", max_length=255)
     create_time                 = models.IntegerField(db_column="create_time", verbose_name="创建时间", default=int(time.time()))
     update_person               = models.CharField(db_column="update_person", null=True, blank=True, verbose_name="更新人", max_length=255)
@@ -172,6 +174,46 @@ class Items(models.Model):
         for i in items_list:
             i['image'] = common.build_photo_url(i['photo_id'], pic_version='thumbicon', cdn=True)
         return items_list
+    
+    @classmethod
+    def get_items_by_campaign_id(cls, campaign_id, current_page):
+        '''
+        获取活动商品列表
+        '''
+        item_id_list = ad_models.CampaignItems.get_all_item_id_list_by_campaign_id(campaign_id)
+        item_obj = cls.objects.filter(status = 'normal', item_id__in=item_id_list).values(
+            'item_id', "item_name", "price", "stock_count", "photo_id", "brand_id"
+        ).order_by('-item_id')
+        if not item_obj:
+            return list()
+        p = Paginator(item_obj, 15)
+        current_page = int(current_page)
+        if current_page > p.num_pages:
+            return list()
+        items_list = p.page(current_page).object_list
+        items_list = list(items_list)
+        for i in items_list:
+            i['item_thumbicon'] = common.build_photo_url(i['photo_id'], cdn=True)
+        data_dict = dict()
+        for i in items_list:
+            brand_obj = Brands.get_brand_by_id(i['brand_id'])
+            if brand_obj:
+                if brand_obj.cn_name not in data_dict:
+                    data_dict[brand_obj.cn_name] = []
+                    data_dict[brand_obj.cn_name].append(i)
+                else:
+                    data_dict[brand_obj.cn_name].append(i)
+            else:
+                if '' not in data_dict:
+                    data_dict[''] = []
+                    data_dict[''].append(i)
+                else:
+                    data_dict[''].append(i)
+        new_data_list = list()
+        for i in data_dict:
+            new_data_list.append({i: data_dict[i]})
+        return new_data_list
+
 
     @classmethod
     def get_item_name_by_barcode(cls, item_barcode):

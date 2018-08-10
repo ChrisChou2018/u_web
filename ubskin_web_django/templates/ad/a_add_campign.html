@@ -1,0 +1,133 @@
+
+{% extends '../a_layout.html' %}
+{% load ui_method %}
+{% block css %}
+<link rel="stylesheet" href="/static/css/myadmin/daterangepicker.css">
+<link rel="stylesheet" href="/static/css/myadmin/multi-select.css">
+{% endblock %}
+{% block title %}
+<a type="button" class="btn btn-default back_btn" onclick="history.back()" >🔙 后退</a>             
+{% endblock %}
+{% block content %}
+<div class="box box-primary" style="padding: 15px">
+    <div class="box-header">
+      <h3 class="box-title">添加活动</h3>
+    </div><!-- /.box-header -->
+    <!-- form start -->
+    <form role="form" method="POST" action="" enctype="multipart/form-data">
+        {% csrf_token %}
+      <div class="box-body">
+        <div class="form-group">
+          <label for="exampleInputEmail1">活动名（主题）</label>
+          <input type="text" class="form-control" id="exampleInputEmail1" name="campaign_name" value="{% if form_data.campaign_name %}{{form_data.campaign_name}}{% endif %}">
+          {% if form_errors and form_errors.campaign_name %}<span style="color: red">{{ form_errors.campaign_name }}</span>{% endif %}
+        </div>
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="cn_name_abridge">活动位置</label>
+                    <input type="text" class="form-control" id="location" name="location" value="{% if form_data.location %}{{form_data.location}}{% endif %}">
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="en_name">活动开始时间和结束时间</label>
+                    <input type="datetime" class="form-control datetime" name="datetime" placeholder="点击选择时间">
+                    {% if form_errors and form_errors.datetime %}<span style="color: red">{{form_errors.datetime}}</span>{% endif %}
+                </div>
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="from_country">活动简介</label>
+            <textarea name="intorduction" id="" cols="100" rows="10" class="form-control"> {% if form_data.intorduction %}{{form_data.intorduction}}{% endif %}</textarea>
+        </div>
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="from_country">活动推广图片</label>
+                    <input type="file" class="form-control" name="campaigns_photo_id">
+                </div>
+                <div class="image-box">
+                    <img class="campaigns_photo_id" src="{%if form_data and form_data.campaigns_photo_id %}{% build_photo_url form_data.campaigns_photo_id %}{% endif %}" alt="图片预览" style="width: 300px;height: 300px;">
+                </div>
+                <br>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="from_country">活动页顶部图片</label>
+                    <input type="file" class="form-control" name="title_photo_id">
+                </div>
+                <div class="image-box">
+                    <img class="title_photo_id" src="{%if form_data and form_data.title_photo_id %}{% build_photo_url form_data.title_photo_id %}{% endif %}" alt="图片预览" style="width: 300px;height: 300px;">
+                </div>
+            </div>
+        </div>
+        
+
+      </div><!-- /.box-body -->
+
+      <div class="box-footer">
+        <button type="submit" class="btn btn-primary">Submit</button>
+      </div>
+    </form>
+  </div>
+
+{% endblock %}
+{% block js %}
+    <script src="/static/js/myadmin/daterangepicker.js"></script>
+    <script src="/static/js/myadmin/jquery.multi-select.js"></script>
+    <script>
+    $(function(){
+        $('.datetime').daterangepicker({
+            locale : {  
+                    applyLabel : '确定',  
+                    cancelLabel : '取消',  
+                    fromLabel : '起始时间',  
+                    toLabel : '结束时间',  
+                    customRangeLabel : '自定义',  
+                    daysOfWeek : [ '日', '一', '二', '三', '四', '五', '六' ],  
+                    monthNames : [ '一月', '二月', '三月', '四月', '五月', '六月',  
+                                '七月', '八月', '九月', '十月', '十一月', '十二月' ],  
+                    firstDay : 1  
+            },
+        });
+        
+        var datevalue = '{{form_data.datetime}}'
+        if(datevalue){ 
+            datevalue = datevalue.split(' - ')
+            $('.datetime').data('daterangepicker').setStartDate(datevalue[0])
+            $('.datetime').data('daterangepicker').setEndDate(datevalue[1])
+        }
+        $('input[name="campaigns_photo_id"]').change(function(){
+            file = this.files[0]
+            var $image_item = $('.campaigns_photo_id')
+            var url = null ;
+            if (window.createObjectURL!=undefined) { // basic
+                url = window.createObjectURL(file) ;
+            } else if (window.URL!=undefined) { // mozilla(firefox)
+                url = window.URL.createObjectURL(file) ;
+            } else if (window.webkitURL!=undefined) { // webkit or chrome
+                url = window.webkitURL.createObjectURL(file) ;
+            }
+            $image_item.attr('src', url)
+        });
+        $('input[name="title_photo_id"]').change(function(){
+            file = this.files[0]
+            var $image_item = $('.title_photo_id')
+            var url = null ;
+            if (window.createObjectURL!=undefined) { // basic
+                url = window.createObjectURL(file) ;
+            } else if (window.URL!=undefined) { // mozilla(firefox)
+                url = window.URL.createObjectURL(file) ;
+            } else if (window.webkitURL!=undefined) { // webkit or chrome
+                url = window.webkitURL.createObjectURL(file) ;
+            }
+            $image_item.attr('src', url)
+        });
+        
+    })
+    
+    </script>
+{% endblock %}
+
+

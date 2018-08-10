@@ -111,6 +111,24 @@
             </select>
         </div>
         <div class="form-group">
+            <label class="control-label">设置活动:</label>
+            <select name="campaign_ids" class="form-control" multiple style="min-height: 200px;">
+                {% for i in campaigns_dict %}
+                    {% if all_campaigns_ids %}
+                        {% ifin i.campaign_id all_campaigns_ids as bool_value %}
+                        {% if bool_value %}
+                            <option value="{{ i.campaign_id }}" selected>{{ i.campaign_name }}</option>
+                        {% else %}
+                            <option value="{{ i.campaign_id }}">{{ i.campaign_name }}</option>
+                        {% endif %}
+                    {% else %}
+                    <option value="{{ i.campaign_id }}">{{ i.campaign_name }}</option>
+                    {% endif %}
+                    
+                {% endfor %}
+            </select>
+        </div>
+        <div class="form-group">
             <label class="control-label">适用人群:</label>
             <input type="text" class="form-control" name="for_people" value="{% if form_data.for_people %}{{ form_data.for_people }}{% endif %}"> 
         </div>

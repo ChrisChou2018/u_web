@@ -9,6 +9,7 @@ from django.contrib.auth.decorators import login_required
 from django.db.models import Count
 
 from ubskin_web_django.item import models as item_models
+from ubskin_web_django.ad import models as ad_models
 from ubskin_web_django.common import photo
 from ubskin_web_django.common import common
 from ubskin_web_django.common import lib_data
@@ -21,11 +22,27 @@ def my_render(request, templater_path, **kwargs):
 def items_manage(request):
     if request.method == 'GET':
         current_page = request.GET.get('page', 1)
-        value = request.GET.get('search_value', '')
-        filter_args = None
-        if value:
-            filter_args = '&search_value={0}'.format(value)
-            search_value = {"item_name__icontains" : value}
+        filter_args_dict = {
+            'search_value': 'item_name__icontains',
+            'categorie_id': 'categorie_id',
+            'campaign_id': 'item_id__in',
+        }
+        search_value = dict()
+        filter_args = ''
+        for i in filter_args_dict:
+            GET = request.GET.get
+            value = GET(i)
+            if value:
+                if i == 'campaign_id':
+                    value = ad_models.CampaignItems.get_all_item_id_list_by_campaign_id(value)
+                    search_value.update({filter_args_dict[i]: value})
+                else:
+                    search_value.update({filter_args_dict[i]: value})
+                filter_args += "&{}={}".format(i, value)
+        else:
+            if not filter_args:
+                filter_args = None
+        if search_value:
             item_list = item_models.get_data_list(
                 item_models.Items,
                 current_page,
@@ -48,6 +65,8 @@ def items_manage(request):
             specifications_type_choices)
         brand_dict = item_models.Brands.get_brands_dict_for_all()
         categories_dict = item_models.Categories.get_categoreis_dict_for_all()
+        categories_select_dict = item_models.Categories.get_categoreis_select_for_all()
+        campaigns_select_dict = ad_models.Campaigns.get_campaigns_selecet_all()
         return my_render(
             request,
             'item/a_item_manage.html',
@@ -59,12 +78,16 @@ def items_manage(request):
             specifications_type_dict = specifications_type_dict,
             brand_dict = brand_dict,
             categories_dict = categories_dict,
-            search_value = value,
+            form_data = request.GET,
+            categories_select_dict = categories_select_dict,
+            campaigns_select_dict = campaigns_select_dict,
         )
 
 
 class AddItemForm(forms.ModelForm):
     item_name = forms.CharField(error_messages={'required': '至少这个不可以为空'})
+    campaign_ids = forms.MultipleChoiceField(choices=ad_models.Campaigns.get_campaigns_tuples_all(), required=False)
+
 
     class Meta:
         model = item_models.Items
@@ -74,13 +97,22 @@ class AddItemForm(forms.ModelForm):
             "foreign_price", "key_word", "origin",
             "shelf_life", "capacity", "specifications_type_id",
             "for_people", "weight", "brand_id",
-            "categorie_id", 'stock_count'
+            "categorie_id", 'stock_count',
         )
+
     def save(self, commit=True, request=None):
         item = super(AddItemForm, self).save(commit=False)
         if commit:
+            campaign_ids = self.cleaned_data['campaign_ids']
             item.create_person = request.user.member_name
             item.save()
+            if campaign_ids:
+                ad_models.CampaignItems.clean_campaigns_for_item_id(item.item_id)
+                for i in campaign_ids:
+                    ad_models.create_model_data(
+                        ad_models.CampaignItems,
+                        {'item_id': item.item_id, 'campaign_id': i}
+                    )
         return item
 
 @login_required(login_url='/myadmin/signin/')
@@ -90,6 +122,7 @@ def add_item(request):
     )
     brands_dict = item_models.Brands.get_brands_dict_for_all()
     categories_dict = item_models.Categories.get_categoreis_select_for_all()
+    campaigns_dict = ad_models.Campaigns.get_campaigns_selecet_all()
     if request.method == 'GET':
         return my_render(
             request,
@@ -97,6 +130,7 @@ def add_item(request):
             specifications_type_dict = specifications_type_dict,
             brands_dict = brands_dict,
             categories_dict = categories_dict,
+            campaigns_dict = campaigns_dict,
         )
     else:
         form = AddItemForm(request.POST)
@@ -109,6 +143,7 @@ def add_item(request):
                 categories_dict = categories_dict,
                 form_errors = form.errors,
                 form_data = request.POST,
+                campaigns_dict = campaigns_dict,
             )
         form.save(request=request)
         return redirect('/myadmin/item_manage/')
@@ -133,6 +168,7 @@ class EditorItemForm(forms.Form):
     brand_id = forms.IntegerField(required=False)
     categorie_id = forms.IntegerField(required=False)
     stock_count = forms.IntegerField(required=False)
+    campaign_ids = forms.MultipleChoiceField(choices=ad_models.Campaigns.get_campaigns_tuples_all(), required=False)
 
 
     def clean_item_code(self):
@@ -156,8 +192,17 @@ class EditorItemForm(forms.Form):
         update_person = request.user.member_name
         data = self.cleaned_data
         item_id = data.pop('item_id')
+        campaign_ids = data.pop('campaign_ids')
         data.update({'update_person': update_person})
         item.update_item_by_id(item_id, data)
+        if campaign_ids:
+            ad_models.CampaignItems.clean_campaigns_for_item_id(item_id)
+            for i in campaign_ids:
+                print(i, '-------')
+                ad_models.create_model_data(
+                    ad_models.CampaignItems,
+                    {'item_id': item_id, 'campaign_id': i}
+                )
         return item
 
 
@@ -172,6 +217,8 @@ def editor_item(request):
     item_obj = item_models.Items.get_item_by_id(item_id)
     form_data = model_to_dict(item_obj)
     back_url = request.GET.get('back_url')
+    campaigns_dict = ad_models.Campaigns.get_campaigns_selecet_all()
+    all_campaigns_ids = ad_models.CampaignItems.get_all_campaign_id_list_by_item_id(item_id)
     if request.method == 'GET':
         return my_render(
             request,
@@ -180,10 +227,13 @@ def editor_item(request):
             specifications_type_dict = specifications_type_dict,
             brands_dict = brands_dict,
             categories_dict = categories_dict,
+            campaigns_dict = campaigns_dict,
+            all_campaigns_ids = all_campaigns_ids,
         )
     else:
         form = EditorItemForm(request.POST)
         if not form.is_valid():
+            print(form.errors)
             return my_render(
                 request,
                 'item/a_add_item.html',
@@ -192,6 +242,8 @@ def editor_item(request):
                 brands_dict = brands_dict,
                 categories_dict = categories_dict,
                 form_errors = form.errors,
+                campaigns_dict = campaigns_dict,
+                all_campaigns_ids = all_campaigns_ids,
             )
         form.update(item_id, request)
         return redirect(back_url)
@@ -387,14 +439,14 @@ def categorie_manage(request):
         search_value = dict()
         current_page = request.GET.get('page', 1)
         categorie_types = item_models.Categories.get_all_categorie_type()
-        filter_args = '&'
+        filter_args = ''
         for i in search_dict:
             value = request.GET.get(i)
             if value is not None:
                 search_value[search_dict[i]] = value
-                filter_args += "{}={}".format(i, value)
+                filter_args += "&{}={}".format(i, value)
         else:
-            if len(filter_args) == 1:
+            if not filter_args:
                 filter_args = None
         if search_value:
             categories_list = item_models.Categories. \

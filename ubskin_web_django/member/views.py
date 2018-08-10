@@ -173,7 +173,7 @@ def user_order_manage(request):
             'pay_status': 'order_status__in'
         }
         current_page = GET('page', 1)
-        filter_args = '&'
+        filter_args = ''
         search_value = dict()
         for i in filter_args_dict:
             value = GET(i)
@@ -190,9 +190,9 @@ def user_order_manage(request):
                     search_value.update({filter_args_dict[i]: value_list})
                 else:
                     search_value.update({filter_args_dict[i]: value})
-                filter_args += "{}={}".format(i, value)
+                filter_args += "&{}={}".format(i, value)
         else:
-            if len(filter_args) == 1:
+            if not filter_args:
                 filter_args = None
         if search_value:
             data_list = member_models.UserOrder.get_user_order_list(

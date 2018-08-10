@@ -60,6 +60,7 @@ Pipfile
 ubskin_web_django/item/migrations/
 ubskin_web_django/member/migrations/
 ubskin_web_django/order/migrations/
+ubskin_web_django/ad/migrations/
 
 # Flask stuff:
 instance/
