@@ -16,5 +16,6 @@ urlpatterns += [
 ]
 
 urlpatterns += [
-    
+    path('api/get_campaigns/', views_api.get_campaigns),
+    path('api/get_items_by_campaign_id/', views_api.get_items_by_campaign_id),
 ]

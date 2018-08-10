@@ -131,3 +131,11 @@ def str_step(s, stop):
         return s[:stop] + '...'
     else:
         return s
+
+@register.simple_tag
+def str_and_digital(a, b):
+    return str(a) == str(b)
+
+@register.simple_tag
+def ifin(item, obj):
+    return item in obj
