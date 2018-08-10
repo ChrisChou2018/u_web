@@ -123,7 +123,6 @@ def add_campaign(request):
 
 class EditorCampaignForm(forms.ModelForm):
 
-
     datetime = forms.CharField(error_messages={'required': '至少这个不可以为空'})
 
 

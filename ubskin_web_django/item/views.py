@@ -25,7 +25,7 @@ def items_manage(request):
         filter_args_dict = {
             'search_value': 'item_name__icontains',
             'categorie_id': 'categorie_id',
-            'campaign_id': 'campaign_id',
+            'campaign_id': 'item_id__in',
         }
         search_value = dict()
         filter_args = ''
@@ -33,7 +33,11 @@ def items_manage(request):
             GET = request.GET.get
             value = GET(i)
             if value:
-                search_value.update({filter_args_dict[i]: value})
+                if i == 'campaign_id':
+                    value = ad_models.CampaignItems.get_all_item_id_list_by_campaign_id(value)
+                    search_value.update({filter_args_dict[i]: value})
+                else:
+                    search_value.update({filter_args_dict[i]: value})
                 filter_args += "&{}={}".format(i, value)
         else:
             if not filter_args:
@@ -63,7 +67,6 @@ def items_manage(request):
         categories_dict = item_models.Categories.get_categoreis_dict_for_all()
         categories_select_dict = item_models.Categories.get_categoreis_select_for_all()
         campaigns_select_dict = ad_models.Campaigns.get_campaigns_selecet_all()
-        print(request.GET)
         return my_render(
             request,
             'item/a_item_manage.html',
@@ -83,6 +86,8 @@ def items_manage(request):
 
 class AddItemForm(forms.ModelForm):
     item_name = forms.CharField(error_messages={'required': '至少这个不可以为空'})
+    campaign_ids = forms.MultipleChoiceField(choices=ad_models.Campaigns.get_campaigns_tuples_all(), required=False)
+
 
     class Meta:
         model = item_models.Items
@@ -92,13 +97,22 @@ class AddItemForm(forms.ModelForm):
             "foreign_price", "key_word", "origin",
             "shelf_life", "capacity", "specifications_type_id",
             "for_people", "weight", "brand_id",
-            "categorie_id", 'stock_count', 'campaign_id'
+            "categorie_id", 'stock_count',
         )
+
     def save(self, commit=True, request=None):
         item = super(AddItemForm, self).save(commit=False)
         if commit:
+            campaign_ids = self.cleaned_data['campaign_ids']
             item.create_person = request.user.member_name
             item.save()
+            if campaign_ids:
+                ad_models.CampaignItems.clean_campaigns_for_item_id(item.item_id)
+                for i in campaign_ids:
+                    ad_models.create_model_data(
+                        ad_models.CampaignItems,
+                        {'item_id': item.item_id, 'campaign_id': i}
+                    )
         return item
 
 @login_required(login_url='/myadmin/signin/')
@@ -154,7 +168,7 @@ class EditorItemForm(forms.Form):
     brand_id = forms.IntegerField(required=False)
     categorie_id = forms.IntegerField(required=False)
     stock_count = forms.IntegerField(required=False)
-    campaign_id = forms.IntegerField(required=False)
+    campaign_ids = forms.MultipleChoiceField(choices=ad_models.Campaigns.get_campaigns_tuples_all(), required=False)
 
 
     def clean_item_code(self):
@@ -178,8 +192,17 @@ class EditorItemForm(forms.Form):
         update_person = request.user.member_name
         data = self.cleaned_data
         item_id = data.pop('item_id')
+        campaign_ids = data.pop('campaign_ids')
         data.update({'update_person': update_person})
         item.update_item_by_id(item_id, data)
+        if campaign_ids:
+            ad_models.CampaignItems.clean_campaigns_for_item_id(item_id)
+            for i in campaign_ids:
+                print(i, '-------')
+                ad_models.create_model_data(
+                    ad_models.CampaignItems,
+                    {'item_id': item_id, 'campaign_id': i}
+                )
         return item
 
 
@@ -195,6 +218,7 @@ def editor_item(request):
     form_data = model_to_dict(item_obj)
     back_url = request.GET.get('back_url')
     campaigns_dict = ad_models.Campaigns.get_campaigns_selecet_all()
+    all_campaigns_ids = ad_models.CampaignItems.get_all_campaign_id_list_by_item_id(item_id)
     if request.method == 'GET':
         return my_render(
             request,
@@ -204,10 +228,12 @@ def editor_item(request):
             brands_dict = brands_dict,
             categories_dict = categories_dict,
             campaigns_dict = campaigns_dict,
+            all_campaigns_ids = all_campaigns_ids,
         )
     else:
         form = EditorItemForm(request.POST)
         if not form.is_valid():
+            print(form.errors)
             return my_render(
                 request,
                 'item/a_add_item.html',
@@ -217,6 +243,7 @@ def editor_item(request):
                 categories_dict = categories_dict,
                 form_errors = form.errors,
                 campaigns_dict = campaigns_dict,
+                all_campaigns_ids = all_campaigns_ids,
             )
         form.update(item_id, request)
         return redirect(back_url)
