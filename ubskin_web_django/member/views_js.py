@@ -102,6 +102,7 @@ def editor_member(request):
                 return_value['message'] = ['两次密码不一致']
                 return JsonResponse(return_value)
             member_obj.set_password(password2)
+            member_obj.save()
         telephone = request.POST.get('telephone')
         if telephone:
             if member_models.Member.has_member_telephone(
