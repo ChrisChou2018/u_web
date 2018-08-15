@@ -92,6 +92,10 @@ def wx_signin(request):
         'message': '',
         'data': '',
     }
+    error_code = {
+        'wx_signin_config': 40125,
+        'code': 4029,
+    }
     if request.method == 'POST':
         data = json.loads(request.body)
         name = data.get('name')
@@ -118,6 +122,7 @@ def wx_signin(request):
                 return wx_regist_member(return_value, openid, name, avatar, session_key)
         else:
             return_value['message'] = '微信接口验证出错,请重新登陆'
+            return_value['error_code'] = error_code['wx_signin_config']
             return JsonResponse(return_value)
 
 
