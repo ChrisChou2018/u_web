@@ -4,6 +4,7 @@ from django.db import models
 from django.core.paginator import Paginator
 from django.db.models import Q
 from django.db.models import Count
+from django.utils.functional import lazy
 
 from ubskin_web_django.common import common
 
@@ -47,11 +48,9 @@ class Campaigns(models.Model):
     
     @classmethod
     def get_campaigns_tuples_all(cls):
-        if cls.objects.use_in_migrations:
-            o = cls.objects.filter(status='normal').values_list("campaign_id", "campaign_name")
-            return o
-        else:
-            return list()
+        o = lazy(cls.objects.filter(status='normal').values_list("campaign_id", "campaign_name"))
+        return o
+        
     
     @classmethod
     def get_campaigns_by_l_and_d(cls, location, datetime):
