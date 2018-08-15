@@ -211,7 +211,7 @@ class Items(models.Model):
                     data_dict[''].append(i)
         new_data_list = list()
         for i in data_dict:
-            new_data_list.append({i: data_dict[i]})
+            new_data_list.append({'title': i, 'list': data_dict[i]})
         return new_data_list
 
 

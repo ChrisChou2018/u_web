@@ -220,6 +220,7 @@ def user_order_manage(request):
             from_data = request.GET,
         )
 
+@login_required(login_url='/myadmin/signin/')
 def out_order_manage(request):
     if request.method == 'GET':
         current_page = request.GET.get('page', 1)

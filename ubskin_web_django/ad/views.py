@@ -7,6 +7,7 @@ from django.shortcuts import redirect
 from django import forms
 from django.conf import settings
 from django.forms import model_to_dict
+from django.contrib.auth.decorators import login_required
 
 from ubskin_web_django.ad import models as ad_models
 from ubskin_web_django.item import models as item_models
@@ -16,6 +17,7 @@ from ubskin_web_django.common import photo
 def my_render(request, templater_path, **kwargs):
     return render(request, templater_path, dict(**kwargs))
 
+@login_required(login_url='/myadmin/signin/')
 def campaigns_manage(request):
     if request.method == "GET":
         search_dict = {
@@ -86,6 +88,7 @@ class AddCampaignForm(forms.ModelForm):
             model_obj.save()
         return model_obj
 
+@login_required(login_url='/myadmin/signin/')
 def add_campaign(request):
     categories_dict = item_models.Categories.get_categoreis_select_for_all()
     if request.method == 'GET':
@@ -148,6 +151,7 @@ class EditorCampaignForm(forms.ModelForm):
         )
 
 
+@login_required(login_url='/myadmin/signin/')
 def editor_campaign(request):
     data_id = request.GET.get('data_id')
     model_obj = ad_models.get_model_obj_by_pk(

@@ -47,8 +47,11 @@ class Campaigns(models.Model):
     
     @classmethod
     def get_campaigns_tuples_all(cls):
-        o = cls.objects.filter(status='normal').values_list("campaign_id", "campaign_name")
-        return o
+        if cls.objects.use_in_migrations:
+            o = cls.objects.filter(status='normal').values_list("campaign_id", "campaign_name")
+            return o
+        else:
+            return list()
     
     @classmethod
     def get_campaigns_by_l_and_d(cls, location, datetime):
