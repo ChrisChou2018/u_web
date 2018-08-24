@@ -20,19 +20,19 @@
 <ul class="nav nav-tabs">
     <li role="presentation"><a href="{% url 'order_manage' %}">商品出库表</a></li>
     <li role="presentation"><a href="{% url 'item_qr_Code_manage' %}">物码查询</a></li>
-    <li role="presentation" class="active"><a href="{% url 'recv_manage' %}">收货方管理</a></li>
-    <li role="presentation"><a href="{% url 'batch_qr_code_manage' %}">二维码生成</a></li>
+    <li role="presentation"><a href="{% url 'recv_manage' %}">收货方管理</a></li>
+    <li role="presentation" class="active"><a href="{% url 'batch_qr_code_manage' %}">二维码生成</a></li>
 </ul>         
 {% endblock %}
 {% block page_header %}
 <ol class="breadcrumb">
     <li><a href="#"><i class="fa fa-dashboard"></i> 扫码出库</a></li>
-    <li><a href="#"><i class="fa fa-dashboard"></i> 收货方管理</a></li>
+    <li><a href="#"><i class="fa fa-dashboard"></i> 二维码生成</a></li>
 </ol>
 {% endblock %}
 
 {% block content_title %}
-<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel">
+<!-- <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
             <div class="modal-header">
@@ -59,20 +59,24 @@
             </div>
             </div>
         </div>
-    </div>
+    </div> -->
 
 <div class="row">
     <div class="col-md-8">
         <div "row">
             <div class="col-md-8">
-                <form action="" method="GET" class="search_input">
+                
+                <a class="btn btn-info add_recv_btn" type="button" href="{% url 'create_batch_qr_code' %}">批量生成二维码 <span class="glyphicon glyphicon-plus"></span></a>
+                <button type="button" class="btn btn-default choose_member" type="button">选择<span class="glyphicon glyphicon-saved"></span></button>
+                <button type="button" class="btn btn-danger delete_recv" type="button">删除<span class="glyphicon glyphicon-trash"></span></button>
+                <!-- <form action="" method="GET" class="search_input">
                 <div class="input-group">
                     <input type="text" class="form-control" placeholder="搜索收货方" name="search_value" value="{{ search_value }}">
                     <span class="input-group-btn">
                         <button class="btn btn-default search_input_btn" type="submit">搜索</button>
                     </span>
-                  </div><!-- /input-group -->
-                </form>
+                  </div>
+                </form> -->
             </div>
             <div class="col-md-4">
 
@@ -80,9 +84,7 @@
         </div>
     </div>
     <div class="col-md-4">
-        <button type="button" class="btn btn-info add_recv_btn" type="button" data-toggle="modal" data-target="#exampleModal" >添加收货方 <span class="glyphicon glyphicon-plus"></span></button>
-        <button type="button" class="btn btn-default choose_member" type="button">选择<span class="glyphicon glyphicon-saved"></span></button>
-        <button type="button" class="btn btn-danger delete_recv" type="button">删除<span class="glyphicon glyphicon-trash"></span></button>
+        
     </div>
 </div>
 {% endblock %}
@@ -95,33 +97,34 @@
     
             <div class="table-responsive">
                 <table class="table table-bordered table-striped recv_table">
-                  <colgroup>
-                    <col class="col-xs-1">
-                    <col class="col-xs-1">
-                    <col class="col-xs-4">
-                    <col class="col-xs-2">
-                  </colgroup>
+                  
                   <thead>
                     <tr>
-                      <th>ID</th>
-                      <th>编码</th>
-                      <th>收货方名称</th>
-                      <th>操作</th>
+                      {% for i in table_head %}
+                        <th>{% get_value_by_key table_head i %}</th>
+                      {% endfor %}
                     </tr>
                   </thead>
                   <tbody>
-                    {% for code in data_list %}
-                    <tr>
-                        <th scope="row">{{ code.recv_id }}</th>
-                        <td>{{ code.recv_code }}</td>
-                        <td>{{ code.recv_addr }}</td>
-                        <td>
-                            <a id="id_set_watch" onclick="javascript:setWatch('{{ code.recv_id }}');" href="javascript:;">
-                            {% if code.is_watch %}取消重点关注{% else %}加重点关注{% endif %}</a>
-                        |   <a href="javascript:;" class="edit_recv"  data-toggle="modal" data-target="#exampleModal">编辑</a>
-                        </td>
-                        <td style='display: none'><input type='checkbox'></td>
-                    </tr>
+                    {% for i in data_list %}
+                        <tr>
+                            {% for j in table_head %}
+                                {% if j != 'more' %}
+                                    {% if j == 'recv_code' %}
+                                        {% get_value_by_key i j as recv_code %}
+                                        <td>{% get_recv_addr_by_code recv_code %}</td>
+                                    {% elif j == 'batch_qr_code_id' %}
+                                        <td><input type="checkbox" style="display: none;">  {% get_value_by_key i j %}</td>
+                                    {% elif j == 'create_member' %}
+                                        {% get_value_by_key i j as menber_id %}
+                                        <td>{% get_menber_by_id menber_id %}</td>
+                                    {% else %}
+                                        <td>{% get_value_by_key i j %}</td>
+                                    {% endif %}
+                                {% endif %}
+                            {% endfor %}
+                            <td><a href="{% url 'create_batch_qr_code' %}?data_id={{ i.batch_qr_code_id }}">编辑</a> | <a href="{% url 'download_qr_code_file' i.batch_qr_code_id %}">下载二维码</a></td>
+                        </tr>
                     {% endfor %}
                   </tbody>
                 </table>
@@ -150,16 +153,15 @@
             $('.submit_btn').click(function(){
                 add_or_edit_recv(false)
             })
-            
         })
         $('.delete_recv').unbind()
         $('.delete_recv').click(delete_recv)
         $('.choose_member').click(function(){
             var tr =  $('.recv_table tbody tr')
             $.each(tr,function(index,item){
-                var $ltd = $(item).children().last()
+                var $ltd = $(item).children().first().find('input')
                 if($ltd.css('display')=='none'){
-                    $ltd.css('display','block')
+                    $ltd.css('display','inline-block')
                 }else{
                     $ltd.css('display','none')
                 }
@@ -172,58 +174,22 @@
             get_edit_recv_info
         )
     })
-    
-    function setWatch(cid) {
-        $.post(
-            "{% url 'set_recv_watch' %}",
-            {'cid': cid, 'csrfmiddlewaretoken':getCookie('csrftoken') },
-            function(r) {
-                location.href = location.href;
-        });
-    }
 
-
-    function add_or_edit_recv(is_edit){
-        var post_url = is_edit ? '{% url "edit_recv" %}?recv_id=' + recv_id : '{% url "create_recv" %}'
-        var $input_list = $('.recv_form input')
-        var data_dict = {}
-        $input_list.each(function(index,item){
-            var input_value = $(item).val().trim()
-            data_dict[$(item).attr('name')]=input_value
-            
-        })
-        data_dict['csrfmiddlewaretoken'] = getCookie('csrftoken');
-        $.post(
-            post_url,
-            data_dict,
-            function(value){
-                if(value.status == 'success'){
-                    $('#exampleModal').modal('hide')
-                    location.reload()
-                }else{
-                    $('.return_msg_box').text(value.message)
-                }
-            },
-            'json'
-        )
-        
-    }
 
     function delete_recv(){
         var tr =  $('.recv_table tbody tr')
-        var recv_id_list = []
+        var data_id_list = []
         $.each(tr,function(index,item){
-            var $ltd = $(item).children().last()
-            var $ftd = $(item).children().first()
-            var $check_box = $ltd.children()
-            if($ltd.css('display')=='block' && $check_box.prop('checked')){
-                recv_id_list.push($ftd.text())
+            var $ltd = $(item).children().first().find('input')
+            var $ftd = $(item).children().first().text().trim()
+            if($ltd.css('display')=='inline-block' && $ltd.prop('checked')){
+                data_id_list.push($ftd)
             }
         })
-        if(recv_id_list.length>0){
+        if(data_id_list.length>0){
             $.post(
-                '{% url "delete_recv" %}',
-                {'recv_id_list':recv_id_list, 'csrfmiddlewaretoken':getCookie('csrftoken')},
+                '{% url "delete_batch_qr_code" %}',
+                {'data_id_list':data_id_list, 'csrfmiddlewaretoken':getCookie('csrftoken')},
                 function(value){
                     if(value.status == 'success'){
                         location.reload()
@@ -236,35 +202,6 @@
         }
     }
 
-    // 获取待编辑用户信息
-    var recv_id = null
-    function get_edit_recv_info(){
-        $('.modal-title').text('编辑收货方')
-        recv_id = $(this).parent().parent().children().first().text()
-        var data_dict = null
-        $.get(
-            '{% url "edit_recv" %}?recv_id='+recv_id,
-            function(value){
-                if(value.status == 'success'){
-                    data_dict = value.data
-                    $('#exampleModal').modal('show')
-                    var $input_list = $('.recv_form input')
-                    $input_list.each(function(index, item){
-                        $(item).attr('old_value', data_dict[$(item).attr('name')])
-                        $(item).val(data_dict[$(item).attr('name')])
-                    })
-                    $('.submit_btn').unbind()
-                    $('.submit_btn').click(function(){
-                        add_or_edit_recv(true)
-                    })
-                }else{
-                    alert(value.message)
-                }
-            },
-            'json'
-        )
-        
-    }
     
     
 
