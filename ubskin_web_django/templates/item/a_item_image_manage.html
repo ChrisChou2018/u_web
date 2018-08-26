@@ -102,7 +102,7 @@
                     contentType:false,
                     processData:false,
                     success:function(data){
-                        if(data.result == 'success'){
+                        if(data.status == 'success'){
                             location.reload()
                         }else{
                             alert(data.message)

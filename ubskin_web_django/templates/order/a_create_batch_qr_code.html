@@ -1,0 +1,61 @@
+
+{% extends '../a_layout.html' %}
+{% load ui_method %}
+{% block css %}
+    
+{% endblock %}
+{% block title %}
+<a type="button" class="btn btn-default back_btn" onclick="history.back()" >🔙 后退</a>             
+{% endblock %}
+{% block content %}
+<div class="box box-primary" style="padding: 20px 100px;box-shadow:0 1px 1px rgba(0,0,0,0.1)">
+    <div class="box-header">
+      <h3 class="box-title">生成二维码</h3>
+    </div><!-- /.box-header -->
+    <!-- form start -->
+    <form role="form" method="POST" action="" enctype="multipart/form-data">
+        {% csrf_token %}
+      <div class="box-body">
+        <div class="form-group">
+            <label for="code_count">生成数量</label>
+            <input type="text" class="form-control" onkeyup="value=value.replace(/[^\d\.]/g,'')"  id="code_count" name="code_count" value="{% if form_data.code_count %}{{ form_data.code_count }}{% endif %}" {% if form_data.code_count %} readonly {% endif %}>
+            {% if form_errors and form_errors.code_count %} <span style="color: red">{{ form_errors.code_count }}</span> {% endif %}
+        </div>
+        
+        <div class="form-group">
+            <label for="from_country">备注</label>
+            <textarea name="message" id="" cols="100" rows="10" class="form-control"> {% if form_data.message %}{{ form_data.message }}{% endif %}</textarea>
+        </div>
+        <div class="form-group">
+            <label for="recv_code">店铺绑定(可选)</label>
+            <select class="form-control"  name="recv_code">
+                <option value="">选择店铺</option>
+                {% for i in recv_choices %}
+                    {% if form_data.recv_code == i.0 %}
+                        <option value="{{ i.0 }}" selected>{{ i.1 }}</option>
+                        {% else %}
+                        <option value="{{ i.0 }}">{{ i.1 }}</option>
+                    {% endif %}
+                    
+                {% endfor %}
+            </select>
+        </div>
+        
+
+      <div class="box-footer">
+        <button type="submit" class="btn btn-primary">提交</button>
+      </div>
+    </form>
+  </div>
+
+{% endblock %}
+{% block js %}
+    <script>
+        $(function(){
+            $('.order_manage').addClass('active')
+            
+        })
+    </script>
+{% endblock %}
+
+

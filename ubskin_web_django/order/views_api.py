@@ -79,14 +79,18 @@ def create_stock_batch_api(request):
                 }
             )
             for i in item:
-                order_models.create_model_data(
-                    order_models.ItemQRCode,
-                    {
-                        "qr_code": i,
-                        "stock_batch_count_id": stock_batch_count.stock_batch_count_id,
-                        "create_user": member.member_id
-                    }
-                )
+                qr_code_obj = order_models.ItemQRCode.get_qr_code_obj_by_qr_code(i)
+                qr_code_obj.stock_batch_count_id =  stock_batch_count.stock_batch_count_id
+                qr_code_obj.create_user = member.member_id
+                qr_code_obj.save()
+                # order_models.create_model_data(
+                #     order_models.ItemQRCode,
+                #     {
+                #         "qr_code": i,
+                #         "stock_batch_count_id": stock_batch_count.stock_batch_count_id,
+                #         "create_user": member.member_id
+                #     }
+                # )
         return_value['status'] = 'success'
         return JsonResponse(return_value)
 
