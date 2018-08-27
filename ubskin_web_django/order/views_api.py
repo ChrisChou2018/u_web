@@ -8,8 +8,10 @@ from django.views.decorators.csrf import csrf_exempt
 
 from ubskin_web_django.order import models as order_models
 from ubskin_web_django.member import models as member_models
+from ubskin_web_django.item import models as item_models
 from ubskin_web_django.common import lib_data 
 from ubskin_web_django.common import decorators
+from ubskin_web_django.common import common
 
 
 def get_recv(request):
@@ -109,12 +111,47 @@ def item_code(request, qr_code):
     if not qr_code_obj:
         return_value['message'] = '没有记录'
         return JsonResponse(return_value)
-        
+    qr_code_obj.search_count += 1
+    qr_code_obj.save()
+    batch_qr_code_id = qr_code_obj.batch_qr_code_id
+    batch_qr_code_obj = order_models.get_model_obj_by_pk(
+        order_models.BatchQrCode,
+        batch_qr_code_id
+    )
+    if not qr_code_obj.stock_batch_count_id and batch_qr_code_obj.recv_code:
+        recv_addr = order_models.Recv.get_recv_addr_by_recv_code(batch_qr_code_obj.recv_code)
+        date = batch_qr_code_obj.create_time
+        date = lib_data.parse_timestamps(date)
+        member_obj = member_models.Member.get_member_by_id(batch_qr_code_obj.create_member)
+        if member_obj:
+            is_admin = member_obj.is_admin
+            action = "出库扫码" if is_admin else '店铺扫码'
+        else:
+            action = '店铺扫码'
+        return_value['data'] = [
+            {"action": action, "to": recv_addr, "date": date},
+        ]
+        return_value["status"] = "success"
+        return JsonResponse(return_value)
+    elif not qr_code_obj.stock_batch_count_id and not batch_qr_code_obj.recv_code:
+        return_value['messge'] = "该二维码未绑定"
+        return JsonResponse(return_value)
     stock_batch_count_id = qr_code_obj.stock_batch_count_id
     obj = order_models.get_model_obj_by_pk(
         order_models.StockBatchCount,
         stock_batch_count_id,
     )
+    item_obj = item_models.Items.get_item_obj_by_barcode(obj.item_barcode)
+    item_name = '未查询到相关商品信息'
+    brand_name = '未查询到相关品牌信息'
+    item_photo = common.build_photo_url(None, pic_version='title', cdn=True)
+    if item_obj:
+        item_name = item_obj.item_name
+        brand_id = item_obj.brand_id
+        item_photo = common.build_photo_url(item_obj.photo_id, pic_version='title', cdn=True)
+        if brand_id:
+            brand_obj = item_models.Brands.get_brand_by_id(brand_id)
+            brand_name = brand_obj.cn_name if brand_obj else brand_name
     stock_batch_dict = order_models.StockBatch.get_stock_dict_by_stock_batch_id(obj.stock_batch_id)
     recv_code = stock_batch_dict.get('recv_code')
     recv_addr = order_models.Recv.get_recv_addr_by_recv_code(recv_code)
@@ -127,7 +164,10 @@ def item_code(request, qr_code):
     else:
         action = '店铺扫码'
     return_value['data'] = [
-        {"action": action, "to": recv_addr, "date": date},
+        {
+            "action": action, "to": recv_addr, "date": date,
+            'item_name': item_name, 'brand_name': brand_name, 'image': item_photo,
+        },
     ]
     return_value["status"] = "success"
     return JsonResponse(return_value)
