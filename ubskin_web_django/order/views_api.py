@@ -143,7 +143,7 @@ def item_code(request, qr_code):
     )
     item_obj = item_models.Items.get_item_obj_by_barcode(obj.item_barcode)
     item_name = '未查询到相关商品信息'
-    brand_name = '未查询到相关商品信息'
+    brand_name = '未查询到相关品牌信息'
     item_photo = common.build_photo_url(None, pic_version='title', cdn=True)
     if item_obj:
         item_name = item_obj.item_name
