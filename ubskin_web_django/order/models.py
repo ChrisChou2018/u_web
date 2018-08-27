@@ -34,7 +34,7 @@ class Recv(models.Model):
         if current_page > p.num_pages:
             return list()
         else:
-            return list(p.page(current_page).object_list.value('recv_code', 'recv_addr'))
+            return list(p.page(current_page).object_list.values('recv_code', 'recv_addr'))
     
     @classmethod
     def get_recv_obj_by_recv_code(cls, recv_code):
@@ -62,7 +62,7 @@ class StockBatch(models.Model):
         if obj:
             return obj[0]
         else:
-            return None 
+            return None
            
     @classmethod
     def check_has_stock_batch_id(cls, stock_batch_id):
