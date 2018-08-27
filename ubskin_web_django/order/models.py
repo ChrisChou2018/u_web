@@ -34,12 +34,15 @@ class Recv(models.Model):
         if current_page > p.num_pages:
             return list()
         else:
-            return list(p.page(current_page).object_list.values('recv_code', 'recv_addr'))
+            return list(p.page(current_page).object_list.value('recv_code', 'recv_addr'))
     
     @classmethod
     def get_recv_obj_by_recv_code(cls, recv_code):
         return cls.objects.filter(recv_code=recv_code).first()
 
+    @classmethod
+    def get_recv_all_by_select(cls):
+        return cls.objects.filter(status='normal').values_list('recv_code', 'recv_addr')
 
     class Meta:
         db_table = 'recv'
@@ -50,8 +53,8 @@ class StockBatch(models.Model):
     stock_batch_id          = models.CharField(db_column="stock_batch_id", verbose_name='库存单号', max_length=255)
     recv_code               = models.CharField(db_column="recv_code", verbose_name='到达商家地点代码', max_length=255)
     create_time             = models.IntegerField(db_column="create_time", verbose_name="创建时间", default=int(time.time()))
-    status                  = models.CharField(db_column="status", default='normal', max_length=255)
     create_user             = models.BigIntegerField(db_column='create_user', verbose_name='创建用户', null=True, blank=True)
+    status                  = models.CharField(db_column="status", default='normal', max_length=255)
 
     @classmethod
     def get_stock_dict_by_stock_batch_id(cls, stock_batch_id):
@@ -78,6 +81,7 @@ class StockBatchCount(models.Model):
     stock_batch_id          = models.CharField(db_column="stock_batch_id", verbose_name='库存单号', max_length=255, null=True, blank=True)
     item_barcode            = models.CharField(db_column='item_barcode', verbose_name='商品条码', max_length=255, null=True, blank=True)
     item_count              = models.IntegerField(db_column="item_count", verbose_name="库商品数量", default=0)
+    
 
     class Meta:
         db_table = 'stock_batch_count'
@@ -104,8 +108,10 @@ class ItemQRCode(models.Model):
     qr_code_id = models.AutoField(db_column='qr_code_id', primary_key=True, verbose_name='qr_code_id')
     qr_code = models.CharField(db_column='qr_code', verbose_name='商品二维码', max_length=255, null=True, blank=True)
     stock_batch_count_id = models.BigIntegerField(db_column='stock_batch_count_id', verbose_name='出库单表ID', null=True, blank=True)
-    status = models.CharField(db_column="status", default='normal', max_length=255)
+    batch_qr_code_id = models.BigIntegerField(db_column='batch_qr_code_id', verbose_name='二维码批次ID', null=True, blank=True)
+    search_count = models.IntegerField(db_column='search_count', verbose_name='查询次数', default=0)
     create_user = models.BigIntegerField(db_column='create_user', verbose_name='创建用户', null=True, blank=True)
+    status = models.CharField(db_column="status", default='normal', max_length=255)
 
 
     @classmethod
@@ -137,14 +143,65 @@ class ItemQRCode(models.Model):
 
     @classmethod
     def check_has_item_qr_code(cls, item_qr_code):
-        flag = False
-        obj = cls.objects.filter(qr_code=item_qr_code).first()
-        flag = True if obj else False
-        return flag
+        obj = cls.objects.filter(qr_code=item_qr_code, status='normal').first()
+        return obj
+    
+    @classmethod
+    def delete_data_by_batch_qr_code_id(cls, batch_qr_code_id):
+        cls.objects.filter(status='normal', batch_qr_code_id=batch_qr_code_id).update(**{'status': 'deleted'})
+    
+
+    @classmethod
+    def get_data_list_by_batch_qr_code_id(cls, batch_qr_code_id):
+        return cls.objects.filter(status='normal', batch_qr_code_id=batch_qr_code_id).values_list('qr_code')
 
 
     class Meta:
         db_table = 'item_qr_code'
+
+
+class BatchQrCode(models.Model):
+    batch_qr_code_id = models.AutoField(db_column='batch_code_id', primary_key=True, verbose_name='二维码批次ID')
+    code_count = models.IntegerField(db_column='code_count', verbose_name='二维码数量')
+    create_member = models.BigIntegerField(db_column='create_member', verbose_name='创建用户')
+    create_time = models.IntegerField(db_column="create_time", verbose_name="创建时间", default=int(time.time()))
+    message = models.TextField(db_column="message", verbose_name='备注信息', null=True, blank=True,)
+    recv_code = models.CharField(db_column="recv_code", verbose_name='店铺码', max_length=255, null=True, blank=True,)
+    status = models.CharField(db_column="status", default='normal', max_length=255)
+
+
+    class Meta:
+        db_table = 'batch_qr_code'
+
+
+    @classmethod
+    def get_style_table_head(cls):
+        return dict(
+            batch_qr_code_id = 'ID',
+            code_count = '二维码数量',
+            create_member = '创建用户',
+            recv_code = '绑定店铺',
+            more = '更多'
+        )
+
+# class BatchQrCodeList(models.Model):
+#     batch_qr_code_list_id = models.AutoField(db_column='batch_qr_code_list_id', primary_key=True, verbose_name='二维码批次表ID')
+#     qr_code = models.CharField(db_column='qr_code', verbose_name='二维码', max_length=255)
+#     batch_qr_code_id = models.BigIntegerField(db_column='batch_qr_code_id', verbose_name='二维码批次ID')
+#     status = models.CharField(db_column="status", default='normal', max_length=255)
+
+
+#     class Meta:
+#         db_table = 'batch_qr_code_list'
+
+    
+#     @classmethod
+#     def delete_data_by_batch_qr_code_id(cls, batch_qr_code_id):
+#         cls.objects.filter(status='normal', batch_qr_code_id=batch_qr_code_id).update({'status': 'deleted'})
+
+#     @classmethod
+#     def has_qr_code(cls, qr_code):
+#         return cls.objects.filter(qr_code=qr_code, status='normal')
 
 
 def get_data_list(model, current_page, search_value=None, order_by="-pk"):
