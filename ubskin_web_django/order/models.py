@@ -109,6 +109,7 @@ class ItemQRCode(models.Model):
     qr_code = models.CharField(db_column='qr_code', verbose_name='商品二维码', max_length=255, null=True, blank=True)
     stock_batch_count_id = models.BigIntegerField(db_column='stock_batch_count_id', verbose_name='出库单表ID', null=True, blank=True)
     batch_qr_code_id = models.BigIntegerField(db_column='batch_qr_code_id', verbose_name='二维码批次ID', null=True, blank=True)
+    search_count = models.IntegerField(db_column='search_count', verbose_name='查询次数', default=0)
     create_user = models.BigIntegerField(db_column='create_user', verbose_name='创建用户', null=True, blank=True)
     status = models.CharField(db_column="status", default='normal', max_length=255)
 
@@ -163,6 +164,7 @@ class BatchQrCode(models.Model):
     batch_qr_code_id = models.AutoField(db_column='batch_code_id', primary_key=True, verbose_name='二维码批次ID')
     code_count = models.IntegerField(db_column='code_count', verbose_name='二维码数量')
     create_member = models.BigIntegerField(db_column='create_member', verbose_name='创建用户')
+    create_time = models.IntegerField(db_column="create_time", verbose_name="创建时间", default=int(time.time()))
     message = models.TextField(db_column="message", verbose_name='备注信息', null=True, blank=True,)
     recv_code = models.CharField(db_column="recv_code", verbose_name='店铺码', max_length=255, null=True, blank=True,)
     status = models.CharField(db_column="status", default='normal', max_length=255)
