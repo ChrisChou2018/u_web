@@ -22,9 +22,9 @@ RSYNC_EXCLUDES = " --exclude=.git --exclude=.gitignore --exclude=.settings "\
     "--exclude=.project --exclude=.buildpath --exclude=.DS_Store --exclude=.idea/ "\
     "--exclude=/scripts/ --exclude=/static/index_data/ --exclude=__pycache__/ "\
     "--exclude=/config_local.py --exclude=*.md --exclude=*.pyc "\
-    "--exclude=/fabfile.py --exclude=/dockers/ --exclude=/static/ --exclude=/ENV/ "\
+    "--exclude=/fabfile.py --exclude=/dockers/ --exclude=/ENV/ "\
     "--exclude=/venv/ --exclude=.vscode --exclude=/conf/supervisor.conf "\
-    "--exclude=migrations/ "
+    "--exclude=migrations/ --exclude=settings_local.py "
 
 curr_time = time.strftime("%y%m%d")
 LOCAL_BACKUP_PATH = "".join(["~/Projects/backup/", PROJECT_NAME, "/"])
