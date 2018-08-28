@@ -33,4 +33,5 @@ urlpatterns += [
     path('api/get_recv/', views_api.get_recv),
     path('api/create_stock_batch_api/', views_api.create_stock_batch_api),
     path('api/item_code/<str:qr_code>/', views_api.item_code),
+    path('api/check_has_item_qr_code/', views_api.check_has_item_qr_code),
 ]

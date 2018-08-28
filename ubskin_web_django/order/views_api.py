@@ -50,7 +50,7 @@ def create_stock_batch_api(request):
                 break
         data = json.loads(request.body)
         recv_code = data.get('shop_id')
-        item_codes_dict = data.get('item_codes_dict')        
+        item_codes_dict = data.get('item_codes_dict')   
         openid = request.COOKIES.get('openid')
         member = member_models.Member.get_member_by_wx_openid(openid)
         if not member and not member.is_staff:
@@ -173,3 +173,23 @@ def item_code(request, qr_code):
     return JsonResponse(return_value)
 
 
+def check_has_item_qr_code(request):
+    return_value = {
+        'status': 'error',
+        'message': '',
+    }
+    if request.method == 'GET':
+        item_qr_code = request.GET.get('item_qr_code')
+        has = order_models.ItemQRCode.check_has_item_qr_code(item_qr_code)
+        if not has:
+            return_value['message'] = '当前二维码无效'
+            return JsonResponse(return_value)
+        elif has.stock_batch_count_id:
+            return_value['message'] = '当前二维码已被录入'
+            return JsonResponse(return_value)
+        elif not (len(item_qr_code) == 9 and item_qr_code.startswith('U')):
+            return_value['message'] = '当前二维码无效'
+            return JsonResponse(return_value)
+        else:
+            return_value['status'] = 'success'
+            return JsonResponse(return_value)
