@@ -51,7 +51,7 @@ def item_image_create(request):
                 )
                 item_obj.photo_id = photo_id
                 item_obj.save()
-            return_value['result'] = 'success'
+            return_value['status'] = 'success'
             return JsonResponse(return_value)
 
 @decorators.js_authenticated

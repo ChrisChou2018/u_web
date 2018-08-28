@@ -211,13 +211,13 @@ class Items(models.Model):
                     data_dict[''].append(i)
         new_data_list = list()
         for i in data_dict:
-            new_data_list.append({i: data_dict[i]})
+            new_data_list.append({'title': i, 'list': data_dict[i]})
         return new_data_list
 
 
     @classmethod
     def get_item_name_by_barcode(cls, item_barcode):
-        obj = cls.objects.filter(item_barcode=item_barcode).first()
+        obj = cls.objects.filter(item_barcode=item_barcode, status='normal').first()
         if obj:
             return obj.item_name
         else:
@@ -225,11 +225,11 @@ class Items(models.Model):
     
     @classmethod
     def get_item_obj_by_barcode(cls, item_barcode):
-        return cls.objects.filter(item_barcode=item_barcode)
+        return cls.objects.filter(item_barcode=item_barcode, status='normal').first()
 
     @classmethod
     def get_item_dict_by_item_barcode(cls, item_barcode):
-        model = cls.objects.filter(item_barcode=item_barcode).first()
+        model = cls.objects.filter(item_barcode=item_barcode, status='normal').first()
         if model:
             return model_to_dict(model)
         else:
@@ -238,7 +238,7 @@ class Items(models.Model):
     @classmethod
     def get_item_dict_by_barcode_api(cls, item_barcode):
         data_dict = dict()
-        model = cls.objects.filter(item_barcode=item_barcode).last()
+        model = cls.objects.filter(item_barcode=item_barcode, status='normal').last()
         if not model:
             return None
         model = model_to_dict(model)
@@ -250,14 +250,14 @@ class Items(models.Model):
 
     @classmethod
     def has_exist_item_code(cls, item_code, item_id):
-        obj = cls.objects.filter(item_code=item_code).first()
+        obj = cls.objects.filter(item_code=item_code, status='normal').first()
         if obj and item_id != obj.item_id:
             return True
         else:
             return False
     @classmethod
     def has_exist_item_barcode(cls, item_barcode, item_id):
-        obj = cls.objects.filter(item_barcode=item_barcode).first()
+        obj = cls.objects.filter(item_barcode=item_barcode, status='normal').first()
         if obj and item_id != obj.item_id:
             return True
         else:

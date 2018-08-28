@@ -662,14 +662,3 @@ def edit_item_comment(request):
 
 
 
-def create_brand(request):
-    obj = item_models.Items.objects.values('brand_name').annotate(c=Count('brand_name'))
-    brand_model = item_models.Brands
-    brand_model.objects.all().delete()
-    for i in obj:
-        item_models.create_model_data(
-            brand_model,
-            {'cn_name': i['brand_name']}
-        )
-    return redirect('/myadmin/brand_manage/')
-

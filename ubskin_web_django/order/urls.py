@@ -10,6 +10,9 @@ urlpatterns = [
     path('myadmin/item_qr_Code_manage/', views.item_qr_Code_manage, name='item_qr_Code_manage'),
     path('myadmin/recv_manage/', views.recv_manage, name='recv_manage'),
     path('myadmin/stock_batch/', views.stock_batch, name='stock_batch'),
+    path('myadmin/a_batch_qr_code_manage/', views.batch_qr_code_manage, name='batch_qr_code_manage'),
+    path('myadmin/create_batch_qr_code/', views.create_batch_qr_code, name='create_batch_qr_code'),
+    path('myadmin/download_qr_code_file/<int:data_id>/', views.download_qr_code_file, name='download_qr_code_file'),
     path('create_recv/', views.create_recv)
 ]
 
@@ -23,10 +26,12 @@ urlpatterns += [
     path('js/create_stock_bach/', views_js.create_stock_bach, name="create_stock_bach"),
     path('js/a_jm_stock_batch_info/', views_js.jm_stock_batch_info, name='a_jm_stock_batch_info'),
     path('js/check_has_item_qr_code/', views_js.check_has_item_qr_code, name='check_has_item_qr_code'),
+    path('js/delete_batch_qr_code/', views_js.delete_batch_qr_code, name='delete_batch_qr_code'),
 ]
 
 urlpatterns += [
     path('api/get_recv/', views_api.get_recv),
     path('api/create_stock_batch_api/', views_api.create_stock_batch_api),
     path('api/item_code/<str:qr_code>/', views_api.item_code),
+    path('api/check_has_item_qr_code/', views_api.check_has_item_qr_code),
 ]

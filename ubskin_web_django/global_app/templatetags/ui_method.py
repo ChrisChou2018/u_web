@@ -4,6 +4,7 @@ from django import template
 from django.conf import settings
 
 from ubskin_web_django.item import models as item_models
+from ubskin_web_django.member import models as member_models
 from ubskin_web_django.common import common
 
 
@@ -139,3 +140,15 @@ def str_and_digital(a, b):
 @register.simple_tag
 def ifin(item, obj):
     return item in obj
+
+@register.simple_tag
+def get_recv_addr_by_code(recv_code):
+    from ubskin_web_django.order import models as order_models
+    addr = order_models.Recv.get_recv_addr_by_recv_code(recv_code)
+    return addr if addr else '未设置'
+
+
+@register.simple_tag
+def get_menber_by_id(member_id):
+    obj = member_models.Member.get_member_by_id(member_id)
+    return obj.member_name if obj else '用户不存在'
