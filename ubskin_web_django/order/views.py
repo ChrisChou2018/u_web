@@ -227,7 +227,7 @@ def create_batch_qr_code(request):
             )
             while code_count > 0:
                 qr_code = 'U'+ ''.join(
-                    random.choice(string.digits) \
+                    random.choice(string.ascii_lowercase + string.digits) \
                     for i in range(8)
                 )
                 if order_models.ItemQRCode.check_has_item_qr_code(qr_code):

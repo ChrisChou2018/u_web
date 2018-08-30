@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/2.0/ref/settings/
 
 import os
 
+
 try:
     import settings_local
 except:
@@ -140,7 +141,7 @@ USE_TZ = True
 STATIC_URL = '/static/'
 
 STATICFILES_DIRS = (
-    os.path.join(BASE_DIR, 'ubskin_web_django/static'),
+    os.path.join(BASE_DIR, 'static'),
 )
 
 MEDIA_ROOT = os.path.join(BASE_DIR, "..", 'media')
