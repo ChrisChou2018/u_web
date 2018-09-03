@@ -15,6 +15,7 @@ from django.contrib.auth import logout
 
 from ubskin_web_django.common import decorators
 from ubskin_web_django.member import models as member_models
+from ubskin_web_django.order import models as order_models
 from ubskin_web_django.common import request_wx_openid
 
 
@@ -78,7 +79,12 @@ def wx_regist_member(return_value, openid, name, avatar, session_key=None):
         if name is None:
             member.member_name = '用户{}'.format(member.member_id)
         return_value['status'] = 'success'
-        return_value['data'] = [{'is_staff': member.is_staff, 'openid': openid},]
+        return_value['data'] = [{
+            'is_staff': member.is_staff,
+            'openid': openid,
+            'bind_recv_code': member.bind_recv,
+            'bind_recv_addr': order_models.Recv.get_recv_addr_by_recv_code(member.bind_recv) if member.bind_recv else None,
+            }]
         return JsonResponse(return_value)
     else:
         return_value['message'] = "携带参数错误或缺少参数"
@@ -115,8 +121,12 @@ def wx_signin(request):
                 member.avatar = avatar
                 member.save()
                 return_value['status'] = 'success'
-                return_value['data'] = [{'is_staff': member.is_staff, 'openid': member.wx_openid},]
-                print(return_value)
+                return_value['data'] = [{
+                    'is_staff': member.is_staff,
+                    'openid': member.wx_openid,
+                    'bind_recv_code': member.bind_recv,
+                    'bind_recv_addr': order_models.Recv.get_recv_addr_by_recv_code(member.bind_recv) if member.bind_recv else None,
+                }]
                 return JsonResponse(return_value)
             else:
                 return wx_regist_member(return_value, openid, name, avatar, session_key)
