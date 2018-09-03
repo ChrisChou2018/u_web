@@ -112,6 +112,7 @@ def editor_member(request):
         clear_data = {
             key:request.POST.get(key) for key in update_field
         }
+        clear_data['bind_recv'] = None if not clear_data['bind_recv'] else clear_data['bind_recv']
         clear_data['is_admin'] = True if clear_data['is_admin'] == 'true' else False
         clear_data['is_staff'] = True if clear_data['is_staff'] == 'true' else False
         member_models.Member.update_member_by_id(member_id, clear_data)

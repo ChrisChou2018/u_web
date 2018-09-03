@@ -59,6 +59,7 @@
                 <div class="form-group">
                     <label for="recipient-name" class="control-label">绑定店铺:</label>
                     <select name="bind_recv" class="form-control">
+                        <option value="">---选择店铺---</option>
                         {% for i in recv_data_list %}
                             <option value="{{ i.0 }}">{{ i.1 }}</option>
                         {% endfor %}
