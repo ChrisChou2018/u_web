@@ -15,6 +15,7 @@ from django.contrib.auth import logout
 
 from ubskin_web_django.common import decorators
 from ubskin_web_django.member import models as member_models
+from ubskin_web_django.order import models as order_models
 from ubskin_web_django.common import request_wx_openid
 
 
@@ -82,6 +83,7 @@ def wx_regist_member(return_value, openid, name, avatar, session_key=None):
             'is_staff': member.is_staff,
             'openid': openid,
             'bind_recv_code': member.bind_recv,
+            'bind_recv_addr': order_models.Recv.get_recv_addr_by_recv_code(member.bind_recv) if member.bind_recv else None,
             }]
         return JsonResponse(return_value)
     else:
@@ -123,6 +125,7 @@ def wx_signin(request):
                     'is_staff': member.is_staff,
                     'openid': member.wx_openid,
                     'bind_recv_code': member.bind_recv,
+                    'bind_recv_addr': order_models.Recv.get_recv_addr_by_recv_code(member.bind_recv) if member.bind_recv else None,
                 }]
                 return JsonResponse(return_value)
             else:
