@@ -12,6 +12,7 @@ from django.db.models import Q
 from django import forms
 
 from ubskin_web_django.member import models as member_models
+from ubskin_web_django.order import models as order_models
 from ubskin_web_django.common import photo
 
 
@@ -63,8 +64,6 @@ def index(request):
             'a_index.html'
         )
 
-
-
 @login_required(login_url='/myadmin/signin/')
 def change_pass(request):
     if request.method == 'GET':
@@ -92,6 +91,7 @@ def member_manage(request):
         GET = request.GET.get
         current_page = GET('page', 1)
         value = GET('search_value', '')
+        recv_data_list = order_models.Recv.get_recv_all_by_select()
         filter_args = None
         if value:
             filter_args = '&search_value={0}'.format(value)
@@ -129,7 +129,8 @@ def member_manage(request):
             uri = uri,
             filter_args = filter_args,
             table_head = table_head,
-            search_value = value
+            search_value = value,
+            recv_data_list = recv_data_list,
         )
 
 

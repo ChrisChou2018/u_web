@@ -78,7 +78,11 @@ def wx_regist_member(return_value, openid, name, avatar, session_key=None):
         if name is None:
             member.member_name = '用户{}'.format(member.member_id)
         return_value['status'] = 'success'
-        return_value['data'] = [{'is_staff': member.is_staff, 'openid': openid},]
+        return_value['data'] = [{
+            'is_staff': member.is_staff,
+            'openid': openid,
+            'bind_recv_code': member.bind_recv,
+            }]
         return JsonResponse(return_value)
     else:
         return_value['message'] = "携带参数错误或缺少参数"
@@ -115,8 +119,11 @@ def wx_signin(request):
                 member.avatar = avatar
                 member.save()
                 return_value['status'] = 'success'
-                return_value['data'] = [{'is_staff': member.is_staff, 'openid': member.wx_openid},]
-                print(return_value)
+                return_value['data'] = [{
+                    'is_staff': member.is_staff,
+                    'openid': member.wx_openid,
+                    'bind_recv_code': member.bind_recv,
+                }]
                 return JsonResponse(return_value)
             else:
                 return wx_regist_member(return_value, openid, name, avatar, session_key)

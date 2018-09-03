@@ -60,6 +60,7 @@ class Member(AbstractBaseUser, PermissionsMixin):
     is_admin            = models.BooleanField(default=False)
     is_staff            = models.BooleanField(default=True)
     avatar              = models.CharField(db_column="avatar", max_length=255, null=True, blank=True)
+    bind_recv           = models.BigIntegerField(db_column="bind_recv", verbose_name='绑定的到货方（店铺）', null=True, blank=True)
     # role                = models.CharField(db_column="role", default="")
 
     objects = UserProfileManager()

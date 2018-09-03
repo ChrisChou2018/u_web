@@ -25,7 +25,7 @@ class UserCreationForm(forms.ModelForm):
 
     class Meta:
         model = member_models.Member
-        fields = ('member_name', 'telephone', 'is_admin', 'is_staff')
+        fields = ('member_name', 'telephone', 'is_admin', 'is_staff', 'bind_recv')
 
     def clean_password2(self):
         # Check that the two password entries match
@@ -86,7 +86,7 @@ def editor_member(request):
         'status':'error',
         'message':'',
     }
-    update_field = ['member_name', 'telephone', 'is_admin', 'is_staff']
+    update_field = ['member_name', 'telephone', 'is_admin', 'is_staff', 'bind_recv']
     member_id = request.GET.get('member_id')
     member_obj = member_models.Member.get_member_by_id(member_id)
     if request.method == 'GET':
