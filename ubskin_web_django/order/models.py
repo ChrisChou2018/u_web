@@ -145,6 +145,13 @@ class ItemQRCode(models.Model):
             return cls.objects.get_or_create(qr_code=qr_code)
         except cls.DoesNotExist:
             return None
+    
+    @classmethod
+    def get_qr_code_obj_by_q_code(cls, qr_code):
+        try:
+            return cls.objects.get_or_create(qr_code=qr_code)
+        except cls.DoesNotExist:
+            return None
 
     @classmethod
     def delete_item_qr_code_by_sb_count_id(cls, data_id_list):
