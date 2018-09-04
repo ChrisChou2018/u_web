@@ -188,7 +188,7 @@ def create_stock_bach(request):
                     }
                 )
                 for i in item:
-                    qr_code_obj = order_models.ItemQRCode.get_qr_code_obj_by_qr_code(i)
+                    qr_code_obj, has = order_models.ItemQRCode.get_qr_code_obj_by_qr_code(i)
                     qr_code_obj.stock_batch_count_id =  stock_batch_count.stock_batch_count_id
                     qr_code_obj.create_user = create_user_id
                     qr_code_obj.save()
