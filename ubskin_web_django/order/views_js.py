@@ -242,9 +242,9 @@ def check_has_item_qr_code(request):
         if not has:
             return_value['message'] = '当前二维码无效'
             return JsonResponse(return_value)
-        elif has.stock_batch_count_id:
-            return_value['message'] = '当前二维码已被录入'
-            return JsonResponse(return_value)
+            if has.stock_batch_count_id:
+                return_value['message'] = '当前二维码已被绑定'
+                return JsonResponse(return_value)
         else:
             return_value['status'] = 'success'
             return JsonResponse(return_value)
