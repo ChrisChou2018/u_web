@@ -4,6 +4,7 @@ import datetime
 
 from django.shortcuts import render
 from django.http import HttpResponseRedirect as redirect
+from django.urls import reverse
 from django.contrib.auth import authenticate
 from django.contrib.auth import login
 from django.contrib.auth import logout
@@ -261,3 +262,22 @@ def out_order_manage(request):
             data_count = data_count,
             default_table_head = member_models.OutOrder.default_table_head(),
         )
+
+
+def add_member_remarks(request):
+    data_id = request.GET.get("data_id")
+    model_obj = None
+    if data_id is not None:
+        model_obj = member_models.Member.get_member_by_id(data_id)
+    if request.method == "GET":
+        return my_render(
+            request,
+            "member/a_add_member_remarks.html",
+            form_data = model_obj
+        )
+    else:
+        remarks = request.POST.get('remarks')
+        if remarks:
+            model_obj.remarks = remarks
+            model_obj.save()
+        return redirect(reverse("member_manage"))

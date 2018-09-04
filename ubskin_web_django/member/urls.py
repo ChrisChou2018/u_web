@@ -13,6 +13,7 @@ urlpatterns = [
     path('myadmin/user_order_manage/', views.user_order_manage, name="user_order_manage"),
     path('myadmin/recv_addr_manage/', views.recv_addr, name='recv_addr_manage'),
     path('myadmin/out_order_manage/', views.out_order_manage, name='out_order_manage'),
+    path('myadmin/add_member_remarks/', views.add_member_remarks, name="add_member_remarks"),
     path('myadmin/', views.index),
 ]
 

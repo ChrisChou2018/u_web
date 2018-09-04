@@ -52,6 +52,7 @@ class UserCreationForm(forms.ModelForm):
             user.save()
         return user
 
+
 @decorators.js_authenticated
 def create_member(request):
     return_value = {
@@ -78,7 +79,6 @@ def delete_member(request):
         member_models.Member.delete_members_by_id_list(id_list)
         return_value['status'] = 'success'
         return JsonResponse(return_value)
-
 
 @decorators.js_authenticated
 def editor_member(request):
@@ -119,7 +119,6 @@ def editor_member(request):
         return_value['status'] = 'success'
         return JsonResponse(return_value)
 
-
 def jm_recv_addr_info(request):
     data_id = request.GET.get('data_id')
     data_list = member_models.RecvAddr.get_recv_addr_by_member_id(data_id)
@@ -147,7 +146,6 @@ def delete_user_order(request):
     member_models.UserOrder.delete_user_order(order_num_list)
     return_value['status'] = 'success'
     return JsonResponse(return_value)
-
 
 def change_order_status_js(request):
     return_value = {
