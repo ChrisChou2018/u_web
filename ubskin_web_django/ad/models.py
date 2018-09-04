@@ -38,7 +38,7 @@ class Campaigns(models.Model):
     @classmethod
     def get_campaigns_selecet_all(cls):
         data_list = list()
-        data = lazy(cls.objects.filter(status='normal').values('location').annotate(c=Count('location')))
+        data = cls.objects.filter(status='normal').values('location').annotate(c=Count('location'))
         for i in data:
             o = cls.objects.filter(location=i['location'], status='normal').values("campaign_id", "campaign_name")
             for j in o:
