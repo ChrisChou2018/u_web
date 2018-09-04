@@ -35,7 +35,7 @@
 
 <div class="row">
     <div class="col-md-8">
-        <div "row">
+        <div class="row">
             <div class="col-md-8">
                 <form action="" method="GET" class="search_input">
                 <div class="input-group">
@@ -53,8 +53,8 @@
     </div>
     <div class="col-md-4">
         <a type="button" class="btn btn-info add_member_btn" type="button" href="{% url 'stock_batch' %}" >开始扫码出库 <span class="glyphicon glyphicon-plus"></span></a>
-        <!-- <button type="button" class="btn btn-default choose_member" type="button">选择<span class="glyphicon glyphicon-saved"></span></button>
-        <button type="button" class="btn btn-danger delete_member" type="button">删除<span class="glyphicon glyphicon-trash"></span></button> -->
+        <button type="button" class="btn btn-default choose_member" type="button">选择<span class="glyphicon glyphicon-saved"></span></button>
+        <button type="button" class="btn btn-danger delete_data" type="button">删除<span class="glyphicon glyphicon-trash"></span></button>
     </div>
 </div>
 {% endblock %}
@@ -66,7 +66,7 @@
     
     <div class="bs-docs-section">
         <div class="table-responsive">
-            <table class="table table-bordered table-striped">
+            <table class="data_table table table-bordered table-striped">
                 <colgroup>
                 <col class="col-xs-1">
                 <col class="col-xs-4">
@@ -91,6 +91,7 @@
                     <td>{{ stock.code_count }}</td>
                     <td>{% parse_timestamps stock.create_time %}</td>
                     <td><a href="#modalItemCodes" data-toggle="modal" data-target="#modalItemCodes" data-batchid="{{ stock.stock_batch_id }}">详情</a></td>
+                    <td style='display: none'><input type='checkbox'></td>
                 </tr>
                 {% endfor %}
                 </tbody>
@@ -142,7 +143,51 @@
                         return;
                     }
                 });
-            });  
+            });
+            $('.choose_member').click(function(){
+                var tr =  $('.data_table tbody tr')
+                $.each(tr,function(index,item){
+                    var $ltd = $(item).children().last()
+                    if($ltd.css('display')=='none'){
+                        $ltd.css('display','block')
+                    }else{
+                        $ltd.css('display','none')
+                    }
+                    
+                })
+                
+            })
+            
+
+            $('.delete_data').unbind()
+            $('.delete_data').click(delete_data)
+            function delete_data(){
+                var tr =  $('.data_table tbody tr')
+                var data_id_list = []
+                $.each(tr,function(index,item){
+                    var $ltd = $(item).children().last()
+                    var $ftd = $(item).children().first()
+                    var $check_box = $ltd.children()
+                    if($ltd.css('display')=='block' && $check_box.prop('checked')){
+                        data_id_list.push($ftd.text())
+                    }
+                })
+                if(data_id_list.length>0){
+                    $.post(
+                        '{% url "delete_stockbatch" %}',
+                        {'data_id_list':data_id_list, 'csrfmiddlewaretoken':getCookie('csrftoken')},
+                        function(value){
+                            if(value.status == 'success'){
+                                location.reload()
+                            }else{
+                                
+                            }
+                        },
+                        'json'
+                    )
+                }
+            }
+            
         })
     </script>
 {% endblock %}
