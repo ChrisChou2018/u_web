@@ -90,7 +90,7 @@
 
 <div class="row">
     <div class="col-md-8">
-        <div "row">
+        <div class="row">
             <div class="col-md-8">
                 <form action="" method="GET" class="search_input">
                 <div class="input-group">
@@ -135,6 +135,7 @@
                 {% endfor %}
                 <td>
                     <a class='edit_member' style='cursor:pointer;text-decoration:none;'><span class="glyphicon glyphicon-pencil"></span> 编辑</a>
+                    <a href="{% url 'add_member_remarks' %}?data_id={{ i.member_id }}" class='editor_remarks' style='cursor:pointer;text-decoration:none;'><span class="glyphicon glyphicon-tag"></span>备注</a>
                 </td> 
                 <td style='display: none'><input type='checkbox'></td>
             </tr>
