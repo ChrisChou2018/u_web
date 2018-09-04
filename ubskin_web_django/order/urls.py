@@ -27,6 +27,7 @@ urlpatterns += [
     path('js/a_jm_stock_batch_info/', views_js.jm_stock_batch_info, name='a_jm_stock_batch_info'),
     path('js/check_has_item_qr_code/', views_js.check_has_item_qr_code, name='check_has_item_qr_code'),
     path('js/delete_batch_qr_code/', views_js.delete_batch_qr_code, name='delete_batch_qr_code'),
+    path('js/delete_stockbatch/', views_js.delete_stockbatch, name='delete_stockbatch'),
 ]
 
 urlpatterns += [

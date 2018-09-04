@@ -265,3 +265,16 @@ def delete_batch_qr_code(request):
             order_models.ItemQRCode.delete_data_by_batch_qr_code_id(i)
         return_value['status'] = 'success'
         return JsonResponse(return_value)
+
+def delete_stockbatch(request):
+    return_value = {
+        'status': 'error',
+        'message': '',
+    }
+    if request.method == 'POST':
+        data_id_list = request.POST.getlist('data_id_list[]')
+        for i in data_id_list:
+            order_models.StockBatch.delete_data_by_stock_batch_id(i)
+            order_models.StockBatchCount.delete_sb_count_by_sb_id(i)
+        return_value['status'] = 'success'
+        return JsonResponse(return_value)
