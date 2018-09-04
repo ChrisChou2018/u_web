@@ -149,7 +149,7 @@ class ItemQRCode(models.Model):
     @classmethod
     def get_qr_code_obj_by_q_code(cls, qr_code):
         try:
-            return cls.objects.get_or_create(qr_code=qr_code)
+            return cls.objects.get(qr_code=qr_code)
         except cls.DoesNotExist:
             return None
 
