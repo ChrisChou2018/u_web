@@ -314,6 +314,7 @@ def upload_qr_code_file(request):
                 )
                 r.seek(0)
                 for line in r:
+                    line = line.strip()
                     if order_models.ItemQRCode.check_has_item_qr_code(line):
                         print('pass-----', line)
                         pass
