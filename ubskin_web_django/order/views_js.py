@@ -1,14 +1,17 @@
 import json
 import time
+import os
 
 from django import forms
 from django.http import JsonResponse
 from django.forms.models import model_to_dict
 from django.shortcuts import render
+from django.conf import settings
 
 from ubskin_web_django.order import models as order_models
 from ubskin_web_django.item import models as item_models
 from ubskin_web_django.common import lib_data
+
 
 def my_render(request, templater_path, **kwargs):
     return render(request, templater_path, dict(**kwargs))
@@ -265,3 +268,66 @@ def delete_batch_qr_code(request):
             order_models.ItemQRCode.delete_data_by_batch_qr_code_id(i)
         return_value['status'] = 'success'
         return JsonResponse(return_value)
+
+def delete_stockbatch(request):
+    return_value = {
+        'status': 'error',
+        'message': '',
+    }
+    if request.method == 'POST':
+        data_id_list = request.POST.getlist('data_id_list[]')
+        for i in data_id_list:
+            order_models.StockBatch.delete_data_by_stock_batch_id(i)
+            order_models.StockBatchCount.delete_sb_count_by_sb_id(i)
+        return_value['status'] = 'success'
+        return JsonResponse(return_value)
+
+
+def upload_qr_code_file(request):
+    return_value = {
+        'status': 'error',
+        'message': '',
+    }
+    if request.method == "POST":
+        files = request.FILES.get('qr_code_file')
+        if files:
+            server_media = settings.MEDIA_ROOT
+            server_temp_path = os.path.join(server_media, 'temp')
+            if not os.path.exists(server_temp_path):
+                os.makedirs(server_temp_path)
+            temp_file_path = os.path.join(server_temp_path, 'temp1.txt')
+            with open(temp_file_path, 'wb') as w:
+                for chunk in files.chunks():
+                    w.write(chunk)
+            with open(temp_file_path, 'r') as r:
+                line_number = 0
+                for line in r:
+                    line_number += 1
+                    if not (len(line.strip()) == 9 and line.startswith('U')):
+                        return_value['message'] = '第{}行二维码格式错误'.format(line_number)
+                        return JsonResponse(return_value)
+                
+                model_obj = order_models.create_model_data(
+                    order_models.BatchQrCode,
+                    {'code_count': line_number, 'message': None, 'recv_code': None,
+                    'create_member': request.user.member_id}
+                )
+                r.seek(0)
+                for line in r:
+                    line = line.strip()
+                    if order_models.ItemQRCode.check_has_item_qr_code(line):
+                        print('pass-----', line)
+                        pass
+                    else:
+                        print('create-----', line)
+                        order_models.create_model_data(
+                            order_models.ItemQRCode,
+                            {'batch_qr_code_id': model_obj.batch_qr_code_id, 'qr_code': line}
+                    )
+            return_value['status'] = 'success'
+            return JsonResponse(return_value)
+                    
+            
+            
+
+                

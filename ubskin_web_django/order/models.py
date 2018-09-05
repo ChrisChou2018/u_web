@@ -5,6 +5,8 @@ from django.forms.models import model_to_dict
 from django.core.paginator import Paginator
 from django.core.paginator import EmptyPage
 from django.db.models import Count
+from django.conf import settings
+
 
 from ubskin_web_django.item import models as item_model
 # Create your models here.
@@ -63,11 +65,15 @@ class StockBatch(models.Model):
             return obj[0]
         else:
             return None
+    
+    @classmethod
+    def delete_data_by_stock_batch_id(cls, data_id):
+        cls.objects.filter(stock_batch_id=data_id).update(status="deleted")
            
     @classmethod
     def check_has_stock_batch_id(cls, stock_batch_id):
         flag = False
-        obj = cls.objects.filter(stock_batch_id=stock_batch_id).first()
+        obj = cls.objects.filter(stock_batch_id=stock_batch_id, status='normal').first()
         flag = True if obj else False
         return flag
 
@@ -81,27 +87,40 @@ class StockBatchCount(models.Model):
     stock_batch_id          = models.CharField(db_column="stock_batch_id", verbose_name='库存单号', max_length=255, null=True, blank=True)
     item_barcode            = models.CharField(db_column='item_barcode', verbose_name='商品条码', max_length=255, null=True, blank=True)
     item_count              = models.IntegerField(db_column="item_count", verbose_name="库商品数量", default=0)
+    status                  = models.CharField(db_column="status", default='normal', max_length=255)
     
 
     class Meta:
         db_table = 'stock_batch_count'
+    
+    
+    @classmethod
+    def delete_sb_count_by_sb_id(cls, data_id):
+        obj = cls.objects.filter(stock_batch_id=data_id)
+        data_id_list = None
+        if obj:
+            data_id_list = [ i.pk for i in obj]
+        if data_id_list:
+            ItemQRCode.delete_item_qr_code_by_sb_count_id(data_id_list)
+        obj.update(status='deleted')
+        
 
     @classmethod
     def get_item_count_by_stock_batch_id(cls, stock_batch_id):
-        obj = cls.objects.filter(stock_batch_id=stock_batch_id).values_list('item_count')
+        obj = cls.objects.filter(stock_batch_id=stock_batch_id, status='normal').values_list('item_count')
         count_list = [ i[0] for i in obj ]
         count = sum(count_list)
         return count
 
     @classmethod
     def get_obj_by_stock_batch_id(cls, stock_batch_id):
-        id_list =  cls.objects.filter(stock_batch_id__icontains=stock_batch_id).values_list('stock_batch_count_id')
+        id_list =  cls.objects.filter(stock_batch_id__icontains=stock_batch_id, status='normal').values_list('stock_batch_count_id')
         id_list = [ i[0] for i in id_list]
         return id_list
     
     @classmethod
     def get_stock_batch_count_by_stock_batch_id(cls, stock_batch_id):
-        return cls.objects.filter(stock_batch_id=stock_batch_id).values()
+        return cls.objects.filter(stock_batch_id=stock_batch_id, status='normal').values()
     
 
 class ItemQRCode(models.Model):
@@ -119,11 +138,16 @@ class ItemQRCode(models.Model):
         return cls.objects.filter(stock_batch_id=stock_batch_id, status='normal').count()
     
     @classmethod
-    def get_qr_code_obj_by_qr_code(cls, qr_code):
-        try:
-            return cls.objects.filter(qr_code=qr_code).first()
-        except cls.DoesNotExist:
-            return None
+    def get_count_by_batch_qr_code_id(cls, batch_qr_code_id):
+        return cls.objects.filter(batch_qr_code_id=batch_qr_code_id).count()
+    
+    @classmethod
+    def get_qr_code_obj_by_qr_code(cls, qr_code): 
+        return cls.objects.filter(qr_code=qr_code).first()
+       
+    @classmethod
+    def delete_item_qr_code_by_sb_count_id(cls, data_id_list):
+        cls.objects.filter(stock_batch_count_id__in=data_id_list).update(status='deleted')
 
     @classmethod
     def get_stock_batch_info_by_stock_batch_id(cls, stock_batch_id):
@@ -184,24 +208,6 @@ class BatchQrCode(models.Model):
             more = '更多'
         )
 
-# class BatchQrCodeList(models.Model):
-#     batch_qr_code_list_id = models.AutoField(db_column='batch_qr_code_list_id', primary_key=True, verbose_name='二维码批次表ID')
-#     qr_code = models.CharField(db_column='qr_code', verbose_name='二维码', max_length=255)
-#     batch_qr_code_id = models.BigIntegerField(db_column='batch_qr_code_id', verbose_name='二维码批次ID')
-#     status = models.CharField(db_column="status", default='normal', max_length=255)
-
-
-#     class Meta:
-#         db_table = 'batch_qr_code_list'
-
-    
-#     @classmethod
-#     def delete_data_by_batch_qr_code_id(cls, batch_qr_code_id):
-#         cls.objects.filter(status='normal', batch_qr_code_id=batch_qr_code_id).update({'status': 'deleted'})
-
-#     @classmethod
-#     def has_qr_code(cls, qr_code):
-#         return cls.objects.filter(qr_code=qr_code, status='normal')
 
 
 def get_data_list(model, current_page, search_value=None, order_by="-pk"):
@@ -211,7 +217,7 @@ def get_data_list(model, current_page, search_value=None, order_by="-pk"):
     else:
         data_list = model.objects.filter(status='normal'). \
             order_by(order_by)
-    p = Paginator(data_list, 15)
+    p = Paginator(data_list, settings.PAGINATION_NUM)
     return p.page(current_page).object_list.values()
 
 def get_data_count(model, search_value=None):

@@ -11,7 +11,7 @@ def js_authenticated(fuc):
     def wrapper(request, *args, **kwargs):
         return_data = dict()
         if str(request.user) == "AnonymousUser":
-            return_data["message"] = "你没有登陆"
+            return_data["message"] = "你没有登录"
             return_data["status"] = "error"
             return JsonResponse(return_data)
         return fuc(request, *args, **kwargs)
@@ -25,8 +25,8 @@ def wx_api_authenticated(fuc):
         if openid is not None:
             member = member_model.Member.get_member_by_wx_openid(openid)
             if not member:
-                return JsonResponse({'status': 'error', 'message': '未登陆无法操作'})
+                return JsonResponse({'status': 'error', 'message': '未登录无法操作'})
         else:
-            return JsonResponse({'status': 'error', 'message': '未登陆无法操作'})
+            return JsonResponse({'status': 'error', 'message': '未登录无法操作'})
         return fuc(request, *args, **kwargs)
     return wrapper

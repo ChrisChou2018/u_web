@@ -82,17 +82,11 @@ def create_stock_batch_api(request):
             )
             for i in item:
                 qr_code_obj = order_models.ItemQRCode.get_qr_code_obj_by_qr_code(i)
-                qr_code_obj.stock_batch_count_id =  stock_batch_count.stock_batch_count_id
+                qr_code_obj.stock_batch_count_id = stock_batch_count.stock_batch_count_id
                 qr_code_obj.create_user = member.member_id
+            else:
                 qr_code_obj.save()
-                # order_models.create_model_data(
-                #     order_models.ItemQRCode,
-                #     {
-                #         "qr_code": i,
-                #         "stock_batch_count_id": stock_batch_count.stock_batch_count_id,
-                #         "create_user": member.member_id
-                #     }
-                # )
+                
         return_value['status'] = 'success'
         return JsonResponse(return_value)
 
@@ -180,16 +174,17 @@ def check_has_item_qr_code(request):
     }
     if request.method == 'GET':
         item_qr_code = request.GET.get('item_qr_code')
+        if not (len(item_qr_code) == 9 and item_qr_code.startswith('U')):
+            return_value['message'] = '当前二维码无效'
+            return JsonResponse(return_value)
         has = order_models.ItemQRCode.check_has_item_qr_code(item_qr_code)
         if not has:
-            return_value['message'] = '当前二维码无效'
-            return JsonResponse(return_value)
-        elif has.stock_batch_count_id:
-            return_value['message'] = '当前二维码已被录入'
-            return JsonResponse(return_value)
-        elif not (len(item_qr_code) == 9 and item_qr_code.startswith('U')):
-            return_value['message'] = '当前二维码无效'
+            return_value['message'] = '当前二维码不在数据库中'
             return JsonResponse(return_value)
         else:
-            return_value['status'] = 'success'
-            return JsonResponse(return_value)
+            if has.stock_batch_count_id:
+                return_value['message'] = '当前二维码已被绑定'
+                return JsonResponse(return_value)
+            else:
+                return_value['status'] = 'success'
+                return JsonResponse(return_value)
