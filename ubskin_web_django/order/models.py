@@ -140,16 +140,9 @@ class ItemQRCode(models.Model):
         return cls.objects.filter(batch_qr_code_id=batch_qr_code_id).count()
     
     @classmethod
-    def get_qr_code_obj_by_qr_code(cls, qr_code):
-        return cls.objects.get_or_create(qr_code=qr_code)
+    def get_qr_code_obj_by_qr_code(cls, qr_code): 
+        return cls.objects.filter(qr_code=qr_code).first()
        
-    @classmethod
-    def get_qr_code_obj_by_q_code(cls, qr_code):
-        try:
-            return cls.objects.get(qr_code=qr_code)
-        except cls.DoesNotExist:
-            return None
-
     @classmethod
     def delete_item_qr_code_by_sb_count_id(cls, data_id_list):
         cls.objects.filter(stock_batch_count_id__in=data_id_list).update(status='deleted')
@@ -212,6 +205,7 @@ class BatchQrCode(models.Model):
             recv_code = '绑定店铺',
             more = '更多'
         )
+
 
 
 def get_data_list(model, current_page, search_value=None, order_by="-pk"):
