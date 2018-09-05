@@ -28,6 +28,7 @@ urlpatterns += [
     path('js/check_has_item_qr_code/', views_js.check_has_item_qr_code, name='check_has_item_qr_code'),
     path('js/delete_batch_qr_code/', views_js.delete_batch_qr_code, name='delete_batch_qr_code'),
     path('js/delete_stockbatch/', views_js.delete_stockbatch, name='delete_stockbatch'),
+    path('js/upload_qr_code_file/', views_js.upload_qr_code_file, name='upload_qr_code_file'),
 ]
 
 urlpatterns += [

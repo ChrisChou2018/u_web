@@ -141,8 +141,12 @@ class ItemQRCode(models.Model):
     
     @classmethod
     def get_qr_code_obj_by_qr_code(cls, qr_code):
+        return cls.objects.get_or_create(qr_code=qr_code)
+       
+    @classmethod
+    def get_qr_code_obj_by_q_code(cls, qr_code):
         try:
-            return cls.objects.filter(qr_code=qr_code).first()
+            return cls.objects.get(qr_code=qr_code)
         except cls.DoesNotExist:
             return None
 
@@ -208,25 +212,6 @@ class BatchQrCode(models.Model):
             recv_code = '绑定店铺',
             more = '更多'
         )
-
-# class BatchQrCodeList(models.Model):
-#     batch_qr_code_list_id = models.AutoField(db_column='batch_qr_code_list_id', primary_key=True, verbose_name='二维码批次表ID')
-#     qr_code = models.CharField(db_column='qr_code', verbose_name='二维码', max_length=255)
-#     batch_qr_code_id = models.BigIntegerField(db_column='batch_qr_code_id', verbose_name='二维码批次ID')
-#     status = models.CharField(db_column="status", default='normal', max_length=255)
-
-
-#     class Meta:
-#         db_table = 'batch_qr_code_list'
-
-    
-#     @classmethod
-#     def delete_data_by_batch_qr_code_id(cls, batch_qr_code_id):
-#         cls.objects.filter(status='normal', batch_qr_code_id=batch_qr_code_id).update({'status': 'deleted'})
-
-#     @classmethod
-#     def has_qr_code(cls, qr_code):
-#         return cls.objects.filter(qr_code=qr_code, status='normal')
 
 
 def get_data_list(model, current_page, search_value=None, order_by="-pk"):

@@ -32,34 +32,6 @@
 {% endblock %}
 
 {% block content_title %}
-<!-- <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                <h4 class="modal-title" id="exampleModalLabel">创建收货方</h4>
-            </div>
-            <div class="modal-body">
-                <form method="post" action="" class="recv_form">
-                    {% csrf_token %}
-                    <div class="form-group">
-                        <label for="recipient-name" class="control-label">收货方编码:</label>
-                        <input type="text" class="form-control" id="recipient-name" name="recv_code">
-                    </div>
-                    <div class="form-group">
-                        <label for="recipient-name" class="control-label">收货方名称:</label>
-                        <input type="text" class="form-control" id="recipient-name" name="recv_addr">
-                    </div>
-                </form>
-                <span class="return_msg_box" style="color: red"></span>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
-                <button type="button" class="btn btn-primary submit_btn" >提交</button>
-            </div>
-            </div>
-        </div>
-    </div> -->
 
 <div class="row">
     <div class="col-md-8">
@@ -79,12 +51,13 @@
                 </form> -->
             </div>
             <div class="col-md-4">
-
+                    
             </div>
         </div>
     </div>
     <div class="col-md-4">
-        
+        <button type="button" class="btn btn-success qr_code_file" type="button">文件导入 <span class="glyphicon glyphicon-folder-open"></span></button>
+        <input type="file" name="qr_code_file" style="display: none;" accept=".txt">
     </div>
 </div>
 {% endblock %}
@@ -201,6 +174,32 @@
             )
         }
     }
+    $('.qr_code_file').click(function(){
+        $('input[name="qr_code_file"]').trigger("click");
+    })
+    $('input[name="qr_code_file"]').change(function(){
+        let files = $('input[name="qr_code_file"]')[0].files
+        let form_data = new FormData();
+        form_data.append('qr_code_file', files[0])
+        form_data.append('csrfmiddlewaretoken', getCookie('csrftoken'))
+        $.ajax({
+            type:'post',
+            url:"{% url 'upload_qr_code_file' %}",
+            data:form_data,
+            dataType:'json',
+            contentType:false,
+            processData:false,
+            success:function(data){
+                if(data.status=='success'){
+                    alert('上传成功')
+                    location.reload()
+                }else{
+                    alert(data.message)
+                }
+			}
+        })
+
+    })
 
     
     

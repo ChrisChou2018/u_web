@@ -81,8 +81,8 @@ def create_stock_batch_api(request):
                 }
             )
             for i in item:
-                qr_code_obj = order_models.ItemQRCode.get_qr_code_obj_by_qr_code(i)
-                qr_code_obj.stock_batch_count_id =  stock_batch_count.stock_batch_count_id
+                qr_code_obj, has = order_models.ItemQRCode.get_qr_code_obj_by_qr_code(i)
+                qr_code_obj.stock_batch_count_id = stock_batch_count.stock_batch_count_id
                 qr_code_obj.create_user = member.member_id
                 qr_code_obj.save()
                 # order_models.create_model_data(
@@ -107,7 +107,7 @@ def item_code(request, qr_code):
         return_value['message'] = '商品码格式错误'
         return JsonResponse(return_value)
     
-    qr_code_obj = order_models.ItemQRCode.get_qr_code_obj_by_qr_code(qr_code)
+    qr_code_obj = order_models.ItemQRCode.get_qr_code_obj_by_q_code(qr_code)
     if not qr_code_obj:
         return_value['message'] = '没有记录'
         return JsonResponse(return_value)
@@ -180,16 +180,19 @@ def check_has_item_qr_code(request):
     }
     if request.method == 'GET':
         item_qr_code = request.GET.get('item_qr_code')
+        if not (len(item_qr_code) == 9 and item_qr_code.startswith('U')):
+            return_value['message'] = '当前二维码无效'
+            return JsonResponse(return_value)
         has = order_models.ItemQRCode.check_has_item_qr_code(item_qr_code)
-        if not has:
-            return_value['message'] = '当前二维码无效'
-            return JsonResponse(return_value)
-        elif has.stock_batch_count_id:
-            return_value['message'] = '当前二维码已被录入'
-            return JsonResponse(return_value)
-        elif not (len(item_qr_code) == 9 and item_qr_code.startswith('U')):
-            return_value['message'] = '当前二维码无效'
-            return JsonResponse(return_value)
+        if has:
+            # return_value['message'] = '当前二维码无效'
+            # return JsonResponse(return_value)
+            if has.stock_batch_count_id:
+                return_value['message'] = '当前二维码已被绑定'
+                return JsonResponse(return_value)
+            else:
+                return_value['status'] = 'success'
+                return JsonResponse(return_value)
         else:
             return_value['status'] = 'success'
             return JsonResponse(return_value)
