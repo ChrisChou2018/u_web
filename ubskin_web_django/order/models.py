@@ -5,6 +5,8 @@ from django.forms.models import model_to_dict
 from django.core.paginator import Paginator
 from django.core.paginator import EmptyPage
 from django.db.models import Count
+from django.conf import settings
+
 
 from ubskin_web_django.item import models as item_model
 # Create your models here.
@@ -215,7 +217,7 @@ def get_data_list(model, current_page, search_value=None, order_by="-pk"):
     else:
         data_list = model.objects.filter(status='normal'). \
             order_by(order_by)
-    p = Paginator(data_list, 15)
+    p = Paginator(data_list, settings.PAGINATION_NUM)
     return p.page(current_page).object_list.values()
 
 def get_data_count(model, search_value=None):

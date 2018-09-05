@@ -29,7 +29,7 @@ def Pagingfunc(current_page, all_count, filter_args, uri=None):
         current_page = int(current_page)
     except:
         current_page = 1
-    data_num = 15
+    data_num = settings.PAGINATION_NUM
     a, b = divmod(all_count, data_num)
     if b:
         a = a + 1

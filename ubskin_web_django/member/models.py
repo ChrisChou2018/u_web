@@ -8,6 +8,7 @@ from django.forms.models import model_to_dict
 from django.core.paginator import Paginator
 from django.db.models import Count
 from django.db.models import Q
+from django.conf import settings
 
 from ubskin_web_django.item import models as item_models
 from ubskin_web_django.common import common
@@ -171,7 +172,7 @@ class RecvAddr(models.Model):
                 ).annotate(
                     c = Count('member_id'),
                     ).order_by('-pk')
-        p = Paginator(data_list, 15)
+        p = Paginator(data_list, settings.PAGINATION_NUM)
         data_list = p.page(current_page).object_list
         for i in data_list:
             i['member_name'] =  Member.get_member_by_id(i['member_id']).member_name
@@ -409,7 +410,7 @@ class UserOrder(models.Model):
                 ).annotate(
                     c = Count('order_num'),
                     ).order_by('-pk')
-        p = Paginator(data_list, 15)
+        p = Paginator(data_list, settings.PAGINATION_NUM)
         return p.page(current_page).object_list
     
     @classmethod
@@ -561,7 +562,7 @@ def get_data_list(model, current_page, search_value=None, order_by="-pk", search
     else:
         data_list = model.objects.filter(status='normal'). \
             order_by(order_by)
-    p = Paginator(data_list, 15)
+    p = Paginator(data_list, settings.PAGINATION_NUM)
     return p.page(current_page).object_list.values()
 
 

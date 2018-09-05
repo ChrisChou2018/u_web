@@ -6,6 +6,8 @@ from django.forms import model_to_dict
 from django.conf import settings
 from django.db.models import Q
 from django.db.models import Count
+from django.conf import settings
+
 
 from ubskin_web_django.member import models as member_models
 from ubskin_web_django.ad import models as ad_models
@@ -371,7 +373,7 @@ class Categories(models.Model):
         else:
             obj = cls.objects.all().order_by('-pk')
         
-        p = Paginator(obj, 15)
+        p = Paginator(obj, settings.PAGINATION_NUM)
         return p.page(current_page).object_list.values() 
     
     @classmethod
@@ -450,7 +452,7 @@ class ItemComments(models.Model):
             ).order_by('-comment_id')
         else:
             item_comments_list = cls.objects.filter(status = 'normal').order_by('-comment_id')
-        p = Paginator(item_comments_list, 15)
+        p = Paginator(item_comments_list, settings.PAGINATION_NUM)
         data = p.page(current_page).object_list.values()
         for i in data:
             member_id = i['member_id']
@@ -616,7 +618,7 @@ def get_data_list(model, current_page, search_value=None, order_by="-pk", search
     else:
         data_list = model.objects.filter(status='normal'). \
             order_by(order_by)
-    p = Paginator(data_list, 15)
+    p = Paginator(data_list, settings.PAGINATION_NUM)
     return p.page(current_page).object_list.values()
 
 def get_data_count(model, search_value=None, search_value_type='dict'):

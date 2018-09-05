@@ -161,3 +161,5 @@ FIXTURE_DIRS = (
    os.path.join(BASE_DIR, 'ubskin_web_django/item/fixtures/'),
    os.path.join(BASE_DIR, 'ubskin_web_django/order/fixtures/'),
 )
+
+PAGINATION_NUM = 30
