@@ -7,6 +7,7 @@ from django.http import JsonResponse
 from django.forms.models import model_to_dict
 from django.shortcuts import render
 from django.conf import settings
+from django.utils import timezone
 
 from ubskin_web_django.order import models as order_models
 from ubskin_web_django.item import models as item_models
@@ -171,7 +172,7 @@ def create_stock_bach(request):
                 "stock_batch_id": stock_batch_id,
                 "recv_code": recv_code,
                 "create_user": create_user_id,
-                "create_time": int(time.time())
+                "create_time": int(timezone.now().timestamp())
             }
         )
         if item_codes_dict:

@@ -9,6 +9,7 @@ from django.core.paginator import Paginator
 from django.db.models import Count
 from django.db.models import Q
 from django.conf import settings
+from django.utils import timezone
 
 from ubskin_web_django.item import models as item_models
 from ubskin_web_django.common import common
@@ -55,8 +56,8 @@ class Member(AbstractBaseUser, PermissionsMixin):
     status              = models.CharField(db_column="status", default='normal', max_length=255)
     sessions            = models.CharField(db_column="sessions", max_length=255, null=True, blank=True)
     created_ip          = models.CharField(db_column="created_ip", null=True, blank=True, max_length=255)
-    create_time         = models.IntegerField(db_column="create_time", default=int(time.time()))
-    update_time         = models.IntegerField(db_column="update_time", default=int(time.time()))
+    create_time         = models.IntegerField(db_column="create_time", default=int(timezone.now().timestamp()))
+    update_time         = models.IntegerField(db_column="update_time", default=int(timezone.now().timestamp()))
     is_active           = models.BooleanField(default=True)
     is_admin            = models.BooleanField(default=False)
     is_staff            = models.BooleanField(default=True)
@@ -243,7 +244,7 @@ class UserOrder(models.Model):
     is_comment              = models.BooleanField(db_column="is_comment", verbose_name="是否评价", default=False)
     recv_addr_id            = models.BigIntegerField(db_column="recv_addr", verbose_name="到货地址ID", null=True, blank=True)
     member_message          = models.CharField(db_column="member_message", verbose_name="用户留言", max_length=1000, null=True, blank=True)
-    create_time             = models.IntegerField(db_column="create_time", verbose_name="创建时间", default=int(time.time()))
+    create_time             = models.IntegerField(db_column="create_time", verbose_name="创建时间", default=int(timezone.now().timestamp()))
     pay_time                = models.IntegerField(db_column="pay_time", verbose_name="支付时间", null=True, blank=True)
     status                  = models.CharField(db_column="status", verbose_name="状态", default="normal", max_length=255)
 
@@ -476,7 +477,7 @@ class UserCollectionItem(models.Model):
     user_collection_id = models.AutoField(db_column="user_collection_id", verbose_name="用户收藏商品id", primary_key=True)
     member_id = models.BigIntegerField(db_column="member_id", verbose_name="用户ID")
     item_id = models.BigIntegerField(db_column="item_id", verbose_name="商品ID", null=True, blank=True)
-    create_time = models.IntegerField(db_column="create_time", verbose_name="创建时间", default=int(time.time()))
+    create_time = models.IntegerField(db_column="create_time", verbose_name="创建时间", default=int(timezone.now().timestamp()))
     status = models.CharField(db_column="status", verbose_name="状态", default="normal", max_length=255)
 
 

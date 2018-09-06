@@ -6,6 +6,7 @@ from django.db.models import Q
 from django.db.models import Count
 from django.utils.functional import lazy
 from django.conf import settings
+from django.utils import timezone
 
 from ubskin_web_django.common import common
 
@@ -23,7 +24,7 @@ class Campaigns(models.Model):
     campaigns_photo_id = models.CharField(db_column="campaigns_photo_id", verbose_name="活动图片ID", max_length=255, null=True, blank=True)
     title_photo_id = models.CharField(db_column="title_photo_id", verbose_name="活动内顶部图片ID", max_length=255, null=True, blank=True)
     status = models.CharField(db_column="status", verbose_name="数据状态", default="normal", max_length=255)
-    create_time = models.IntegerField(db_column="create_time", verbose_name="活动创建时间", default=int(time.time()))
+    create_time = models.IntegerField(db_column="create_time", verbose_name="活动创建时间", default=int(timezone.now().timestamp()))
 
 
     class Meta:
@@ -72,7 +73,7 @@ class CampaignItems(models.Model):
     campaign_id = models.BigIntegerField(db_column="campaign_id", verbose_name="活动ID")
     item_id = models.BigIntegerField(db_column="item_id", verbose_name="商品ID")
     status = models.CharField(db_column="status", verbose_name="数据状态", default="normal", max_length=255)
-    create_time = models.IntegerField(db_column="create_time", verbose_name="活动创建时间", default=int(time.time()))
+    create_time = models.IntegerField(db_column="create_time", verbose_name="活动创建时间", default=int(timezone.now().timestamp()))
 
 
     class Meta:

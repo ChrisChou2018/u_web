@@ -7,6 +7,7 @@ from django.conf import settings
 from django.db.models import Q
 from django.db.models import Count
 from django.conf import settings
+from django.utils import timezone
 
 
 from ubskin_web_django.member import models as member_models
@@ -105,9 +106,9 @@ class Items(models.Model):
     weight                      = models.CharField(db_column="weight", null=True, blank=True, verbose_name="重量", max_length=255)
     campaign_id                 = models.IntegerField(db_column="campaign_id", null=True, blank=True, verbose_name="活动ID")
     create_person               = models.CharField(db_column="create_person", verbose_name="创建人", max_length=255)
-    create_time                 = models.IntegerField(db_column="create_time", verbose_name="创建时间", default=int(time.time()))
+    create_time                 = models.IntegerField(db_column="create_time", verbose_name="创建时间", default=int(timezone.now().timestamp()))
     update_person               = models.CharField(db_column="update_person", null=True, blank=True, verbose_name="更新人", max_length=255)
-    update_time                 = models.IntegerField(db_column="update_time", verbose_name="更新时间", default=int(time.time()))
+    update_time                 = models.IntegerField(db_column="update_time", verbose_name="更新时间", default=int(timezone.now().timestamp()))
     stock_count                 = models.IntegerField(db_column="stock_count", verbose_name="库存", default=0, null=True, blank=True)
     status                      = models.CharField(db_column="status", verbose_name="状态", default="normal", max_length=255)
     photo_id                    = models.CharField(db_column="photo_id", verbose_name="图片名", max_length=255, null=True, blank=True)
@@ -432,7 +433,7 @@ class ItemComments(models.Model):
     item_id         = models.BigIntegerField(db_column="item_id", verbose_name="所属商品ID")
     order_num       = models.CharField(db_column="order_num", verbose_name="订单号", null=True, blank=True, max_length=255)
     comment_content = models.CharField(max_length=255, db_column="comment_content", verbose_name="评论内容")
-    create_time     = models.IntegerField(db_column="create_time", verbose_name="创建时间", default=int(time.time()))
+    create_time     = models.IntegerField(db_column="create_time", verbose_name="创建时间", default=int(timezone.now().timestamp()))
     start_choices   = (
         (1, '1星'),
         (2, '2星'),
@@ -594,7 +595,7 @@ class ShoppingCart(models.Model):
     shopping_cart_id        = models.AutoField(db_column="shopping_cart_id", verbose_name="购物车ID", primary_key=True)
     member_id               = models.BigIntegerField(db_column="member_id", verbose_name="用户ID")
     shopping_cart_info      = models.CharField(db_column="item_info", verbose_name="购物车信息(维护一个json字典)", max_length=10000, null=True, blank=True)
-    create_time             = models.IntegerField(db_column="create_time", verbose_name="创建时间", default=int(time.time()))
+    create_time             = models.IntegerField(db_column="create_time", verbose_name="创建时间", default=int(timezone.now().timestamp()))
     pay_status              = models.CharField(db_column="pay_status", verbose_name="支付状态", max_length=255, default='not_pay')
 
 
