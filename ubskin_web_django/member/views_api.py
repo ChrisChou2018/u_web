@@ -12,6 +12,7 @@ from django.conf import settings
 from django.contrib.auth import authenticate
 from django.contrib.auth import login
 from django.contrib.auth import logout
+from django.utils import timezone
 
 from ubskin_web_django.common import decorators
 from ubskin_web_django.member import models as member_models
@@ -374,7 +375,7 @@ def create_user_order(request):
                 break
         for i in order_info:
             i.update({
-                'create_time': int(time.time()),
+                'create_time': int(timezone.now().timestamp()),
                 'member_id': member.member_id,
                 'recv_addr_id': recv_addr_id,
                 'order_num': order_num,

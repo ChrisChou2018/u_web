@@ -5,6 +5,7 @@ import time
 
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
+from django.utils import timezone
 
 from ubskin_web_django.order import models as order_models
 from ubskin_web_django.member import models as member_models
@@ -62,7 +63,7 @@ def create_stock_batch_api(request):
                 "stock_batch_id": stock_batch_id,
                 "recv_code": recv_code,
                 "create_user": member.member_id,
-                "create_time": int(time.time()),
+                "create_time": int(timezone.now().timestamp()),
             }
         )
         for key, item in item_codes_dict.items():

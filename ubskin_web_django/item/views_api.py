@@ -8,6 +8,7 @@ from django import forms
 from django.http import JsonResponse
 from django.conf import settings
 from django.forms.models import model_to_dict
+from django.utils import timezone
 
 from ubskin_web_django.common import photo
 from ubskin_web_django.common import decorators
@@ -326,7 +327,7 @@ def shopping_cart(request):
                 item_models.ShoppingCart,
                 {'member_id': member.member_id,
                 'shopping_cart_info': json.dumps(shopping_cart_info),
-                'create_time': int(time.time(),)}
+                'create_time': int(timezone.now().timestamp())}
             )
             return_value['status'] = 'success'
             return JsonResponse(return_value)
