@@ -5,6 +5,8 @@ from django.forms.models import model_to_dict
 from django.core.paginator import Paginator
 from django.core.paginator import EmptyPage
 from django.db.models import Count
+from django.conf import settings
+
 
 from ubskin_web_django.item import models as item_model
 # Create your models here.
@@ -140,15 +142,8 @@ class ItemQRCode(models.Model):
         return cls.objects.filter(batch_qr_code_id=batch_qr_code_id).count()
     
     @classmethod
-    def get_qr_code_obj_by_qr_code(cls, qr_code):
-        return cls.objects.get_or_create(qr_code=qr_code)
-       
-    @classmethod
-    def get_qr_code_obj_by_q_code(cls, qr_code):
-        try:
-            return cls.objects.get(qr_code=qr_code)
-        except cls.DoesNotExist:
-            return None
+    def get_qr_code_obj_by_qr_code(cls, qr_code): 
+        return cls.objects.filter(qr_code=qr_code).first()
 
     @classmethod
     def delete_item_qr_code_by_sb_count_id(cls, data_id_list):
@@ -221,7 +216,7 @@ def get_data_list(model, current_page, search_value=None, order_by="-pk"):
     else:
         data_list = model.objects.filter(status='normal'). \
             order_by(order_by)
-    p = Paginator(data_list, 15)
+    p = Paginator(data_list, settings.PAGINATION_NUM)
     return p.page(current_page).object_list.values()
 
 def get_data_count(model, search_value=None):

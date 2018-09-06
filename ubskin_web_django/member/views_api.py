@@ -131,7 +131,7 @@ def wx_signin(request):
             else:
                 return wx_regist_member(return_value, openid, name, avatar, session_key)
         else:
-            return_value['message'] = '微信接口验证出错,请重新登陆'
+            return_value['message'] = '微信接口验证出错,请重新登录'
             return_value['error_code'] = error_code['wx_signin_config']
             return JsonResponse(return_value)
 
