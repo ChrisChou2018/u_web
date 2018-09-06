@@ -6,7 +6,7 @@ from django.core.paginator import Paginator
 from django.core.paginator import EmptyPage
 from django.db.models import Count
 from django.conf import settings
-
+from django.utils import timezone
 
 from ubskin_web_django.item import models as item_model
 # Create your models here.
@@ -54,7 +54,7 @@ class StockBatch(models.Model):
     stock_id                = models.AutoField(db_column='stock_id', primary_key=True, verbose_name='stock_id')
     stock_batch_id          = models.CharField(db_column="stock_batch_id", verbose_name='库存单号', max_length=255)
     recv_code               = models.CharField(db_column="recv_code", verbose_name='到达商家地点代码', max_length=255)
-    create_time             = models.IntegerField(db_column="create_time", verbose_name="创建时间", default=int(time.time()))
+    create_time             = models.IntegerField(db_column="create_time", verbose_name="创建时间", default=int(timezone.now().timestamp()))
     create_user             = models.BigIntegerField(db_column='create_user', verbose_name='创建用户', null=True, blank=True)
     status                  = models.CharField(db_column="status", default='normal', max_length=255)
 
@@ -188,7 +188,7 @@ class BatchQrCode(models.Model):
     batch_qr_code_id = models.AutoField(db_column='batch_code_id', primary_key=True, verbose_name='二维码批次ID')
     code_count = models.IntegerField(db_column='code_count', verbose_name='二维码数量')
     create_member = models.BigIntegerField(db_column='create_member', verbose_name='创建用户')
-    create_time = models.IntegerField(db_column="create_time", verbose_name="创建时间", default=int(time.time()))
+    create_time = models.IntegerField(db_column="create_time", verbose_name="创建时间", default=int(timezone.now().timestamp()))
     message = models.TextField(db_column="message", verbose_name='备注信息', null=True, blank=True,)
     recv_code = models.CharField(db_column="recv_code", verbose_name='店铺码', max_length=255, null=True, blank=True,)
     status = models.CharField(db_column="status", default='normal', max_length=255)
