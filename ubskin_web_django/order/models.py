@@ -144,7 +144,7 @@ class ItemQRCode(models.Model):
     @classmethod
     def get_qr_code_obj_by_qr_code(cls, qr_code): 
         return cls.objects.filter(qr_code=qr_code).first()
-       
+
     @classmethod
     def delete_item_qr_code_by_sb_count_id(cls, data_id_list):
         cls.objects.filter(stock_batch_count_id__in=data_id_list).update(status='deleted')
@@ -207,7 +207,6 @@ class BatchQrCode(models.Model):
             recv_code = '绑定店铺',
             more = '更多'
         )
-
 
 
 def get_data_list(model, current_page, search_value=None, order_by="-pk"):
