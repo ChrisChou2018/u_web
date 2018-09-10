@@ -16,29 +16,27 @@
 {% block content_title %}
 
 <div class="row">
-    <div class="col-md-8">
+    <form action="" class="select_form" method="GET">
         <div class="col-md-8">
-            <form action="" class="select_form" method="GET">
-                <select name="order_value" class="form-control">
-                    <option value="">--排序条件--</option>
-                    <option value="is_watch" {% if form_data.order_value == 'is_watch' %} selected {% endif %}>按重点关注</option>
-                </select>
-            </form>
+            <div class="col-md-8">
+                    <select name="order_value" class="form-control">
+                        <option value="">--排序条件--</option>
+                        <option value="is_watch" {% if form_data.order_value == 'is_watch' %} selected {% endif %}>按重点关注</option>
+                    </select>
+            </div>
+            <div class="col-md-4">
+
+            </div>
         </div>
         <div class="col-md-4">
-
-        </div>
-    </div>
-    <div class="col-md-4">
-        <form action="" method="GET" class="search_input" >
             <div class="input-group">
                 <input type="text" class="form-control" placeholder="搜索品牌" name="search_value" value="{{ form_data.search_value }}">
                 <span class="input-group-btn">
                     <button class="btn btn-default search_input_btn" type="submit">搜索</button>
                 </span>
             </div><!-- /input-group -->
-        </form>
-    </div>
+        </div>
+    </form>
 </div>
 <br>
 <br>
