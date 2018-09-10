@@ -71,7 +71,12 @@ class UserCreationFormWX(forms.ModelForm):
         return user
 
 def wx_regist_member(return_value, openid, name, avatar, session_key=None):
-    user_data = {'wx_openid': openid, 'member_name': name, 'avatar': avatar, 'is_staff': False}
+    user_data = {
+        'wx_openid': openid,
+        'member_name': name,
+        'avatar': avatar,
+        'is_staff': False
+    }
     if session_key is not None:
         user_data.update({'sessions': session_key})
     form  = UserCreationFormWX(user_data)

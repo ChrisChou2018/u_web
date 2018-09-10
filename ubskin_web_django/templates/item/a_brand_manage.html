@@ -17,21 +17,34 @@
 
 <div class="row">
     <div class="col-md-8">
-        <div "row">
-            <div class="col-md-8">
-                <form action="" method="GET" class="search_input">
-                <div class="input-group">
-                    <input type="text" class="form-control" placeholder="搜索品牌" name="search_value" value="{{ search_value }}">
-                    <span class="input-group-btn">
-                        <button class="btn btn-default search_input_btn" type="submit">搜索</button>
-                    </span>
-                  </div><!-- /input-group -->
-                </form>
-            </div>
-            <div class="col-md-4">
-
-            </div>
+        <div class="col-md-8">
+            <form action="" class="select_form" method="GET">
+                <select name="order_value" class="form-control">
+                    <option value="">--排序条件--</option>
+                    <option value="is_watch" {% if form_data.order_value == 'is_watch' %} selected {% endif %}>按重点关注</option>
+                </select>
+            </form>
         </div>
+        <div class="col-md-4">
+
+        </div>
+    </div>
+    <div class="col-md-4">
+        <form action="" method="GET" class="search_input" >
+            <div class="input-group">
+                <input type="text" class="form-control" placeholder="搜索品牌" name="search_value" value="{{ form_data.search_value }}">
+                <span class="input-group-btn">
+                    <button class="btn btn-default search_input_btn" type="submit">搜索</button>
+                </span>
+            </div><!-- /input-group -->
+        </form>
+    </div>
+</div>
+<br>
+<br>
+<div class="row">
+    <div class="col-md-8">
+
     </div>
     <div class="col-md-4">
         <a href="{% url 'add_brand' %}" class="btn btn-info" >添加品牌 <span class="glyphicon glyphicon-plus"></span></a>
@@ -143,6 +156,9 @@
                     'json'
                 )
             }
+        })
+        $('select[name="order_value"]').change(function(){
+            $('.select_form').submit()
         })
     })
     function set_brand_watch(cid) {
