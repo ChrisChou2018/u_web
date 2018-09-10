@@ -83,8 +83,14 @@ def create_stock_batch_api(request):
             )
             for i in item:
                 qr_code_obj = order_models.ItemQRCode.get_qr_code_obj_by_qr_code(i)
-                qr_code_obj.stock_batch_count_id = stock_batch_count.stock_batch_count_id
-                qr_code_obj.create_user = member.member_id
+                if qr_code_obj:
+                    qr_code_obj.stock_batch_count_id = stock_batch_count.stock_batch_count_id
+                    qr_code_obj.create_user = member.member_id
+                else:
+                    qr_code_obj = order_models.ItemQRCode.objects.create(
+                        qr_code=i, stock_batch_count_id=stock_batch_count.stock_batch_count_id,
+                        batch_qr_code_id=0, search_count=0, create_user=member.member_id
+                    )
             else:
                 qr_code_obj.save()
                 
