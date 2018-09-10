@@ -91,7 +91,8 @@ def import_item_data(f_path=None):
         db_obj = item_model.Items.get_item_obj_by_barcode(obj["item_barcode"])
         if db_obj:
             # print "Updating obj", obj["product_no"], "..."
-            db_obj.update(**obj)
+            # db_obj.update(**obj)
+            pass
         else:
             # print "Inserting obj", obj["product_no"], "..."
             print(obj)

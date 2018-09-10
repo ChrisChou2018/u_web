@@ -179,10 +179,10 @@ def check_has_item_qr_code(request):
             return_value['message'] = '当前二维码无效'
             return JsonResponse(return_value)
         has = order_models.ItemQRCode.check_has_item_qr_code(item_qr_code)
-        if not has:
-            return_value['message'] = '当前二维码无效'
-            return JsonResponse(return_value)
-        elif has.stock_batch_count_id:
+        # if not has:
+        #     return_value['message'] = '当前二维码无效'
+        #     return JsonResponse(return_value)
+        if has and has.stock_batch_count_id:
             return_value['message'] = '当前二维码已被绑定'
             return JsonResponse(return_value)
         else:
