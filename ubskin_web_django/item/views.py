@@ -26,6 +26,7 @@ def items_manage(request):
             'search_value': 'item_name__icontains',
             'categorie_id': 'categorie_id',
             'campaign_id': 'item_id__in',
+            'brand_name': 'brand_id',
         }
         search_value = dict()
         filter_args = ''
@@ -291,7 +292,7 @@ def brand_manage(request):
     if request.method == 'GET':
         filter_args_dict = {
             'search_value': 'cn_name__icontains',
-            'order_value': 'order_value',
+            'filter_value': 'is_wfilter_valueatch',
         }
         current_page = request.GET.get('page', 1)
         search_value = dict()
@@ -301,8 +302,9 @@ def brand_manage(request):
             GET = request.GET.get
             value = GET(i)
             if value:
-                if i == 'order_value':
-                    order_value = '-{}'.format(value)
+                if i == 'filter_value':
+                    if value == 'is_watch':
+                        search_value.update({'is_watch': True})
                 else:
                     search_value.update({filter_args_dict[i]: value})
                 filter_args += "&{}={}".format(i, value)

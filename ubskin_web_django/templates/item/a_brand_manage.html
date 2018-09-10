@@ -19,10 +19,10 @@
     <form action="" class="select_form" method="GET">
         <div class="col-md-8">
             <div class="col-md-8">
-                    <select name="order_value" class="form-control">
-                        <option value="">--排序条件--</option>
-                        <option value="is_watch" {% if form_data.order_value == 'is_watch' %} selected {% endif %}>按重点关注</option>
-                    </select>
+                <select name="filter_value" class="form-control">
+                    <option value="">--过滤条件--</option>
+                    <option value="is_watch" {% if form_data.filter_value == 'is_watch' %} selected {% endif %}>按重点关注</option>
+                </select>
             </div>
             <div class="col-md-4">
 
@@ -155,7 +155,7 @@
                 )
             }
         })
-        $('select[name="order_value"]').change(function(){
+        $('select[name="filter_value"]').change(function(){
             $('.select_form').submit()
         })
     })

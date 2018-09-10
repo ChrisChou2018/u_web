@@ -46,6 +46,19 @@
                         {% endfor %}
                     </select>
                 </div>
+                <div class="col-md-4" style="padding: 0">
+                    <select name="brand_name" class="form-control filter_select">
+                        <option value="">品牌</option>
+                        {% for i in brand_dict %}
+                            {% str_and_digital i form_data.brand_name as bool_value3 %}
+                            {% if bool_value3 %}
+                                <option value="{{ i }}" selected>{% get_value_by_key brand_dict i %}</option>
+                            {% else %}
+                                <option value="{{ i }}">{% get_value_by_key brand_dict i %}</option>
+                            {% endif %}
+                        {% endfor %}
+                    </select>
+                </div>
             </div>
         </div>
         <div class="col-md-4">
