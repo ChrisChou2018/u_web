@@ -7,6 +7,7 @@ from django.http import JsonResponse
 from django.forms.models import model_to_dict
 from django.shortcuts import render
 from django.conf import settings
+from django.utils import timezone
 
 from ubskin_web_django.order import models as order_models
 from ubskin_web_django.item import models as item_models
@@ -171,7 +172,7 @@ def create_stock_bach(request):
                 "stock_batch_id": stock_batch_id,
                 "recv_code": recv_code,
                 "create_user": create_user_id,
-                "create_time": int(time.time())
+                "create_time": int(timezone.now().timestamp())
             }
         )
         if item_codes_dict:
@@ -241,12 +242,15 @@ def check_has_item_qr_code(request):
     }
     if request.method == 'GET':
         item_qr_code = request.GET.get('item_qr_code')
+        if not (len(item_qr_code) == 9 and item_qr_code.startswith('U')):
+            return_value['message'] = '当前二维码无效'
+            return JsonResponse(return_value)
         has = order_models.ItemQRCode.check_has_item_qr_code(item_qr_code)
         if not has:
             return_value['message'] = '当前二维码无效'
             return JsonResponse(return_value)
         elif has.stock_batch_count_id:
-            return_value['message'] = '当前二维码已被录入'
+            return_value['message'] = '当前二维码已被绑定'
             return JsonResponse(return_value)
         else:
             return_value['status'] = 'success'

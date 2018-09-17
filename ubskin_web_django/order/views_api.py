@@ -5,6 +5,7 @@ import time
 
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
+from django.utils import timezone
 
 from ubskin_web_django.order import models as order_models
 from ubskin_web_django.member import models as member_models
@@ -62,7 +63,7 @@ def create_stock_batch_api(request):
                 "stock_batch_id": stock_batch_id,
                 "recv_code": recv_code,
                 "create_user": member.member_id,
-                "create_time": int(time.time()),
+                "create_time": int(timezone.now().timestamp()),
             }
         )
         for key, item in item_codes_dict.items():
@@ -82,8 +83,14 @@ def create_stock_batch_api(request):
             )
             for i in item:
                 qr_code_obj = order_models.ItemQRCode.get_qr_code_obj_by_qr_code(i)
-                qr_code_obj.stock_batch_count_id = stock_batch_count.stock_batch_count_id
-                qr_code_obj.create_user = member.member_id
+                if qr_code_obj:
+                    qr_code_obj.stock_batch_count_id = stock_batch_count.stock_batch_count_id
+                    qr_code_obj.create_user = member.member_id
+                else:
+                    qr_code_obj = order_models.ItemQRCode.objects.create(
+                        qr_code=i, stock_batch_count_id=stock_batch_count.stock_batch_count_id,
+                        batch_qr_code_id=0, search_count=0, create_user=member.member_id
+                    )
             else:
                 qr_code_obj.save()
                 
@@ -178,13 +185,12 @@ def check_has_item_qr_code(request):
             return_value['message'] = '当前二维码无效'
             return JsonResponse(return_value)
         has = order_models.ItemQRCode.check_has_item_qr_code(item_qr_code)
-        if not has:
-            return_value['message'] = '当前二维码不在数据库中'
+        # if not has:
+        #     return_value['message'] = '当前二维码无效'
+        #     return JsonResponse(return_value)
+        if has and has.stock_batch_count_id:
+            return_value['message'] = '当前二维码已被绑定'
             return JsonResponse(return_value)
         else:
-            if has.stock_batch_count_id:
-                return_value['message'] = '当前二维码已被绑定'
-                return JsonResponse(return_value)
-            else:
-                return_value['status'] = 'success'
-                return JsonResponse(return_value)
+            return_value['status'] = 'success'
+            return JsonResponse(return_value)

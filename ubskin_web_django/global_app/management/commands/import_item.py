@@ -16,6 +16,14 @@ class Command(BaseCommand):
     help = 'Closes the specified poll for voting'
 
     # def add_arguments(self, parser):
-    #     parser.add_argument('poll_id', nargs='+', type=int)
+    #     parser.add_argument(
+    #         '-f',
+    #         '--file',
+    #         action='store',
+    #         dest='file',
+    #         default='None',
+    #         help='input file path',
+    #     )
+
     def handle(self, *args, **options):
         import_item_data.import_item_data()

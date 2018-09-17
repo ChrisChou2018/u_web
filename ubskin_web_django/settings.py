@@ -56,6 +56,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'ubskin_web_django.ad.middleware.test_middleware.MD1'
 ]
 
 ROOT_URLCONF = 'ubskin_web_django.urls'

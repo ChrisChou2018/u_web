@@ -8,6 +8,7 @@ from django import forms
 from django.conf import settings
 from django.forms import model_to_dict
 from django.contrib.auth.decorators import login_required
+from django.utils import timezone
 
 from ubskin_web_django.ad import models as ad_models
 from ubskin_web_django.item import models as item_models
@@ -84,7 +85,7 @@ class AddCampaignForm(forms.ModelForm):
                 end_time = time.mktime(time.strptime(end_time, r'%m/%d/%Y'))
                 model_obj.start_time = start_time
                 model_obj.end_time = end_time
-                model_obj.create_time = int(time.time())
+                model_obj.create_time = int(timezone.now().timestamp())
             model_obj.save()
         return model_obj
 

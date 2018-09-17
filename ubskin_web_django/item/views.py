@@ -26,6 +26,7 @@ def items_manage(request):
             'search_value': 'item_name__icontains',
             'categorie_id': 'categorie_id',
             'campaign_id': 'item_id__in',
+            'brand_name': 'brand_id',
         }
         search_value = dict()
         filter_args = ''
@@ -289,37 +290,55 @@ def item_image_manage(request):
 @login_required(login_url='/myadmin/signin/')
 def brand_manage(request):
     if request.method == 'GET':
+        filter_args_dict = {
+            'search_value': 'cn_name__icontains',
+            'filter_value': 'is_wfilter_valueatch',
+        }
         current_page = request.GET.get('page', 1)
-        value = request.GET.get('search_value', '')
-        filter_args = None
-        if value:
-            filter_args = '&search_value={0}'.format(value)
-            search_value = {"cn_name__icontains": value}
-            brands_list = item_models.get_data_list(
+        search_value = dict()
+        filter_args = ''
+        order_value = None
+        for i in filter_args_dict:
+            GET = request.GET.get
+            value = GET(i)
+            if value:
+                if i == 'filter_value':
+                    if value == 'is_watch':
+                        search_value.update({'is_watch': True})
+                else:
+                    search_value.update({filter_args_dict[i]: value})
+                filter_args += "&{}={}".format(i, value)
+        else:
+            if not filter_args:
+                filter_args = None
+        if search_value:
+            data_list = item_models.get_data_list(
                 item_models.Brands,
                 current_page,
-                search_value
+                search_value,
+                order_by = order_value if order_value else '-pk'
             )
-            brands_count = item_models.get_data_count(
+            data_count = item_models.get_data_count(
                 item_models.Brands,
                 search_value
             )
         else:
-            brands_list = item_models.get_data_list(
+            data_list = item_models.get_data_list(
                 item_models.Brands,
                 current_page,
+                order_by = order_value if order_value else '-pk'
             )
-            brands_count = item_models.get_data_count(
-                item_models.Brands
+            data_count = item_models.get_data_count(
+                item_models.Brands,
             )
         return my_render(
             request,
             'item/a_brand_manage.html',
-            search_value = value,
+            form_data = request.GET,
             current_page = current_page,
             filter_args = filter_args,
-            brands_list = brands_list,
-            brands_count = brands_count,
+            brands_list = data_list,
+            brands_count = data_count,
         )
 
 
